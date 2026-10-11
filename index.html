@@ -218,7 +218,7 @@
             <div class="space-y-4">
               <div>
                 <label class="block text-xs font-semibold text-gray-300 mb-1">ID da Sala:</label>
-                <input id="searchRoomIdInput" type="text" placeholder="Ex: nexora-lobby ou salaandin" onkeydown="if(event.key==='Enter') joinRoomFromSearchTab()" class="w-full bg-[#08090d] border border-pink-500/30 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-pink-400">
+                <input id="searchRoomIdInput" type="text" placeholder="Ex: nex-lobby-principal ou sala-teste" onkeydown="if(event.key==='Enter') joinRoomFromSearchTab()" class="w-full bg-[#08090d] border border-pink-500/30 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-pink-400">
               </div>
               <button onclick="joinRoomFromSearchTab()" class="w-full bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs py-3 rounded-xl transition shadow-[0_0_15px_rgba(255,0,127,0.3)] flex items-center justify-center gap-2">
                 <i class="fa-solid fa-right-to-bracket"></i> ENTRAR NA SALA
@@ -236,7 +236,7 @@
             <div class="space-y-3.5">
               <div>
                 <label class="block text-xs font-semibold text-gray-300 mb-1">ID Único da Sala:</label>
-                <input id="newRoomId" type="text" placeholder="ex: salaandin" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-purple-400">
+                <input id="newRoomId" type="text" placeholder="ex: sala-teste" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-purple-400">
               </div>
               <div>
                 <label class="block text-xs font-semibold text-gray-300 mb-1">Nome da Sala:</label>
@@ -574,7 +574,6 @@
     let currentRoomId = null;
     let pendingJoinRoomId = null;
 
-    // BANCO DE SALAS REGISTRADAS (Simulação Local Persistida)
     let globalRooms = [
       { id: 'nex-lobby-principal', name: 'Lobby Principal Nexora', isPrivate: false, password: '' },
       { id: 'nex-jogos-e-apps', name: 'Transmissão de Jogos e Apps', isPrivate: false, password: '' },
@@ -594,7 +593,7 @@
     window.addEventListener('DOMContentLoaded', () => {
       const savedRooms = localStorage.getItem('nexora_global_rooms');
       if (savedRooms) {
-        globalRooms = JSON.parse(savedRooms);
+        try { globalRooms = JSON.parse(savedRooms); } catch(e) {}
       } else {
         localStorage.setItem('nexora_global_rooms', JSON.stringify(globalRooms));
       }
@@ -738,8 +737,7 @@
       const email = document.getElementById('loginEmail').value.trim();
       const password = document.getElementById('loginPassword').value.trim();
       if (!email || !password) return alert('Informe seu e-mail e senha.');
-      const defaultName = email.split('@')[0];
-      currentUser = { email, nickname: defaultName, isPro: false };
+      currentUser = { email, nickname: email.split('@')[0], isPro: false };
       localStorage.setItem('nexora_current_user', JSON.stringify(currentUser));
       showDashboardView();
     }
@@ -752,7 +750,6 @@
       if (!name || !email || !pass || !birth) return alert('Preencha todos os campos.');
       currentUser = { email, nickname: name, birthDate: birth, isPro: false };
       localStorage.setItem('nexora_current_user', JSON.stringify(currentUser));
-      alert('Conta criada com sucesso na Nexora!');
       showDashboardView();
     }
 
@@ -805,9 +802,7 @@
 
       const cleanId = 'nex-' + roomId.toLowerCase().replace(/[^a-z0-9-_]/g, '');
 
-      // Registra no catálogo global
-      const existing = globalRooms.find(r => r.id === cleanId);
-      if (!existing) {
+      if (!globalRooms.some(r => r.id === cleanId)) {
         globalRooms.push({ id: cleanId, name: roomName, isPrivate, password });
         localStorage.setItem('nexora_global_rooms', JSON.stringify(globalRooms));
       }
@@ -834,7 +829,6 @@
       switchDashboardTab('explore');
     }
 
-    // ARQUITETURA HOST/CONVIDADO COM TRATAMENTO DE ID
     function initPeerRoom(roomId) {
       if (peer) peer.destroy();
       connections = {};
