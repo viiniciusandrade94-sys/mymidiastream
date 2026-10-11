@@ -251,7 +251,7 @@
           </div>
           <div class="px-3 py-1 bg-[#08090d] rounded-lg border border-cyan-500/30 text-xs text-gray-300 flex items-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span id="roomParticipantsInfo">Aguardando Conexão Direta...</span>
+            <span id="roomParticipantsInfo">Conectando à Sala...</span>
           </div>
         </div>
 
@@ -357,12 +357,12 @@
         
         <div class="bg-[#0f111a] border border-cyan-500/30 rounded-2xl p-3.5 shadow-md">
           <h2 class="text-xs font-bold text-white mb-2 flex items-center justify-between uppercase">
-            <span><i class="fa-solid fa-link text-cyan-400"></i> Link Direto da Sala</span>
-            <span id="connectionStatus" class="text-[9px] bg-amber-900/80 text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/30">Criando Sala</span>
+            <span><i class="fa-solid fa-link text-cyan-400"></i> ID Privado da Sala</span>
+            <span id="connectionStatus" class="text-[9px] bg-amber-900/80 text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/30">Iniciando</span>
           </h2>
 
           <div class="flex items-center gap-2 bg-[#08090d] p-1.5 rounded-xl border border-cyan-500/30">
-            <span id="roomLinkDisplay" class="text-[10px] font-mono text-cyan-300 truncate flex-1">Gerando link...</span>
+            <span id="roomLinkDisplay" class="text-[10px] font-mono text-cyan-300 truncate flex-1">Gerando...</span>
             <button onclick="copyRoomLink()" title="Copiar Link" class="text-gray-400 hover:text-white text-xs p-1">
               <i class="fa-solid fa-copy"></i>
             </button>
@@ -376,7 +376,7 @@
           </h2>
 
           <div id="chatMessages" class="flex-1 bg-[#08090d] border border-cyan-500/20 rounded-xl p-2.5 overflow-y-auto mb-2 text-xs space-y-2 max-h-[220px]">
-            <div class="text-gray-500 italic text-center text-[11px]">Canal de chat estabelecido no ID. Fale com seu amigo ou digite <strong>/ia</strong>!</div>
+            <div class="text-gray-500 italic text-center text-[11px]">Canal de chat P2P sincronizado! Fale com seu amigo ou digite <strong>/ia</strong>!</div>
           </div>
 
           <input type="file" id="deviceImageInput" accept="image/*" class="hidden" onchange="handleDeviceImageUpload(event)">
@@ -446,20 +446,21 @@
     let currentUser = null;
     let isPro = false;
     let peer = null;
-    let activeConnection = null;
+    let connections = {}; // Mapeia todas as conexões ativas na sala Mesh
     let localStream = null;
     let ytPlayer = null;
     let isYtReady = false;
     let isCinema = false;
     let currentRoomId = null;
-    let connectionTimeout = null;
 
+    // Servidores STUN e TURN Globais de Alta Disponibilidade
     const peerConfig = {
       config: {
         iceServers: [
           { urls: 'stun:stun.l.google.com:19302' },
           { urls: 'stun:stun1.l.google.com:19302' },
-          { urls: 'stun:stun2.l.google.com:19302' }
+          { urls: 'stun:stun2.l.google.com:19302' },
+          { urls: 'stun:global.stun.twilio.com:3478' }
         ]
       }
     };
@@ -577,8 +578,7 @@
 
     function returnToDashboard() {
       if (peer) peer.destroy();
-      activeConnection = null;
-      if (connectionTimeout) clearTimeout(connectionTimeout);
+      connections = {};
       const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
       window.history.replaceState({path: newUrl}, '', newUrl);
       document.getElementById('roomView').classList.add('hidden');
@@ -587,67 +587,64 @@
 
     function initPeerRoom(roomId) {
       if (peer) peer.destroy();
+      connections = {};
 
-      peer = new Peer(roomId, peerConfig);
+      // ID único dinâmico para evitar conflitos de 'unavailable-id'
+      const myUniquePeerId = roomId + "-" + Math.random().toString(36).substring(2, 7);
+      peer = new Peer(myUniquePeerId, peerConfig);
 
       peer.on('open', (id) => {
-        document.getElementById('connectionStatus').innerText = 'Sala Ativa (Aguardando Amigo)';
-        document.getElementById('connectionStatus').className = 'text-[9px] bg-amber-900/80 text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/30';
-        document.getElementById('roomParticipantsInfo').innerText = 'Sala Pronta (Esperando Conexão)';
-      });
+        document.getElementById('connectionStatus').innerText = 'Sala Ativa';
+        document.getElementById('connectionStatus').className = 'text-[9px] bg-emerald-900/80 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30';
+        document.getElementById('roomParticipantsInfo').innerText = 'Procurando Participantes...';
 
-      peer.on('error', (err) => {
-        if (err.type === 'unavailable-id') {
-          const guestPeerId = roomId + "-guest-" + Math.random().toString(36).substring(2, 6);
-          peer = new Peer(guestPeerId, peerConfig);
-
-          peer.on('open', () => {
-            document.getElementById('connectionStatus').innerText = 'Conectando ao Anfitrião...';
-            connectToHost(roomId);
-          });
-
-          peer.on('connection', (conn) => bindConnection(conn));
-          peer.on('call', (call) => answerVideoCall(call));
-        }
+        // Tenta conectar ao ID Mestre fixo da Sala
+        connectToRoomMaster(roomId);
       });
 
       peer.on('connection', (conn) => bindConnection(conn));
       peer.on('call', (call) => answerVideoCall(call));
     }
 
-    function connectToHost(hostId) {
-      if (activeConnection) {
-        activeConnection.close();
-      }
+    function connectToRoomMaster(roomId) {
+      // Conecta no Master da sala para registrar presença
+      const masterConn = peer.connect(roomId, { reliable: true });
+      
+      masterConn.on('open', () => {
+        bindConnection(masterConn);
+      });
 
-      const conn = peer.connect(hostId, { reliable: true });
-      bindConnection(conn);
+      masterConn.on('error', () => {
+        // Se o Master não existir, registramos este usuário no Master da Sala
+        registerAsRoomMaster(roomId);
+      });
+    }
 
-      // Sistema de Auto-Retry caso a conexão fique pendente por mais de 3.5 segundos
-      if (connectionTimeout) clearTimeout(connectionTimeout);
-      connectionTimeout = setTimeout(() => {
-        if (!activeConnection || !activeConnection.open) {
-          console.warn("Tentando reconectar ao anfitrião...");
-          connectToHost(hostId);
-        }
-      }, 3500);
+    function registerAsRoomMaster(roomId) {
+      const masterPeer = new Peer(roomId, peerConfig);
+
+      masterPeer.on('open', () => {
+        document.getElementById('roomParticipantsInfo').innerText = 'Aguardando Amigo Conectar...';
+      });
+
+      masterPeer.on('connection', (conn) => bindConnection(conn));
+      masterPeer.on('call', (call) => answerVideoCall(call));
     }
 
     function bindConnection(conn) {
-      activeConnection = conn;
+      connections[conn.peer] = conn;
 
       conn.on('open', () => {
-        if (connectionTimeout) clearTimeout(connectionTimeout);
         document.getElementById('connectionStatus').innerText = 'Conectado à Sala!';
         document.getElementById('connectionStatus').className = 'text-[9px] bg-emerald-900/80 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30';
         
+        // Troca de nomes entre os dois lados
         conn.send({ type: 'nickname', name: currentUser.nickname });
 
+        // Se você já tiver a partilha de ecrã ligada, envia para a nova conexão de imediato
         if (localStream) {
           const call = peer.call(conn.peer, localStream);
-          call.on('stream', (remoteStream) => {
-            handleRemoteStream(remoteStream);
-          });
+          call.on('stream', (remoteStream) => handleRemoteStream(remoteStream));
         }
       });
 
@@ -661,11 +658,10 @@
         if (data.type === 'nickname') {
           document.getElementById('remoteStreamLabel').innerText = `Tela de ${data.name}`;
           document.getElementById('roomParticipantsInfo').innerText = `Conectado com ${data.name}`;
-          document.getElementById('remoteStatusText').innerText = `${data.name} não está transmitindo no momento.`;
+          document.getElementById('remoteStatusText').innerText = `${data.name} não está a transmitir no momento.`;
 
-          if (activeConnection && activeConnection.open) {
-            activeConnection.send({ type: 'nickname_ack', name: currentUser.nickname });
-          }
+          conn.send({ type: 'nickname_ack', name: currentUser.nickname });
+
           if (localStream) {
             peer.call(conn.peer, localStream);
           }
@@ -679,6 +675,7 @@
       });
 
       conn.on('close', () => {
+        delete connections[conn.peer];
         document.getElementById('connectionStatus').innerText = 'Amigo Desconectou';
         document.getElementById('connectionStatus').className = 'text-[9px] bg-pink-900/80 text-pink-300 px-2 py-0.5 rounded-full border border-pink-500/30';
         document.getElementById('remoteVideo').classList.add('hidden');
@@ -712,9 +709,7 @@
     function sendSticker(imgUrl) {
       const myName = currentUser ? currentUser.nickname : 'Visitante';
       appendChatMessage(myName, imgUrl, true);
-      if (activeConnection && activeConnection.open) {
-        activeConnection.send({ type: 'chat', sender: myName, text: imgUrl, isSticker: true });
-      }
+      broadcastData({ type: 'chat', sender: myName, text: imgUrl, isSticker: true });
       toggleStickerPicker();
     }
 
@@ -727,9 +722,7 @@
         const base64Img = e.target.result;
         const myName = currentUser ? currentUser.nickname : 'Visitante';
         appendChatMessage(myName, base64Img, true);
-        if (activeConnection && activeConnection.open) {
-          activeConnection.send({ type: 'chat', sender: myName, text: base64Img, isSticker: true });
-        }
+        broadcastData({ type: 'chat', sender: myName, text: base64Img, isSticker: true });
       };
       reader.readAsDataURL(file);
     }
@@ -742,9 +735,7 @@
       const myName = currentUser ? currentUser.nickname : 'Visitante';
       appendChatMessage(myName, text, false);
 
-      if (activeConnection && activeConnection.open) {
-        activeConnection.send({ type: 'chat', sender: myName, text: text, isSticker: false });
-      }
+      broadcastData({ type: 'chat', sender: myName, text: text, isSticker: false });
       input.value = '';
 
       if (text.toLowerCase().startsWith('/ia')) {
@@ -761,16 +752,21 @@
           chatBox.lastChild.remove();
           
           appendChatMessage('🤖 Gemini AI', aiResponse);
-          
-          if (activeConnection && activeConnection.open) {
-            activeConnection.send({ type: 'ai_response', sender: '🤖 Gemini AI', text: aiResponse });
-          }
+          broadcastData({ type: 'ai_response', sender: '🤖 Gemini AI', text: aiResponse });
         } catch (e) {
           const chatBox = document.getElementById('chatMessages');
           chatBox.lastChild.remove();
           appendChatMessage('🤖 Gemini AI', 'Erro ao obter resposta.');
         }
       }
+    }
+
+    function broadcastData(data) {
+      Object.values(connections).forEach(conn => {
+        if (conn && conn.open) {
+          conn.send(data);
+        }
+      });
     }
 
     async function getGeminiAIResponse(prompt) {
@@ -804,9 +800,7 @@
 
     function sendEmoji(emoji) {
       showFloatingEmoji(emoji);
-      if (activeConnection && activeConnection.open) {
-        activeConnection.send({ type: 'emoji', emoji: emoji });
-      }
+      broadcastData({ type: 'emoji', emoji: emoji });
     }
 
     function showFloatingEmoji(emoji) {
@@ -882,12 +876,11 @@
         displayLocalStream(localStream);
         document.getElementById('btnStartStream').innerHTML = `<i class="fa-solid fa-stop"></i> PARAR PARTILHA`;
 
-        if (activeConnection && activeConnection.peer) {
-          const call = peer.call(activeConnection.peer, localStream);
-          call.on('stream', (remoteStream) => {
-            handleRemoteStream(remoteStream);
-          });
-        }
+        // Transmite o vídeo para todas as conexões ativas na sala Mesh
+        Object.keys(connections).forEach(peerId => {
+          const call = peer.call(peerId, localStream);
+          call.on('stream', (remoteStream) => handleRemoteStream(remoteStream));
+        });
 
         localStream.getVideoTracks()[0].onended = () => { toggleScreenShare(); };
       } catch (err) { console.error("Erro ao partilhar ecrã:", err); }
@@ -960,9 +953,7 @@
       if (action === 'play') ytPlayer.playVideo();
       if (action === 'pause') ytPlayer.pauseVideo();
 
-      if (activeConnection && activeConnection.open) {
-        activeConnection.send({ type: 'ytSync', action: action, time: currentTime, videoId: extraData });
-      }
+      broadcastData({ type: 'ytSync', action: action, time: currentTime, videoId: extraData });
     }
 
     function handleRemoteYtSync(data) {
