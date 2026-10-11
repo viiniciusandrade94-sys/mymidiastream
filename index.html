@@ -200,3 +200,773 @@
           <label class="block text-[11px] text-gray-300 mb-1 font-semibold">ID da Sala:</label>
           <input id="dashRoomIdInput" type="text" placeholder="Ex: sala-gamer-1" class="w-full bg-[#08090d] border border-pink-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:border-pink-400">
         </div>
+        <button onclick="createOrJoinRoom()" class="w-full bg-pink-600 hover:bg-pink-500 text-white text-xs font-bold py-2.5 rounded-xl transition mt-4 shadow-[0_0_10px_rgba(255,0,127,0.3)]">
+          <i class="fa-solid fa-right-to-bracket"></i> Entrar na Sala Privada
+        </button>
+      </div>
+
+      <!-- Card 3: Plano PRO & OBS Studio -->
+      <div class="bg-[#0f111a] border border-cyan-500/30 rounded-2xl p-5 flex flex-col justify-between">
+        <div>
+          <h3 class="text-sm font-bold text-amber-400 mb-3 uppercase flex items-center gap-2">
+            <i class="fa-solid fa-crown"></i> Plano PRO & OBS Studio
+          </h3>
+          <p class="text-xs text-gray-400 mb-3">Desbloqueie transmissões em 4K, 240 FPS e chave dedicada do OBS Studio.</p>
+          
+          <div class="bg-[#08090d] p-2.5 rounded-xl border border-cyan-500/20 text-[11px] space-y-1.5 font-mono">
+            <div class="text-gray-400">Servidor RTMP: <span class="text-cyan-300">rtmp://stream.mymidiastream.br/live</span></div>
+            <div class="text-gray-400">Chave OBS: <span id="dashObsKey" class="text-amber-300">mms_key_live_99</span></div>
+          </div>
+        </div>
+
+        <button id="dashProBtn" onclick="openCheckoutModal()" class="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-black font-extrabold text-xs py-2.5 rounded-xl transition mt-4 shadow-[0_0_10px_rgba(255,183,0,0.3)]">
+          <i class="fa-solid fa-bolt"></i> Obter Licença PRO
+        </button>
+      </div>
+
+    </main>
+  </div>
+
+
+  <!-- ================= TELA DA SALA DE TRANSMISSÃO ================= -->
+  <div id="roomView" class="hidden min-h-screen flex flex-col">
+    <!-- Header Sala -->
+    <header class="border-b border-cyan-500/20 bg-[#0f111a]/90 backdrop-blur-md py-3 px-6 flex justify-between items-center z-30">
+      <div class="flex items-center space-x-3">
+        <button onclick="returnToDashboard()" class="text-cyan-400 hover:text-white text-xs bg-[#08090d] px-3 py-1.5 rounded-xl border border-cyan-500/30 flex items-center gap-1.5 font-bold">
+          <i class="fa-solid fa-arrow-left"></i> Voltar à Dashboard
+        </button>
+        <h1 class="text-sm font-black tracking-wider text-gradient-neon">SALA PRIVADA: <span id="currentRoomTitle" class="text-white">...</span></h1>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button onclick="toggleCinemaMode()" id="btnCinema" class="bg-[#08090d] border border-pink-500/30 text-pink-400 text-xs py-1.5 px-3 rounded-xl">
+          <i class="fa-solid fa-expand"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Conteúdo da Sala -->
+    <main class="flex-1 p-4 md:p-6 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Coluna Esquerda: Ecrãs em Direto / YouTube -->
+      <div id="leftColumn" class="lg:col-span-2 flex flex-col gap-4">
+        
+        <!-- Seletor Modo & Status -->
+        <div class="flex justify-between items-center bg-[#0f111a] p-2 rounded-xl border border-cyan-500/20 gap-2">
+          <div class="flex flex-1 gap-1">
+            <button id="tabScreen" onclick="switchTab('screen')" class="flex-1 py-1.5 text-xs font-bold rounded-lg bg-cyan-600 text-white transition shadow">
+              <i class="fa-solid fa-desktop"></i> Ecrãs em Direto
+            </button>
+            <button id="tabYoutube" onclick="switchTab('youtube')" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-400 hover:text-white transition">
+              <i class="fa-brands fa-youtube text-red-500"></i> YouTube Sync <span class="text-[9px] bg-pink-500/20 text-pink-400 px-1 py-0.5 rounded">PRO</span>
+            </button>
+          </div>
+          <div class="px-3 py-1 bg-[#08090d] rounded-lg border border-cyan-500/30 text-xs text-gray-300 flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span id="roomParticipantsInfo">Sala Conectada</span>
+          </div>
+        </div>
+
+        <!-- Área dos Vídeos -->
+        <div id="displayArea" class="bg-[#0f111a] border-neon-glow rounded-2xl p-3 relative min-h-[400px] flex items-center justify-center overflow-hidden">
+          
+          <!-- Grid de Transmissões -->
+          <div id="screenView" class="w-full h-full grid grid-cols-1 md:grid-cols-2 gap-3 items-center justify-center">
+            
+            <!-- Local -->
+            <div class="relative bg-black/80 rounded-xl overflow-hidden flex flex-col items-center justify-center min-h-[220px] border border-cyan-500/30">
+              <span id="localStreamLabel" class="absolute top-2 left-2 bg-black/80 text-cyan-300 text-[10px] px-2 py-0.5 rounded font-bold border border-cyan-500/30">Seu Ecrã</span>
+              <button onclick="toggleVideoFullscreen('localVideo')" class="absolute top-2 right-2 bg-black/80 text-white text-xs px-2 py-0.5 rounded border border-cyan-500/20">
+                <i class="fa-solid fa-expand"></i>
+              </button>
+              <video id="localVideo" autoplay playsinline muted class="w-full max-h-[340px] object-contain hidden"></video>
+              <div id="localPlaceholder" class="text-center p-4 text-gray-500 text-xs">
+                <i class="fa-solid fa-desktop text-3xl mb-1 text-cyan-400/40"></i>
+                <p>Sua transmissão está inativa</p>
+              </div>
+            </div>
+
+            <!-- Remoto -->
+            <div class="relative bg-black/80 rounded-xl overflow-hidden flex flex-col items-center justify-center min-h-[220px] border border-pink-500/30">
+              <span id="remoteStreamLabel" class="absolute top-2 left-2 bg-black/80 text-pink-400 text-[10px] px-2 py-0.5 rounded font-bold border border-pink-500/30">Participante</span>
+              <button onclick="toggleVideoFullscreen('remoteVideo')" class="absolute top-2 right-2 bg-black/80 text-white text-xs px-2 py-0.5 rounded border border-pink-500/20">
+                <i class="fa-solid fa-expand"></i>
+              </button>
+              <video id="remoteVideo" autoplay playsinline class="w-full max-h-[340px] object-contain hidden"></video>
+              <div id="remotePlaceholder" class="text-center p-4 text-gray-500 text-xs">
+                <i class="fa-solid fa-user-slash text-3xl mb-1 text-pink-500/30"></i>
+                <p>Nenhum amigo transmitindo</p>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- YouTube Sync -->
+          <div id="youtubeView" class="w-full h-full hidden flex-col items-center absolute inset-3 bg-[#0f111a]">
+            <div class="w-full aspect-video bg-black rounded-xl overflow-hidden relative border border-cyan-500/30">
+              <div id="ytPlayer"></div>
+            </div>
+
+            <div class="w-full mt-2 p-2.5 bg-[#08090d] rounded-xl border border-cyan-500/20 flex flex-col gap-2">
+              <div id="proYtNotice" class="text-xs text-pink-400 bg-pink-500/10 p-2 rounded-lg border border-pink-500/20">
+                <i class="fa-solid fa-lock"></i> Requer licença PRO para controlar sincronização do vídeo.
+              </div>
+
+              <div id="ytControlsPro" class="hidden flex-col gap-2">
+                <div class="flex gap-2">
+                  <input id="ytUrlInput" type="text" placeholder="Cole o link do YouTube..." class="flex-1 bg-[#0f111a] border border-cyan-500/30 rounded-xl px-3 py-1.5 text-xs text-white">
+                  <button onclick="loadProYoutubeVideo()" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded-xl font-bold">
+                    Carregar
+                  </button>
+                </div>
+                <div class="flex items-center justify-between text-xs text-gray-400">
+                  <span class="text-cyan-400 font-bold">Controles Globais PRO:</span>
+                  <div class="flex gap-2">
+                    <button onclick="syncYtAction('play')" class="bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 px-2.5 py-1 rounded-lg font-bold">Play</button>
+                    <button onclick="syncYtAction('pause')" class="bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 px-2.5 py-1 rounded-lg font-bold">Pausa</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Emojis Flutuantes -->
+          <div class="absolute bottom-3 right-3 bg-[#08090d]/90 border border-cyan-500/30 px-3 py-1 rounded-full flex gap-2 shadow-2xl z-20">
+            <button onclick="sendEmoji('❤️')" class="hover:scale-125 transition text-xs">❤️</button>
+            <button onclick="sendEmoji('🔥')" class="hover:scale-125 transition text-xs">🔥</button>
+            <button onclick="sendEmoji('😂')" class="hover:scale-125 transition text-xs">😂</button>
+            <button onclick="sendEmoji('🚀')" class="hover:scale-125 transition text-xs">🚀</button>
+          </div>
+
+        </div>
+
+        <!-- Definições de Transmissão -->
+        <div class="bg-[#0f111a] border border-cyan-500/30 rounded-2xl p-3.5 shadow-md">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+            <div>
+              <label class="block text-[10px] font-medium text-gray-400 mb-1">Resolução do Ecrã</label>
+              <select id="selectResolution" class="w-full bg-[#08090d] border border-cyan-500/30 rounded-xl px-2.5 py-1.5 text-xs text-white">
+                <option value="480">480p SD (Grátis)</option>
+                <option value="720">720p HD (Grátis)</option>
+                <option value="1080" selected>1080p Full HD (Grátis)</option>
+                <option value="1440" class="pro-option text-pink-400" disabled>1440p 2K 🔒 PRO</option>
+                <option value="2160" class="pro-option text-pink-400" disabled>2160p 4K Ultra HD 🔒 PRO</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-medium text-gray-400 mb-1">Taxa de Quadros (FPS)</label>
+              <select id="selectFps" class="w-full bg-[#08090d] border border-cyan-500/30 rounded-xl px-2.5 py-1.5 text-xs text-white" onchange="checkFpsSelection(this)">
+                <option value="30">30 FPS (Grátis)</option>
+                <option value="60" selected>60 FPS (Grátis)</option>
+                <option value="120" class="pro-option text-pink-400">120 FPS 🔒 PRO</option>
+                <option value="240" class="pro-option text-pink-400">240 FPS 🔒 PRO</option>
+              </select>
+            </div>
+          </div>
+
+          <button id="btnStartStream" onclick="toggleScreenShare()" class="w-full btn-neon-gradient text-white font-extrabold text-xs py-2.5 px-4 rounded-xl transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-desktop"></i> INICIAR PARTILHA DE ECRÃ COM ÁUDIO
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Coluna Direita: Link & Chat com Figurinhas (50x50) -->
+      <div id="rightColumn" class="flex flex-col gap-4">
+        
+        <!-- Link de Convite da Sala -->
+        <div class="bg-[#0f111a] border border-cyan-500/30 rounded-2xl p-3.5 shadow-md">
+          <h2 class="text-xs font-bold text-white mb-2 flex items-center justify-between uppercase">
+            <span><i class="fa-solid fa-link text-cyan-400"></i> Link da Sala Privada</span>
+            <span id="connectionStatus" class="text-[9px] bg-pink-900/80 text-pink-300 px-2 py-0.5 rounded-full border border-pink-500/30">Conectando</span>
+          </h2>
+
+          <div class="flex items-center gap-2 bg-[#08090d] p-1.5 rounded-xl border border-cyan-500/30">
+            <span id="roomLinkDisplay" class="text-[10px] font-mono text-cyan-300 truncate flex-1">A gerar link...</span>
+            <button onclick="copyRoomLink()" title="Copiar Link" class="text-gray-400 hover:text-white text-xs p-1">
+              <i class="fa-solid fa-copy"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Chat ao Vivo com Figurinhas 50x50 & IA -->
+        <div class="bg-[#0f111a] border border-cyan-500/30 rounded-2xl p-3.5 flex-1 flex flex-col shadow-md min-h-[320px] relative">
+          <h2 class="text-xs font-bold text-white mb-2 flex items-center justify-between uppercase">
+            <span><i class="fa-solid fa-comments text-cyan-400"></i> Chat do Grupo & IA</span>
+            <span class="text-[9px] text-cyan-400">Use <code>/ia [pergunta]</code></span>
+          </h2>
+
+          <div id="chatMessages" class="flex-1 bg-[#08090d] border border-cyan-500/20 rounded-xl p-2.5 overflow-y-auto mb-2 text-xs space-y-2 max-h-[220px]">
+            <div class="text-gray-500 italic text-center text-[11px]">Chat da sala privada. Converse com amigos ou digite <strong>/ia</strong>!</div>
+          </div>
+
+          <!-- Input arquivo figurinha -->
+          <input type="file" id="deviceImageInput" accept="image/*" class="hidden" onchange="handleDeviceImageUpload(event)">
+
+          <!-- Popover Figurinhas -->
+          <div id="stickerPicker" class="hidden absolute bottom-14 left-3 right-3 bg-[#08090d] border border-cyan-500/40 p-2.5 rounded-xl shadow-2xl z-30 grid grid-cols-4 gap-2">
+            <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHY5eWJreXVnY241OHI1b3R5bHdqdXJkZXBvZXAxaXNmMXdrODR5MSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l3q2K5jinAlChoCLS/giphy.gif" onclick="sendSticker(this.src)" class="w-10 h-10 object-cover rounded cursor-pointer border border-cyan-500/30">
+            <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNndicm95c2RrbjUzeXZrYjE1ejUxeXh6cWV6NDdpcXlneXB1MWo4OSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/26u4cqiYI30juCOGY/giphy.gif" onclick="sendSticker(this.src)" class="w-10 h-10 object-cover rounded cursor-pointer border border-cyan-500/30">
+            <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3Z0bjJvaWtwYm4zeGtwOHdzdTFneXV6aTFneTBqOWtsaDRocTZ3cCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/13CoXDiaCcCoyk/giphy.gif" onclick="sendSticker(this.src)" class="w-10 h-10 object-cover rounded cursor-pointer border border-cyan-500/30">
+            <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbms0bnFlZWZtdTJseWF4cmtyazU5YXlsMTRjOXRneTZrbTV2NmV2bSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKsjLuL324yPBU4/giphy.gif" onclick="sendSticker(this.src)" class="w-10 h-10 object-cover rounded cursor-pointer border border-cyan-500/30">
+          </div>
+
+          <div class="flex gap-1.5 items-center">
+            <button onclick="toggleStickerPicker()" class="text-gray-400 hover:text-cyan-400 text-xs px-1.5 py-1" title="Enviar GIF">
+              <i class="fa-solid fa-face-smile"></i>
+            </button>
+            <button onclick="document.getElementById('deviceImageInput').click()" class="text-gray-400 hover:text-pink-400 text-xs px-1.5 py-1" title="Carregar do Celular/PC (50x50)">
+              <i class="fa-solid fa-image"></i>
+            </button>
+            <input id="chatInput" type="text" placeholder="Escreva ou /ia..." onkeydown="if(event.key==='Enter') sendChatMessage()" class="flex-1 bg-[#08090d] border border-cyan-500/30 rounded-xl px-2.5 py-1.5 text-xs text-white">
+            <button onclick="sendChatMessage()" class="bg-cyan-600 hover:bg-cyan-500 text-white text-xs px-2.5 py-1.5 rounded-xl">
+              <i class="fa-solid fa-paper-plane"></i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+
+  <!-- Modal Checkout / Plano PRO -->
+  <div id="checkoutModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+    <div class="bg-[#0f111a] border-pink-glow rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+      <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      
+      <div class="text-center mb-4">
+        <div class="inline-flex p-3 bg-pink-500/10 text-pink-400 rounded-2xl mb-2 border border-pink-500/30">
+          <i class="fa-solid fa-crown text-2xl"></i>
+        </div>
+        <h3 class="text-base font-bold text-white">M.Y.MIDIASTREAM <span class="text-pink-400">PRO</span></h3>
+        <p class="text-xs text-gray-400 mt-1">Desbloqueie 4K, 240 FPS, Sincronização YouTube e Transmissão OBS.</p>
+      </div>
+
+      <div class="bg-[#08090d] p-3.5 rounded-xl border border-pink-500/30 mb-4 flex justify-between items-center">
+        <div>
+          <span class="text-[11px] text-gray-400 block">Licença Mensal</span>
+          <span class="text-sm font-bold text-white">R$ 19,90 <span class="text-xs text-gray-500 font-normal">/ 30 dias</span></span>
+        </div>
+        <span class="text-[9px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30 font-bold">Ativação Imediata</span>
+      </div>
+
+      <div class="space-y-3 mb-4">
+        <div class="text-center bg-white p-3.5 rounded-xl">
+          <div class="w-24 h-24 mx-auto bg-gray-900 flex items-center justify-center text-pink-400 rounded-lg mb-1">
+            <i class="fa-solid fa-qrcode text-4xl"></i>
+          </div>
+          <span class="text-[10px] text-gray-800 font-mono font-bold">Chave Pix: mymidiastream@pagamento.br</span>
+        </div>
+
+        <button onclick="simulateSuccessfulPayment()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.4)]">
+          <i class="fa-solid fa-bolt"></i> SIMULAR PAGAMENTO APROVADO (PIX)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lógica e Estado do Sistema -->
+  <script>
+    let currentUser = null;
+    let isPro = false;
+    let peer = null;
+    let conn = null;
+    let localStream = null;
+    let ytPlayer = null;
+    let isYtReady = false;
+    let isCinema = false;
+    let remotePeerNickname = "Amigo";
+    let currentRoomId = null;
+
+    const peerConfig = {
+      config: {
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:stun1.l.google.com:19302' },
+          { urls: 'stun:stun2.l.google.com:19302' }
+        ]
+      }
+    };
+
+    // Auto-login se já existia usuário salvo
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedUser = localStorage.getItem('mymidia_current_user');
+      if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        isPro = currentUser.isPro || false;
+        showDashboardView();
+      } else {
+        showAuthScreen();
+      }
+    });
+
+    function switchAuthTab(tab) {
+      if (tab === 'login') {
+        document.getElementById('formLogin').classList.remove('hidden');
+        document.getElementById('formRegister').classList.add('hidden');
+        document.getElementById('tabLoginBtn').className = 'flex-1 py-2 text-xs font-bold rounded-lg bg-cyan-600 text-white transition shadow-[0_0_10px_rgba(0,242,254,0.3)]';
+        document.getElementById('tabRegisterBtn').className = 'flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 hover:text-white transition';
+      } else {
+        document.getElementById('formLogin').classList.add('hidden');
+        document.getElementById('formRegister').classList.remove('hidden');
+        document.getElementById('tabRegisterBtn').className = 'flex-1 py-2 text-xs font-bold rounded-lg bg-cyan-600 text-white transition shadow-[0_0_10px_rgba(0,242,254,0.3)]';
+        document.getElementById('tabLoginBtn').className = 'flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 hover:text-white transition';
+      }
+    }
+
+    function handleLogin() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value.trim();
+
+      if (!email || !password) {
+        return alert('Por favor, informe seu e-mail e senha para entrar.');
+      }
+
+      const defaultNickname = email.split('@')[0];
+      currentUser = { email, nickname: defaultNickname, isPro: false };
+      localStorage.setItem('mymidia_current_user', JSON.stringify(currentUser));
+
+      showDashboardView();
+    }
+
+    function handleRegister() {
+      const email = document.getElementById('regEmail').value.trim();
+      const pass = document.getElementById('regPassword').value.trim();
+      const confirmPass = document.getElementById('regConfirmPassword').value.trim();
+      const birth = document.getElementById('regBirthDate').value;
+
+      if (!email || !pass || !confirmPass || !birth) {
+        return alert('Preencha todos os campos obrigatórios para criar sua conta.');
+      }
+
+      if (pass !== confirmPass) {
+        return alert('A confirmação da senha não coincide com a senha informada.');
+      }
+
+      const defaultNickname = email.split('@')[0];
+      currentUser = { email, nickname: defaultNickname, birthDate: birth, isPro: false };
+      localStorage.setItem('mymidia_current_user', JSON.stringify(currentUser));
+
+      alert('Conta criada com sucesso!');
+      showDashboardView();
+    }
+
+    function handleGoogleLogin() {
+      const randomId = Math.floor(Math.random() * 1000);
+      currentUser = { email: `google_user_${randomId}@gmail.com`, nickname: `GoogleUser_${randomId}`, isPro: false };
+      localStorage.setItem('mymidia_current_user', JSON.stringify(currentUser));
+
+      showDashboardView();
+    }
+
+    function handleLogout() {
+      localStorage.removeItem('mymidia_current_user');
+      currentUser = null;
+      if (peer) peer.destroy();
+      showAuthScreen();
+    }
+
+    function showAuthScreen() {
+      document.getElementById('authScreen').classList.remove('hidden');
+      document.getElementById('dashboardView').classList.add('hidden');
+      document.getElementById('roomView').classList.add('hidden');
+    }
+
+    function showDashboardView() {
+      document.getElementById('authScreen').classList.add('hidden');
+      document.getElementById('dashboardView').classList.remove('hidden');
+      document.getElementById('roomView').classList.add('hidden');
+
+      document.getElementById('dashUserEmail').innerText = currentUser.email;
+      document.getElementById('dashNicknameInput').value = currentUser.nickname;
+
+      if (currentUser.isPro) {
+        document.getElementById('proBadge').classList.remove('hidden');
+      }
+
+      // Se entrou por um link direto (?sala=XYZ), redireciona direto pra sala
+      const urlParams = new URLSearchParams(window.location.search);
+      const roomParam = urlParams.get('sala');
+      if (roomParam) {
+        enterRoom(roomParam);
+      }
+    }
+
+    function saveDashNickname() {
+      const newName = document.getElementById('dashNicknameInput').value.trim();
+      if (!newName) return alert('Informe um nome válido.');
+
+      currentUser.nickname = newName;
+      localStorage.setItem('mymidia_current_user', JSON.stringify(currentUser));
+      alert('Nome de exibição salvo com sucesso!');
+    }
+
+    function createOrJoinRoom() {
+      const roomId = document.getElementById('dashRoomIdInput').value.trim();
+      if (!roomId) return alert('Informe um ID de sala.');
+
+      const cleanId = 'mms-' + roomId.toLowerCase().replace(/[^a-z0-9-_]/g, '');
+      enterRoom(cleanId);
+    }
+
+    function enterRoom(roomId) {
+      currentRoomId = roomId;
+      const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?sala=' + currentRoomId;
+      window.history.replaceState({path: newUrl}, '', newUrl);
+
+      document.getElementById('dashboardView').classList.add('hidden');
+      document.getElementById('roomView').classList.remove('hidden');
+      document.getElementById('currentRoomTitle').innerText = currentRoomId;
+      document.getElementById('roomLinkDisplay').innerText = newUrl;
+
+      initPeerRoom(currentRoomId);
+      loadYouTubeAPI();
+    }
+
+    function returnToDashboard() {
+      if (peer) peer.destroy();
+      const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+      window.history.replaceState({path: newUrl}, '', newUrl);
+
+      document.getElementById('roomView').classList.add('hidden');
+      document.getElementById('dashboardView').classList.remove('hidden');
+    }
+
+    function initPeerRoom(roomId) {
+      if (peer) peer.destroy();
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const isHost = !urlParams.get('sala') || urlParams.get('sala') === roomId;
+
+      const myPeerId = isHost ? roomId : roomId + "-guest-" + Math.random().toString(36).substring(2, 6);
+      peer = new Peer(myPeerId, peerConfig);
+
+      peer.on('open', () => {
+        document.getElementById('connectionStatus').innerText = 'Conectado à Sala';
+        document.getElementById('connectionStatus').className = 'text-[9px] bg-emerald-900/80 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30';
+
+        if (!isHost) {
+          connectToPeerHost(roomId);
+        }
+      });
+
+      peer.on('connection', (connection) => {
+        setupConnectionEvents(connection);
+      });
+
+      peer.on('call', (call) => {
+        call.answer(localStream);
+        call.on('stream', (remoteStream) => {
+          displayRemoteStream(remoteStream);
+        });
+      });
+    }
+
+    function connectToPeerHost(hostId) {
+      const connection = peer.connect(hostId);
+      setupConnectionEvents(connection);
+
+      setTimeout(() => {
+        if (localStream) peer.call(hostId, localStream);
+      }, 1200);
+    }
+
+    function setupConnectionEvents(connection) {
+      conn = connection;
+
+      const handleOpen = () => {
+        document.getElementById('connectionStatus').innerText = 'Conectado com Amigo';
+        const myName = currentUser ? currentUser.nickname : 'Visitante';
+        conn.send({ type: 'nickname', name: myName });
+      };
+
+      if (conn.open) handleOpen();
+      else conn.on('open', handleOpen);
+
+      conn.on('data', (data) => {
+        if (data.type === 'chat') appendChatMessage(data.sender, data.text, data.isSticker);
+        if (data.type === 'nickname') {
+          remotePeerNickname = data.name;
+          document.getElementById('remoteStreamLabel').innerText = `Ecrã de ${remotePeerNickname}`;
+          document.getElementById('roomParticipantsInfo').innerText = `Sala (${currentUser.nickname} & ${remotePeerNickname})`;
+        }
+        if (data.type === 'ytSync') handleRemoteYtSync(data);
+        if (data.type === 'emoji') showFloatingEmoji(data.emoji);
+      });
+    }
+
+    function copyRoomLink() {
+      navigator.clipboard.writeText(document.getElementById('roomLinkDisplay').innerText);
+      alert('Link da sala copiado!');
+    }
+
+    function toggleStickerPicker() {
+      document.getElementById('stickerPicker').classList.toggle('hidden');
+    }
+
+    function sendSticker(imgUrl) {
+      const myName = currentUser ? currentUser.nickname : 'Visitante';
+      appendChatMessage(myName, imgUrl, true);
+      if (conn && conn.open) {
+        conn.send({ type: 'chat', sender: myName, text: imgUrl, isSticker: true });
+      }
+      toggleStickerPicker();
+    }
+
+    function handleDeviceImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64Img = e.target.result;
+        const myName = currentUser ? currentUser.nickname : 'Visitante';
+        appendChatMessage(myName, base64Img, true);
+        if (conn && conn.open) {
+          conn.send({ type: 'chat', sender: myName, text: base64Img, isSticker: true });
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function sendChatMessage() {
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const myName = currentUser ? currentUser.nickname : 'Visitante';
+      appendChatMessage(myName, text, false);
+      if (conn && conn.open) {
+        conn.send({ type: 'chat', sender: myName, text: text, isSticker: false });
+      }
+      input.value = '';
+
+      if (text.toLowerCase().startsWith('/ia')) {
+        const query = text.replace(/^\/ia\s*/i, '');
+        if (!query) {
+          appendChatMessage('🤖 Gemini AI', 'Digite `/ia [pergunta]` para consultar!');
+          return;
+        }
+
+        appendChatMessage('🤖 Gemini AI', 'A processar consulta...');
+        try {
+          const aiResponse = await getGeminiAIResponse(query);
+          const chatBox = document.getElementById('chatMessages');
+          chatBox.lastChild.remove();
+          appendChatMessage('🤖 Gemini AI', aiResponse);
+        } catch (e) {
+          const chatBox = document.getElementById('chatMessages');
+          chatBox.lastChild.remove();
+          appendChatMessage('🤖 Gemini AI', 'Erro ao obter resposta da IA.');
+        }
+      }
+    }
+
+    async function getGeminiAIResponse(prompt) {
+      const p = prompt.toLowerCase();
+      if (p.includes('fivem') || p.includes('lua')) {
+        return 'Em FiveM/Lua, gerencie eventos de forma segura com `RegisterNetEvent` e otimize laços com `Citizen.Wait`.';
+      } else if (p.includes('godot') || p.includes('gdscript')) {
+        return 'No Godot 4, utilize `CharacterBody3D` com a função `move_and_slide()` para movimentação fluida.';
+      }
+      return `Entendi sua dúvida sobre "${prompt}". Como assistente Gemini no M.Y.MIDIASTREAM, estou pronto para ajudar!`;
+    }
+
+    function appendChatMessage(sender, content, isSticker = false) {
+      const chatBox = document.getElementById('chatMessages');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'bg-[#08090d] p-2 rounded-xl border border-cyan-500/20 flex flex-col gap-1 shadow';
+      const isAI = sender.includes('Gemini');
+      const colorClass = isAI ? 'text-amber-400 font-bold' : 'text-cyan-400 font-bold';
+
+      if (isSticker) {
+        msgDiv.innerHTML = `<span class="${colorClass}">${sender}:</span><img src="${content}" style="width: 50px; height: 50px;" class="rounded-lg border border-cyan-500/40 object-cover mt-1 shadow-[0_0_8px_rgba(0,242,254,0.3)]">`;
+      } else {
+        msgDiv.innerHTML = `<span class="${colorClass}">${sender}:</span> <span class="text-gray-200">${content}</span>`;
+      }
+
+      chatBox.appendChild(msgDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function sendEmoji(emoji) {
+      showFloatingEmoji(emoji);
+      if (conn && conn.open) conn.send({ type: 'emoji', emoji: emoji });
+    }
+
+    function showFloatingEmoji(emoji) {
+      const area = document.getElementById('displayArea');
+      const span = document.createElement('span');
+      span.className = 'floating-emoji text-2xl md:text-4xl';
+      span.innerText = emoji;
+      span.style.left = Math.random() * 80 + 10 + '%';
+      area.appendChild(span);
+      setTimeout(() => span.remove(), 2200);
+    }
+
+    function openCheckoutModal() { document.getElementById('checkoutModal').classList.remove('hidden'); document.getElementById('checkoutModal').classList.add('flex'); }
+    function closeCheckoutModal() { document.getElementById('checkoutModal').classList.add('hidden'); document.getElementById('checkoutModal').classList.remove('flex'); }
+
+    function simulateSuccessfulPayment() {
+      isPro = true;
+      currentUser.isPro = true;
+      localStorage.setItem('mymidia_current_user', JSON.stringify(currentUser));
+
+      closeCheckoutModal();
+      activateProUI();
+      alert('Licença PRO ativada!');
+    }
+
+    function activateProUI() {
+      document.getElementById('proBadge').classList.remove('hidden');
+      document.getElementById('proYtNotice').classList.add('hidden');
+      document.getElementById('ytControlsPro').classList.remove('hidden');
+      document.getElementById('ytControlsPro').classList.add('flex');
+
+      document.querySelectorAll('.pro-option').forEach(opt => opt.disabled = false);
+    }
+
+    function checkFpsSelection(selectElem) {
+      const val = parseInt(selectElem.value);
+      if ((val === 120 || val === 240) && !isPro) {
+        alert('As taxas de 120 FPS e 240 FPS são exclusivas da licença PRO!');
+        selectElem.value = "60";
+        openCheckoutModal();
+      }
+    }
+
+    function toggleCinemaMode() {
+      isCinema = !isCinema;
+      const rightCol = document.getElementById('rightColumn');
+      const leftCol = document.getElementById('leftColumn');
+
+      if (isCinema) {
+        rightCol.classList.add('hidden');
+        leftCol.className = 'lg:col-span-3 flex flex-col gap-4';
+      } else {
+        rightCol.classList.remove('hidden');
+        leftCol.className = 'lg:col-span-2 flex flex-col gap-4';
+      }
+    }
+
+    async function toggleScreenShare() {
+      if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+        localStream = null;
+        document.getElementById('localVideo').classList.add('hidden');
+        document.getElementById('localPlaceholder').classList.remove('hidden');
+        document.getElementById('btnStartStream').innerHTML = `<i class="fa-solid fa-desktop"></i> INICIAR PARTILHA DE ECRÃ COM ÁUDIO`;
+        return;
+      }
+
+      const fpsVal = parseInt(document.getElementById('selectFps').value);
+
+      try {
+        localStream = await navigator.mediaDevices.getDisplayMedia({
+          video: { width: { ideal: 1920 }, height: { ideal: 1080 }, frameRate: { ideal: fpsVal } },
+          audio: true
+        });
+
+        displayLocalStream(localStream);
+        document.getElementById('btnStartStream').innerHTML = `<i class="fa-solid fa-stop"></i> PARAR PARTILHA`;
+
+        if (currentRoomId) peer.call(currentRoomId, localStream);
+        if (conn && conn.peer) peer.call(conn.peer, localStream);
+
+        localStream.getVideoTracks()[0].onended = () => { toggleScreenShare(); };
+      } catch (err) { console.error("Erro ao partilhar ecrã:", err); }
+    }
+
+    function displayLocalStream(stream) {
+      const videoElem = document.getElementById('localVideo');
+      videoElem.srcObject = stream;
+      videoElem.muted = true;
+      videoElem.classList.remove('hidden');
+      document.getElementById('localPlaceholder').classList.add('hidden');
+    }
+
+    function displayRemoteStream(stream) {
+      const videoElem = document.getElementById('remoteVideo');
+      videoElem.srcObject = stream;
+      videoElem.muted = false;
+      videoElem.classList.remove('hidden');
+      document.getElementById('remotePlaceholder').classList.add('hidden');
+    }
+
+    function toggleVideoFullscreen(videoId) {
+      const videoElem = document.getElementById(videoId);
+      if (!document.fullscreenElement) {
+        if (videoElem.requestFullscreen) videoElem.requestFullscreen();
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    }
+
+    function switchTab(tab) {
+      if (tab === 'screen') {
+        document.getElementById('screenView').classList.remove('hidden');
+        document.getElementById('youtubeView').classList.add('hidden');
+        document.getElementById('tabScreen').className = 'flex-1 py-1.5 text-xs font-bold rounded-lg bg-cyan-600 text-white transition shadow';
+        document.getElementById('tabYoutube').className = 'flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-400 hover:text-white transition';
+      } else {
+        document.getElementById('screenView').classList.add('hidden');
+        document.getElementById('youtubeView').classList.remove('hidden');
+        document.getElementById('tabYoutube').className = 'flex-1 py-1.5 text-xs font-bold rounded-lg bg-cyan-600 text-white transition shadow';
+        document.getElementById('tabScreen').className = 'flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-400 hover:text-white transition';
+      }
+    }
+
+    function loadYouTubeAPI() {
+      if (window.YT) return;
+      const tag = document.createElement('script');
+      tag.src = "https://www.youtube.com/iframe_api";
+      document.getElementsByTagName('script')[0].parentNode.insertBefore(tag, document.getElementsByTagName('script')[0]);
+    }
+
+    function onYouTubeIframeAPIReady() {
+      ytPlayer = new YT.Player('ytPlayer', {
+        height: '100%', width: '100%', videoId: 'dQw4w9WgXcQ',
+        playerVars: { 'playsinline': 1, 'controls': 1 },
+        events: { 'onReady': () => { isYtReady = true; } }
+      });
+    }
+
+    function extractYtVideoId(url) {
+      const match = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
+      return (match && match[2].length === 11) ? match[2] : null;
+    }
+
+    function loadProYoutubeVideo() {
+      if (!isPro) return;
+      const videoId = extractYtVideoId(document.getElementById('ytUrlInput').value.trim());
+      if (!videoId) return alert('Insira um link do YouTube válido.');
+      if (isYtReady && ytPlayer) {
+        ytPlayer.loadVideoById(videoId);
+        syncYtAction('load', videoId);
+      }
+    }
+
+    function syncYtAction(action, extraData = null) {
+      if (!isPro || !ytPlayer) return;
+      const currentTime = ytPlayer.getCurrentTime();
+      if (action === 'play') ytPlayer.playVideo();
+      if (action === 'pause') ytPlayer.pauseVideo();
+
+      if (conn && conn.open) {
+        conn.send({ type: 'ytSync', action: action, time: currentTime, videoId: extraData });
+      }
+    }
+
+    function handleRemoteYtSync(data) {
+      if (!isYtReady || !ytPlayer) return;
+      if (data.action === 'load' && data.videoId) ytPlayer.loadVideoById(data.videoId);
+      else if (data.action === 'play') { ytPlayer.seekTo(data.time, true); ytPlayer.playVideo(); }
+      else if (data.action === 'pause') { ytPlayer.seekTo(data.time, true); ytPlayer.pauseVideo(); }
+    }
+  </script>
+</body>
+</html>
