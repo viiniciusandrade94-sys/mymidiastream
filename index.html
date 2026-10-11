@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-PT">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>M.Y.MidiaStream - Pro & Sync</title>
+  <title>M.Y.MidiaStream - Pro & Sync Streaming</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- PeerJS para conexões P2P WebRTC -->
@@ -14,50 +14,64 @@
     .bg-dark-custom { background-color: #0d1117; }
     .bg-card-custom { background-color: #161b22; }
     .border-custom { border-color: #30363d; }
+    @keyframes floatUp {
+      0% { transform: translateY(0px) scale(0.8); opacity: 1; }
+      100% { transform: translateY(-350px) scale(1.4); opacity: 0; }
+    .floating-emoji { animation: floatUp 2.5s ease-out forwards; pointer-events: none; position: absolute; bottom: 20px; z-index: 50; }
   </style>
 </head>
-<body class="bg-dark-custom text-gray-200 min-h-screen flex flex-col font-sans">
+<body class="bg-dark-custom text-gray-200 min-h-screen flex flex-col font-sans relative overflow-x-hidden">
 
   <!-- Header / Navbar -->
-  <header class="border-b border-custom bg-card-custom py-4 px-6 flex flex-wrap justify-between items-center gap-4">
+  <header id="mainHeader" class="border-b border-custom bg-card-custom py-4 px-6 flex flex-wrap justify-between items-center gap-4 transition-all duration-300">
     <div class="flex items-center space-x-3">
       <i class="fa-solid fa-play-circle text-indigo-500 text-3xl"></i>
       <h1 class="text-xl font-bold tracking-wide text-white">M.Y.<span class="text-indigo-400">MidiaStream</span></h1>
     </div>
 
-    <!-- Usuário & Apelido -->
+    <!-- Utilizador & Apelido -->
     <div class="flex items-center gap-3 bg-dark-custom px-3 py-1.5 rounded-lg border border-custom">
       <i class="fa-solid fa-user text-gray-400"></i>
-      <input id="nicknameInput" type="text" value="Usuário_Guest" class="bg-transparent text-sm text-white focus:outline-none w-32 border-b border-transparent focus:border-indigo-500" title="Clique para editar o seu apelido">
-      <span id="proBadge" class="hidden bg-gradient-to-r from-amber-500 to-yellow-400 text-black text-xs font-extrabold px-2 py-0.5 rounded-full uppercase">PRO</span>
+      <input id="nicknameInput" type="text" value="Visitante" class="bg-transparent text-sm text-white focus:outline-none w-32 border-b border-transparent focus:border-indigo-500" title="Clique para editar o seu apelido">
+      <span id="proBadge" class="hidden bg-gradient-to-r from-amber-500 to-yellow-400 text-black text-xs font-extrabold px-2 py-0.5 rounded-full uppercase shadow">PRO</span>
     </div>
 
-    <!-- Status & Botão Pro -->
+    <!-- Status & Botão Pro & Modo Cinema -->
     <div class="flex items-center gap-3">
-      <button id="btnBuyPro" onclick="simulateProPurchase()" class="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-black font-semibold text-xs py-2 px-4 rounded-lg shadow-md transition flex items-center gap-2">
+      <button onclick="toggleCinemaMode()" id="btnCinema" class="bg-card-custom border border-custom hover:border-indigo-500 text-gray-300 hover:text-white text-xs py-2 px-3 rounded-lg transition flex items-center gap-1.5" title="Modo Cinema">
+        <i class="fa-solid fa-expand"></i> <span class="hidden md:inline">Modo Cinema</span>
+      </button>
+      <button id="btnBuyPro" onclick="openCheckoutModal()" class="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-black font-semibold text-xs py-2 px-4 rounded-lg shadow-md transition flex items-center gap-2">
         <i class="fa-solid fa-crown"></i> Obter Plano PRO
       </button>
     </div>
   </header>
 
   <!-- Conteúdo Principal -->
-  <main class="flex-1 p-4 md:p-6 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <main id="mainContainer" class="flex-1 p-4 md:p-6 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-3 gap-6 transition-all duration-300">
 
     <!-- Coluna Esquerda & Centro: Vídeo / Player YouTube -->
-    <div class="lg:col-span-2 flex flex-col gap-4">
+    <div id="leftColumn" class="lg:col-span-2 flex flex-col gap-4 transition-all duration-300">
       
-      <!-- Seletor de Modo (Screen Share vs YouTube Sync) -->
-      <div class="flex bg-card-custom p-1 rounded-xl border border-custom gap-1">
-        <button id="tabScreen" onclick="switchTab('screen')" class="flex-1 py-2 text-sm font-medium rounded-lg bg-indigo-600 text-white transition flex items-center justify-center gap-2">
-          <i class="fa-solid fa-desktop"></i> Transmissão de Tela
-        </button>
-        <button id="tabYoutube" onclick="switchTab('youtube')" class="flex-1 py-2 text-sm font-medium rounded-lg text-gray-400 hover:text-white transition flex items-center justify-center gap-2">
-          <i class="fa-brands fa-youtube text-red-500"></i> YouTube Sincronizado <span class="text-xs bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded border border-amber-500/30">PRO</span>
-        </button>
+      <!-- Seletor de Modo & Contador de Sala -->
+      <div class="flex flex-wrap justify-between items-center bg-card-custom p-1.5 rounded-xl border border-custom gap-2">
+        <div class="flex flex-1 gap-1 min-w-[200px]">
+          <button id="tabScreen" onclick="switchTab('screen')" class="flex-1 py-2 text-sm font-medium rounded-lg bg-indigo-600 text-white transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-desktop"></i> Ecrã
+          </button>
+          <button id="tabYoutube" onclick="switchTab('youtube')" class="flex-1 py-2 text-sm font-medium rounded-lg text-gray-400 hover:text-white transition flex items-center justify-center gap-2">
+            <i class="fa-brands fa-youtube text-red-500"></i> YouTube Sync <span class="text-[10px] bg-amber-500/20 text-amber-400 px-1 py-0.5 rounded border border-amber-500/30">PRO</span>
+          </button>
+        </div>
+        <!-- Live Viewer Counter -->
+        <div class="px-3 py-1 bg-dark-custom rounded-lg border border-custom text-xs text-gray-300 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span id="viewerCount">Sala Ativa</span>
+        </div>
       </div>
 
-      <!-- Área de Exibição Principal -->
-      <div class="bg-card-custom border border-custom rounded-xl p-3 relative min-h-[380px] flex items-center justify-center overflow-hidden shadow-xl">
+      <!-- Área de Exibição Principal (Com Reações Flutuantes) -->
+      <div id="displayArea" class="bg-card-custom border border-custom rounded-xl p-3 relative min-h-[380px] flex items-center justify-center overflow-hidden shadow-xl">
         
         <!-- View 1: Screen Share Video -->
         <div id="screenView" class="w-full h-full flex items-center justify-center">
@@ -65,7 +79,7 @@
           <div id="videoPlaceholder" class="text-center p-8 text-gray-500">
             <i class="fa-solid fa-tv text-6xl mb-3 text-gray-600"></i>
             <p class="text-base font-medium">Nenhuma transmissão ativa no momento.</p>
-            <p class="text-xs text-gray-500 mt-1">Inicie a transmissão abaixo ou aguarde uma conexão.</p>
+            <p class="text-xs text-gray-500 mt-1">Inicie a transmissão abaixo ou conecte-se a uma sala.</p>
           </div>
         </div>
 
@@ -78,18 +92,18 @@
           <!-- Controles de Sincronização do YouTube (Apenas PRO) -->
           <div class="w-full mt-3 p-3 bg-dark-custom rounded-lg border border-custom flex flex-col gap-2">
             <div id="proYtNotice" class="text-xs text-amber-400 bg-amber-500/10 p-2 rounded border border-amber-500/20 flex items-center gap-2">
-              <i class="fa-solid fa-lock"></i> Controles de Sincronização de Vídeo bloqueados. Torne-se PRO para carregar e controlar vídeos para a sala.
+              <i class="fa-solid fa-lock"></i> Controles de Sincronização bloqueados. Adira ao Plano PRO para controlar o vídeo para toda a sala.
             </div>
 
             <div id="ytControlsPro" class="hidden flex-col gap-2">
               <div class="flex gap-2">
-                <input id="ytUrlInput" type="text" placeholder="Cole o link do vídeo do YouTube aqui..." class="flex-1 bg-card-custom border border-custom rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+                <input id="ytUrlInput" type="text" placeholder="Cole o link do YouTube aqui..." class="flex-1 bg-card-custom border border-custom rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
                 <button onclick="loadProYoutubeVideo()" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1">
                   <i class="fa-solid fa-play"></i> Carregar
                 </button>
               </div>
               <div class="flex items-center justify-between pt-1 border-t border-custom/50 text-xs text-gray-400">
-                <span>Controles da Sala (PRO):</span>
+                <span>Controles Globais (PRO):</span>
                 <div class="flex gap-2">
                   <button onclick="syncYtAction('play')" class="bg-indigo-600/30 border border-indigo-500/50 hover:bg-indigo-600 text-indigo-200 hover:text-white px-2.5 py-1 rounded transition">
                     <i class="fa-solid fa-play"></i> Play Geral
@@ -103,16 +117,24 @@
           </div>
         </div>
 
+        <!-- Barra de Emojis Flutuantes Sobreposta -->
+        <div class="absolute bottom-4 right-4 bg-dark-custom/80 backdrop-blur-md border border-custom px-3 py-1.5 rounded-full flex gap-2 shadow-lg z-20">
+          <button onclick="sendEmoji('❤️')" class="hover:scale-125 transition text-sm">❤️</button>
+          <button onclick="sendEmoji('🔥')" class="hover:scale-125 transition text-sm">🔥</button>
+          <button onclick="sendEmoji('😂')" class="hover:scale-125 transition text-sm">😂</button>
+          <button onclick="sendEmoji('👏')" class="hover:scale-125 transition text-sm">👏</button>
+          <button onclick="sendEmoji('🚀')" class="hover:scale-125 transition text-sm">🚀</button>
+        </div>
+
       </div>
 
-      <!-- Painel de Transmissão de Tela (Configurações Pro de Resolução/Bitrate) -->
+      <!-- Painel de Transmissão de Ecrã (Configurações Pro) -->
       <div id="screenControlsPanel" class="bg-card-custom border border-custom rounded-xl p-4 shadow-md">
         <h2 class="text-sm font-semibold text-white mb-3 flex items-center gap-2">
-          <i class="fa-solid fa-sliders text-indigo-400"></i> Configurações da Transmissão de Tela
+          <i class="fa-solid fa-sliders text-indigo-400"></i> Definições de Transmissão de Ecrã
         </h2>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-          <!-- Resolução -->
           <div>
             <label class="block text-xs font-medium text-gray-400 mb-1">Resolução</label>
             <select id="selectResolution" class="w-full bg-dark-custom border border-custom rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
@@ -122,7 +144,6 @@
             </select>
           </div>
 
-          <!-- FPS -->
           <div>
             <label class="block text-xs font-medium text-gray-400 mb-1">Taxa de Quadros (FPS)</label>
             <select id="selectFps" class="w-full bg-dark-custom border border-custom rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
@@ -131,7 +152,6 @@
             </select>
           </div>
 
-          <!-- Bitrate -->
           <div>
             <label class="block text-xs font-medium text-gray-400 mb-1">Qualidade (Bitrate)</label>
             <select id="selectBitrate" class="w-full bg-dark-custom border border-custom rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
@@ -143,25 +163,31 @@
         </div>
 
         <button id="btnStartStream" onclick="toggleScreenShare()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm py-2 px-4 rounded-lg transition flex items-center justify-center gap-2">
-          <i class="fa-solid fa-play"></i> Iniciar Compartilhamento de Tela
+          <i class="fa-solid fa-play"></i> Iniciar Partilha de Ecrã
         </button>
       </div>
 
     </div>
 
-    <!-- Coluna Direita: Conexão, ID da Sala e Chat -->
-    <div class="flex flex-col gap-4">
+    <!-- Coluna Direita: Conexão, ID Personalizado e Chat -->
+    <div id="rightColumn" class="flex flex-col gap-4 transition-all duration-300">
       
-      <!-- Cartão de Conexão PeerJS -->
+      <!-- Cartão de Conexão PeerJS & Salas PRO -->
       <div class="bg-card-custom border border-custom rounded-xl p-4 shadow-md">
-        <h2 class="text-sm font-semibold text-white mb-2 flex items-center gap-2">
-          <i class="fa-solid fa-network-wired text-indigo-400"></i> Sua Sala de Conexão
+        <h2 class="text-sm font-semibold text-white mb-2 flex items-center justify-between">
+          <span><i class="fa-solid fa-network-wired text-indigo-400"></i> Gestão da Sala</span>
+          <span id="connectionStatus" class="text-[10px] bg-red-900 text-red-300 px-2 py-0.5 rounded-full">Desconetado</span>
         </h2>
 
         <div class="mb-3">
-          <span class="text-xs text-gray-400 block mb-1">Seu ID de Conexão:</span>
+          <div class="flex justify-between items-center mb-1">
+            <span class="text-xs text-gray-400">O seu ID de Sala:</span>
+            <button id="btnCustomRoom" onclick="openCustomRoomPrompt()" class="text-[10px] text-amber-400 hover:underline hidden">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> Personalizar Sala (PRO)
+            </button>
+          </div>
           <div class="flex items-center gap-2 bg-dark-custom p-2 rounded-lg border border-custom">
-            <span id="myPeerId" class="text-xs font-mono text-indigo-300 truncate flex-1">Conectando...</span>
+            <span id="myPeerId" class="text-xs font-mono text-indigo-300 truncate flex-1">A carregar...</span>
             <button onclick="copyPeerId()" title="Copiar ID" class="text-gray-400 hover:text-white text-xs p-1">
               <i class="fa-solid fa-copy"></i>
             </button>
@@ -169,11 +195,11 @@
         </div>
 
         <div>
-          <span class="text-xs text-gray-400 block mb-1">Conectar ao ID do Amigo:</span>
+          <span class="text-xs text-gray-400 block mb-1">Ligar a Sala do Amigo:</span>
           <div class="flex gap-2">
-            <input id="remotePeerIdInput" type="text" placeholder="Cole o ID aqui..." class="flex-1 bg-dark-custom border border-custom rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+            <input id="remotePeerIdInput" type="text" placeholder="Cole o ID da sala..." class="flex-1 bg-dark-custom border border-custom rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
             <button onclick="connectToRemotePeer()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded-lg transition">
-              Conectar
+              Ligar
             </button>
           </div>
         </div>
@@ -182,18 +208,15 @@
       <!-- Cartão de Chat da Sala -->
       <div class="bg-card-custom border border-custom rounded-xl p-4 flex-1 flex flex-col shadow-md min-h-[250px]">
         <h2 class="text-sm font-semibold text-white mb-2 flex items-center justify-between">
-          <span><i class="fa-solid fa-comments text-indigo-400"></i> Chat da Sala</span>
-          <span id="connectionStatus" class="text-[10px] bg-gray-700 text-gray-300 px-2 py-0.5 rounded-full">Desconectado</span>
+          <span><i class="fa-solid fa-comments text-indigo-400"></i> Chat ao Vivo</span>
         </h2>
 
-        <!-- Mensagens do Chat -->
         <div id="chatMessages" class="flex-1 bg-dark-custom border border-custom rounded-lg p-2.5 overflow-y-auto mb-3 text-xs space-y-2 max-h-[220px]">
-          <div class="text-gray-500 italic text-center">Bem-vindo ao chat do M.Y.MidiaStream!</div>
+          <div class="text-gray-500 italic text-center">Bem-vindo ao chat da transmissão!</div>
         </div>
 
-        <!-- Input de Mensagem -->
         <div class="flex gap-2">
-          <input id="chatInput" type="text" placeholder="Digite uma mensagem..." onkeydown="if(event.key==='Enter') sendChatMessage()" class="flex-1 bg-dark-custom border border-custom rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+          <input id="chatInput" type="text" placeholder="Escreva uma mensagem..." onkeydown="if(event.key==='Enter') sendChatMessage()" class="flex-1 bg-dark-custom border border-custom rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
           <button onclick="sendChatMessage()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded-lg transition">
             <i class="fa-solid fa-paper-plane"></i>
           </button>
@@ -204,30 +227,79 @@
 
   </main>
 
+  <!-- Modal de Checkout / Assinatura PRO (Pix & Cartão) -->
+  <div id="checkoutModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-card-custom border border-custom rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+      <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      
+      <div class="text-center mb-6">
+        <div class="inline-block p-3 bg-amber-500/10 text-amber-400 rounded-full mb-3 border border-amber-500/20">
+          <i class="fa-solid fa-crown text-2xl"></i>
+        </div>
+        <h3 class="text-lg font-bold text-white">M.Y.MidiaStream <span class="text-amber-400">PRO</span></h3>
+        <p class="text-xs text-gray-400 mt-1">Desbloqueie qualidade 4K, 60 FPS, YouTube Sync e salas personalizadas.</p>
+      </div>
+
+      <!-- Resumo do Preço -->
+      <div class="bg-dark-custom p-4 rounded-xl border border-custom mb-6 flex justify-between items-center">
+        <div>
+          <span class="text-xs text-gray-400 block">Plano Mensal Ilimitado</span>
+          <span class="text-lg font-bold text-white">R$ 29,90 <span class="text-xs text-gray-500 font-normal">/mês</span></span>
+        </div>
+        <span class="text-xs bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full border border-emerald-500/30">Ativação Instantânea</span>
+      </div>
+
+      <!-- Opção Pix / QR Code Simulado -->
+      <div class="space-y-4 mb-6">
+        <div class="text-center bg-white p-4 rounded-xl">
+          <!-- QR Code Fictício Visual -->
+          <div class="w-32 h-32 mx-auto bg-gray-900 flex items-center justify-center text-white text-xs rounded mb-2">
+            <i class="fa-solid fa-qrcode text-5xl text-amber-400"></i>
+          </div>
+          <span class="text-[10px] text-gray-600 font-mono">Chave Pix: mymidiastream@pagamento.br</span>
+        </div>
+
+        <button onclick="simulateSuccessfulPayment()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm py-2.5 px-4 rounded-xl transition flex items-center justify-center gap-2 shadow-lg">
+          <i class="fa-solid fa-bolt"></i> Simular Pagamento Aprovado (Pix)
+        </button>
+      </div>
+
+      <p class="text-[10px] text-center text-gray-500">Pagamento seguro processado via Mercado Pago & Pix. Cancele quando quiser.</p>
+    </div>
+  </div>
+
   <!-- Script Principal da Aplicação -->
   <script>
-    // Estado do Usuário
     let isPro = false;
     let peer = null;
     let conn = null;
     let currentStream = null;
-
-    // Estado do YouTube Sync
     let ytPlayer = null;
     let isYtReady = false;
+    let isCinema = false;
 
-    // Inicialização ao carregar a página
     window.addEventListener('DOMContentLoaded', () => {
       initPeerJS();
       loadYouTubeAPI();
     });
 
-    // 1. Lógica do PeerJS (P2P)
-    function initPeerJS() {
-      peer = new Peer();
+    // 1. PeerJS & Gestão de Salas
+    function initPeerJS(customId = null) {
+      if (peer) peer.destroy();
+      
+      peer = customId ? new Peer(customId) : new Peer();
 
       peer.on('open', (id) => {
         document.getElementById('myPeerId').innerText = id;
+        document.getElementById('connectionStatus').innerText = 'Pronto';
+        document.getElementById('connectionStatus').className = 'text-[10px] bg-amber-900 text-amber-300 px-2 py-0.5 rounded-full';
+      });
+
+      peer.on('error', (err) => {
+        if (err.type === 'unavailable-id') {
+          alert('Esse ID de sala personalizado já está a ser utilizado. Escolha outro.');
+          initPeerJS();
+        }
       });
 
       peer.on('connection', (connection) => {
@@ -245,128 +317,150 @@
 
     function connectToRemotePeer() {
       const remoteId = document.getElementById('remotePeerIdInput').value.trim();
-      if (!remoteId) return alert('Por favor, insira o ID do parceiro.');
+      if (!remoteId) return alert('Insira o ID da sala para se ligar.');
 
       conn = peer.connect(remoteId);
       setupConnectionEvents();
     }
 
     function setupConnectionEvents() {
-      document.getElementById('connectionStatus').innerText = 'Conectado';
-      document.getElementById('connectionStatus').className = 'text-[10px] bg-green-900 text-green-300 px-2 py-0.5 rounded-full';
+      document.getElementById('connectionStatus').innerText = 'Conetado';
+      document.getElementById('connectionStatus').className = 'text-[10px] bg-emerald-900 text-emerald-300 px-2 py-0.5 rounded-full';
+      document.getElementById('viewerCount').innerText = '2 Participantes na Sala';
 
       conn.on('data', (data) => {
-        // Mensagem de Chat
-        if (data.type === 'chat') {
-          appendChatMessage(data.sender, data.text);
-        }
-        // Eventos de Sincronização de Vídeo YouTube
-        if (data.type === 'ytSync') {
-          handleRemoteYtSync(data);
-        }
+        if (data.type === 'chat') appendChatMessage(data.sender, data.text);
+        if (data.type === 'ytSync') handleRemoteYtSync(data);
+        if (data.type === 'emoji') showFloatingEmoji(data.emoji);
       });
     }
 
-    // 2. Chat de Mensagens
+    // 2. Chat & Emojis Flutuantes
     function sendChatMessage() {
       const input = document.getElementById('chatInput');
       const text = input.value.trim();
-      const nickname = document.getElementById('nicknameInput').value || 'Usuário';
+      const nickname = document.getElementById('nicknameInput').value || 'Visitante';
 
       if (!text) return;
 
       appendChatMessage(nickname + ' (Você)', text);
-
-      if (conn && conn.open) {
-        conn.send({ type: 'chat', sender: nickname, text: text });
-      }
-
+      if (conn && conn.open) conn.send({ type: 'chat', sender: nickname, text: text });
       input.value = '';
     }
 
     function appendChatMessage(sender, text) {
       const chatBox = document.getElementById('chatMessages');
       const msgDiv = document.createElement('div');
-      msgDiv.className = 'bg-card-custom p-1.5 rounded border border-custom/50';
+      msgDiv.className = 'bg-dark-custom p-1.5 rounded border border-custom/50';
       msgDiv.innerHTML = `<span class="font-semibold text-indigo-400">${sender}:</span> <span class="text-gray-200">${text}</span>`;
       chatBox.appendChild(msgDiv);
       chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    function copyPeerId() {
-      const idText = document.getElementById('myPeerId').innerText;
-      navigator.clipboard.writeText(idText);
-      alert('ID copiado para a área de transferência!');
+    function sendEmoji(emoji) {
+      showFloatingEmoji(emoji);
+      if (conn && conn.open) conn.send({ type: 'emoji', emoji: emoji });
     }
 
-    // 3. Simulação da Compra PRO
-    function simulateProPurchase() {
-      isPro = true;
+    function showFloatingEmoji(emoji) {
+      const area = document.getElementById('displayArea');
+      const span = document.createElement('span');
+      span.className = 'floating-emoji text-2xl md:text-4xl';
+      span.innerText = emoji;
+      span.style.left = Math.random() * 80 + 10 + '%';
+      area.appendChild(span);
+      setTimeout(() => span.remove(), 2500);
+    }
 
-      // Atualizar UI
+    function copyPeerId() {
+      navigator.clipboard.writeText(document.getElementById('myPeerId').innerText);
+      alert('ID da sala copiado!');
+    }
+
+    // 3. Checkout & Plano PRO
+    function openCheckoutModal() { document.getElementById('checkoutModal').classList.remove('hidden'); document.getElementById('checkoutModal').classList.add('flex'); }
+    function closeCheckoutModal() { document.getElementById('checkoutModal').classList.add('hidden'); document.getElementById('checkoutModal').classList.remove('flex'); }
+
+    function simulateSuccessfulPayment() {
+      isPro = true;
+      closeCheckoutModal();
+
       document.getElementById('proBadge').classList.remove('hidden');
-      document.getElementById('btnBuyPro').innerHTML = `<i class="fa-solid fa-check-circle"></i> Plano PRO Ativo`;
+      document.getElementById('btnBuyPro').innerHTML = `<i class="fa-solid fa-check-circle"></i> PRO Ativo`;
       document.getElementById('btnBuyPro').className = `bg-emerald-600 text-white font-semibold text-xs py-2 px-4 rounded-lg cursor-default flex items-center gap-2`;
 
-      // Desbloquear Opções de Resolução/FPS/Bitrate
-      const proOptions = document.querySelectorAll('.pro-option');
-      proOptions.forEach(opt => {
+      // Desbloquear Opções PRO
+      document.querySelectorAll('.pro-option').forEach(opt => {
         opt.disabled = false;
         opt.innerText = opt.innerText.replace('🔒 PRO', '✨ Desbloqueado');
       });
 
-      // Desbloquear Controles do YouTube Sync
+      // Desbloquear YouTube Sync & Salas Customizadas
       document.getElementById('proYtNotice').classList.add('hidden');
       document.getElementById('ytControlsPro').classList.remove('hidden');
       document.getElementById('ytControlsPro').classList.add('flex');
+      document.getElementById('btnCustomRoom').classList.remove('hidden');
 
-      alert('Parabéns! O seu status PRO foi ativado com sucesso. Todas as resoluções e a sincronização do YouTube foram liberadas!');
+      alert('Pagamento aprovado com sucesso! Estatuto PRO ativado.');
     }
 
-    // 4. Transmissão de Tela (Screen Share)
+    // 4. Salas Personalizadas (PRO)
+    function openCustomRoomPrompt() {
+      const customName = prompt('Escolha o nome da sua sala personalizada (ex: minha-sala-vip):');
+      if (customName) {
+        const cleanName = customName.toLowerCase().replace(/[^a-z0-9-_]/g, '');
+        initPeerJS(cleanName);
+      }
+    }
+
+    // 5. Modo Cinema
+    function toggleCinemaMode() {
+      isCinema = !isCinema;
+      const rightCol = document.getElementById('rightColumn');
+      const leftCol = document.getElementById('leftColumn');
+      const header = document.mainHeader;
+
+      if (isCinema) {
+        rightCol.classList.add('hidden');
+        leftCol.className = 'lg:col-span-3 flex flex-col gap-4';
+        document.getElementById('btnCinema').innerHTML = `<i class="fa-solid fa-compress"></i> <span class="hidden md:inline">Sair Modo Cinema</span>`;
+      } else {
+        rightCol.classList.remove('hidden');
+        leftCol.className = 'lg:col-span-2 flex flex-col gap-4';
+        document.getElementById('btnCinema').innerHTML = `<i class="fa-solid fa-expand"></i> <span class="hidden md:inline">Modo Cinema</span>`;
+      }
+    }
+
+    // 6. Transmissão de Ecrã & YouTube Sync
     async function toggleScreenShare() {
       if (currentStream) {
-        // Parar Transmissão
         currentStream.getTracks().forEach(track => track.stop());
         currentStream = null;
         document.getElementById('localVideo').classList.add('hidden');
         document.getElementById('videoPlaceholder').classList.remove('hidden');
-        document.getElementById('btnStartStream').innerHTML = `<i class="fa-solid fa-play"></i> Iniciar Compartilhamento de Tela`;
+        document.getElementById('btnStartStream').innerHTML = `<i class="fa-solid fa-play"></i> Iniciar Partilha de Ecrã`;
         document.getElementById('btnStartStream').className = `w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm py-2 px-4 rounded-lg transition flex items-center justify-center gap-2`;
         return;
       }
 
-      // Parâmetros Selecionados
       const res = document.getElementById('selectResolution').value;
       const fps = parseInt(document.getElementById('selectFps').value);
-
       let width = 1280, height = 720;
       if (res === '1080') { width = 1920; height = 1080; }
       if (res === '4k') { width = 3840; height = 2160; }
 
       try {
         currentStream = await navigator.mediaDevices.getDisplayMedia({
-          video: {
-            width: { ideal: width },
-            height: { ideal: height },
-            frameRate: { ideal: fps }
-          },
+          video: { width: { ideal: width }, height: { ideal: height }, frameRate: { ideal: fps } },
           audio: true
         });
 
         displayStream(currentStream);
-
-        document.getElementById('btnStartStream').innerHTML = `<i class="fa-solid fa-stop"></i> Parar Compartilhamento`;
+        document.getElementById('btnStartStream').innerHTML = `<i class="fa-solid fa-stop"></i> Parar Partilha`;
         document.getElementById('btnStartStream').className = `w-full bg-red-600 hover:bg-red-700 text-white font-medium text-sm py-2 px-4 rounded-lg transition flex items-center justify-center gap-2`;
 
-        // Transmitir para parceiro conectado
-        if (conn && conn.peer) {
-          peer.call(conn.peer, currentStream);
-        }
-
-      } catch (err) {
-        console.error("Erro ao compartilhar tela:", err);
-      }
+        if (conn && conn.peer) peer.call(conn.peer, currentStream);
+      } catch (err) { console.error("Erro ao partilhar ecrã:", err); }
     }
 
     function displayStream(stream) {
@@ -376,7 +470,6 @@
       document.getElementById('videoPlaceholder').classList.add('hidden');
     }
 
-    // 5. Troca de Abas (Screen Share vs YouTube)
     function switchTab(tab) {
       if (tab === 'screen') {
         document.getElementById('screenView').classList.remove('hidden');
@@ -393,43 +486,29 @@
       }
     }
 
-    // 6. API do Player do YouTube Sincronizado
     function loadYouTubeAPI() {
       const tag = document.createElement('script');
       tag.src = "https://www.youtube.com/iframe_api";
-      const firstScriptTag = document.getElementsByTagName('script')[0];
-      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+      document.getElementsByTagName('script')[0].parentNode.insertBefore(tag, document.getElementsByTagName('script')[0]);
     }
 
     function onYouTubeIframeAPIReady() {
       ytPlayer = new YT.Player('ytPlayer', {
-        height: '100%',
-        width: '100%',
-        videoId: 'dQw4w9WgXcQ', // Vídeo Padrão
-        playerVars: {
-          'playsinline': 1,
-          'controls': 1
-        },
-        events: {
-          'onReady': () => { isYtReady = true; }
-        }
+        height: '100%', width: '100%', videoId: 'dQw4w9WgXcQ',
+        playerVars: { 'playsinline': 1, 'controls': 1 },
+        events: { 'onReady': () => { isYtReady = true; } }
       });
     }
 
-    // Extrai o ID do vídeo a partir de URLs do YouTube
     function extractYtVideoId(url) {
-      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-      const match = url.match(regExp);
+      const match = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
       return (match && match[2].length === 11) ? match[2] : null;
     }
 
     function loadProYoutubeVideo() {
       if (!isPro) return;
-      const url = document.getElementById('ytUrlInput').value.trim();
-      const videoId = extractYtVideoId(url);
-
-      if (!videoId) return alert('Cole uma URL válida do YouTube!');
-
+      const videoId = extractYtVideoId(document.getElementById('ytUrlInput').value.trim());
+      if (!videoId) return alert('Insira um link válido do YouTube!');
       if (isYtReady && ytPlayer) {
         ytPlayer.loadVideoById(videoId);
         syncYtAction('load', videoId);
@@ -438,35 +517,20 @@
 
     function syncYtAction(action, extraData = null) {
       if (!isPro || !ytPlayer) return;
-
       const currentTime = ytPlayer.getCurrentTime();
-
       if (action === 'play') ytPlayer.playVideo();
       if (action === 'pause') ytPlayer.pauseVideo();
 
-      // Enviar evento via WebRTC para os outros utilizadores da sala
       if (conn && conn.open) {
-        conn.send({
-          type: 'ytSync',
-          action: action,
-          time: currentTime,
-          videoId: extraData
-        });
+        conn.send({ type: 'ytSync', action: action, time: currentTime, videoId: extraData });
       }
     }
 
     function handleRemoteYtSync(data) {
       if (!isYtReady || !ytPlayer) return;
-
-      if (data.action === 'load' && data.videoId) {
-        ytPlayer.loadVideoById(data.videoId);
-      } else if (data.action === 'play') {
-        ytPlayer.seekTo(data.time, true);
-        ytPlayer.playVideo();
-      } else if (data.action === 'pause') {
-        ytPlayer.seekTo(data.time, true);
-        ytPlayer.pauseVideo();
-      }
+      if (data.action === 'load' && data.videoId) ytPlayer.loadVideoById(data.videoId);
+      else if (data.action === 'play') { ytPlayer.seekTo(data.time, true); ytPlayer.playVideo(); }
+      else if (data.action === 'pause') { ytPlayer.seekTo(data.time, true); ytPlayer.pauseVideo(); }
     }
   </script>
 </body>
