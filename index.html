@@ -17,6 +17,7 @@
     @keyframes floatUp {
       0% { transform: translateY(0px) scale(0.8); opacity: 1; }
       100% { transform: translateY(-350px) scale(1.4); opacity: 0; }
+    }
     .floating-emoji { animation: floatUp 2.5s ease-out forwards; pointer-events: none; position: absolute; bottom: 20px; z-index: 50; }
   </style>
 </head>
@@ -418,7 +419,6 @@
       isCinema = !isCinema;
       const rightCol = document.getElementById('rightColumn');
       const leftCol = document.getElementById('leftColumn');
-      const header = document.mainHeader;
 
       if (isCinema) {
         rightCol.classList.add('hidden');
