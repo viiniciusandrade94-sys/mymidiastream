@@ -1,1187 +1,454 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NEXORA - Social Stream & Virtual Rooms Platform</title>
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- PeerJS WebRTC -->
-  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <style>
-    :root {
-      --neon-purple: #8b5cf6;
-      --neon-cyan: #00f2fe;
-      --neon-pink: #ff007f;
-      --bg-dark: #08090d;
-      --card-dark: #0f111a;
-    }
-
-    body {
-      background-color: var(--bg-dark);
-      background-image: 
-        radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.12) 0%, transparent 60%),
-        radial-gradient(circle at 100% 100%, rgba(0, 242, 254, 0.08) 0%, transparent 50%),
-        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-      background-size: 100% 100%, 100% 100%, 24px 24px, 24px 24px;
-      color: #f1f5f9;
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    }
-
-    .border-nexora-glow {
-      border: 1px solid rgba(139, 92, 246, 0.4);
-      box-shadow: 0 0 15px rgba(139, 92, 246, 0.2), inset 0 0 10px rgba(139, 92, 246, 0.1);
-    }
-
-    .border-pink-glow {
-      border: 1px solid rgba(255, 0, 127, 0.4);
-      box-shadow: 0 0 15px rgba(255, 0, 127, 0.2), inset 0 0 10px rgba(255, 0, 127, 0.1);
-    }
-
-    .text-gradient-nexora {
-      background: linear-gradient(135deg, #8b5cf6 0%, #00f2fe 50%, #ff007f 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.4));
-    }
-
-    .btn-nexora-gradient {
-      background: linear-gradient(90deg, #8b5cf6 0%, #0099ff 50%, #ff007f 100%);
-      background-size: 200% auto;
-      transition: 0.4s ease;
-      box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
-    }
-    .btn-nexora-gradient:hover {
-      background-position: right center;
-      box-shadow: 0 0 25px rgba(255, 0, 127, 0.5);
-    }
-
-    @keyframes floatUp {
-      0% { transform: translateY(0px) scale(0.8); opacity: 1; }
-      100% { transform: translateY(-300px) scale(1.3); opacity: 0; }
-    }
-    .floating-emoji { animation: floatUp 2.2s ease-out forwards; pointer-events: none; position: absolute; bottom: 20px; z-index: 50; }
-
-    :fullscreen video, :-webkit-full-screen video {
-      width: 100vw !important; height: 100vh !important; object-fit: contain !important;
-    }
-    :fullscreen, :-webkit-full-screen { background-color: #000 !important; display: flex !important; align-items: center !important; justify-content: center !important; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXORA - Social Stream & Virtual Rooms</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+body{background:#08090d;background-image:radial-gradient(circle at 50% 0%,rgba(139,92,246,.12),transparent 60%),radial-gradient(circle at 100% 100%,rgba(0,242,254,.08),transparent 50%);color:#f1f5f9;font-family:'Segoe UI',system-ui,sans-serif}
+.card{background:#0f111a;border:1px solid rgba(139,92,246,.3);border-radius:1rem;padding:1rem}
+.glow{box-shadow:0 0 15px rgba(139,92,246,.2)}
+.pink{border-color:rgba(255,0,127,.4)!important;box-shadow:0 0 15px rgba(255,0,127,.2)}
+.inp{width:100%;background:#08090d;border:1px solid rgba(139,92,246,.3);border-radius:.75rem;padding:.55rem .85rem;font-size:.75rem;color:#fff;outline:none}
+.inp:focus{border-color:#a78bfa}
+.lbl{display:block;font-size:.75rem;font-weight:600;color:#d1d5db;margin-bottom:.25rem}
+.btn{display:block;width:100%;border-radius:.75rem;font-weight:800;font-size:.75rem;padding:.7rem;color:#fff;text-transform:uppercase;letter-spacing:.05em;background:linear-gradient(90deg,#8b5cf6,#0099ff 50%,#ff007f);background-size:200% auto;transition:.4s}
+.btn:hover{background-position:right center}
+.btn2{background:#7c3aed;border-radius:.75rem;font-weight:700;font-size:.75rem;padding:.5rem .8rem;color:#fff}
+.btn2:hover{background:#8b5cf6}
+.nav{width:100%;text-align:left;padding:.6rem .9rem;border-radius:.75rem;font-size:.75rem;font-weight:700;color:#9ca3af;display:flex;gap:.6rem;align-items:center}
+.nav:hover{background:rgba(139,92,246,.1);color:#fff}
+.nav.on{background:#7c3aed;color:#fff}
+.tabb{flex:1;padding:.4rem;font-size:.75rem;font-weight:700;border-radius:.5rem;color:#9ca3af}
+.tabb.on{background:#7c3aed;color:#fff}
+.gt{background:linear-gradient(135deg,#8b5cf6,#00f2fe 50%,#ff007f);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:1rem;z-index:60}
+.modal.open{display:flex}
+.view{display:none}.view.on{display:block}
+.view.flexv.on{display:flex}
+@keyframes fl{0%{transform:translateY(0) scale(.8);opacity:1}100%{transform:translateY(-300px) scale(1.3);opacity:0}}
+.fe{animation:fl 2.2s ease-out forwards;pointer-events:none;position:absolute;bottom:20px;z-index:50}
+.tile{position:relative;background:#000;border-radius:.75rem;overflow:hidden;border:1px solid rgba(139,92,246,.3);min-height:200px;display:flex;align-items:center;justify-content:center}
+.tile video{width:100%;max-height:520px;object-fit:contain}
+.tile .lb{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.8);color:#c4b5fd;font-size:10px;padding:2px 8px;border-radius:6px;font-weight:700;z-index:5}
+.tile .ac{position:absolute;top:8px;right:8px;display:flex;gap:4px;z-index:5}
+.tile .ac button{background:rgba(0,0,0,.8);color:#fff;font-size:12px;padding:2px 8px;border-radius:6px}
+</style>
 </head>
-<body class="min-h-screen flex flex-col relative overflow-x-hidden">
+<body class="min-h-screen flex flex-col">
 
-  <!-- ================= 1. TELA DE AUTENTICAÇÃO ================= -->
-  <div id="authScreen" class="fixed inset-0 bg-[#08090d]/95 backdrop-blur-xl flex items-center justify-center p-4 z-50">
-    <div class="bg-[#0f111a] border-nexora-glow rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
-      <div class="text-center mb-5">
-        <div class="inline-flex p-3 bg-purple-500/10 border border-purple-400/40 rounded-2xl mb-2 shadow-[0_0_20px_rgba(139,92,246,0.3)]">
-          <i class="fa-solid fa-cube text-3xl text-gradient-nexora"></i>
-        </div>
-        <h2 class="text-2xl font-black tracking-widest text-gradient-nexora">NEXORA</h2>
-        <p class="text-xs text-purple-400/70 mt-1 uppercase font-semibold tracking-wider">Social Stream & Virtual Rooms</p>
-      </div>
+<!-- ============ AUTENTICAÇÃO ============ -->
+<div id="authScreen" class="fixed inset-0 bg-[#08090d]/95 flex items-center justify-center p-4 z-50">
+ <div class="card glow max-w-md w-full p-6">
+  <div class="text-center mb-5">
+   <i class="fa-solid fa-cube text-4xl gt"></i>
+   <h2 class="text-2xl font-black tracking-widest gt">NEXORA</h2>
+   <p class="text-xs text-purple-400/70 uppercase font-semibold tracking-wider">Social Stream & Virtual Rooms</p>
+  </div>
+  <div class="flex bg-[#08090d] p-1 rounded-xl mb-5">
+   <button id="tabLoginBtn" class="tabb on" onclick="authTab('login')">Entrar</button>
+   <button id="tabRegisterBtn" class="tabb" onclick="authTab('register')">Criar Conta</button>
+  </div>
+  <div id="formLogin" class="space-y-3">
+   <div><label class="lbl">E-mail:</label><input id="loginEmail" type="email" class="inp" placeholder="utilizador@nexora.com"></div>
+   <div><label class="lbl">Palavra-passe:</label><input id="loginPassword" type="password" class="inp" placeholder="••••••••" onkeydown="if(event.key==='Enter')handleLogin()"></div>
+   <button class="btn" onclick="handleLogin()">Entrar na Nexora</button>
+   <div class="grid grid-cols-2 gap-2">
+    <button class="inp text-center font-bold" onclick="oauth('Google')"><i class="fa-brands fa-google text-red-400"></i> Google</button>
+    <button class="inp text-center font-bold" onclick="oauth('Discord')"><i class="fa-brands fa-discord text-indigo-400"></i> Discord</button>
+   </div>
+  </div>
+  <div id="formRegister" class="space-y-3 hidden">
+   <div><label class="lbl">Nome de Exibição:</label><input id="regName" class="inp" placeholder="CyberPlayer"></div>
+   <div><label class="lbl">E-mail:</label><input id="regEmail" type="email" class="inp"></div>
+   <div><label class="lbl">Palavra-passe:</label><input id="regPassword" type="password" class="inp"></div>
+   <div><label class="lbl">Data de Nascimento:</label><input id="regBirthDate" type="date" class="inp"></div>
+   <button class="btn" onclick="handleRegister()">Criar Conta & Entrar</button>
+  </div>
+ </div>
+</div>
 
-      <div class="flex bg-[#08090d] p-1 rounded-xl border border-purple-500/30 mb-5">
-        <button id="tabLoginBtn" type="button" onclick="switchAuthTab('login')" class="flex-1 py-2 text-xs font-bold rounded-lg bg-purple-600 text-white transition shadow-[0_0_10px_rgba(139,92,246,0.3)]">Entrar</button>
-        <button id="tabRegisterBtn" type="button" onclick="switchAuthTab('register')" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 hover:text-white transition">Criar Conta</button>
-      </div>
+<!-- ============ DASHBOARD ============ -->
+<div id="dashboardView" class="hidden min-h-screen flex-col">
+ <header class="border-b border-purple-500/20 bg-[#0f111a]/90 py-4 px-6 flex justify-between items-center">
+  <h1 class="text-lg font-black tracking-wider gt"><i class="fa-solid fa-cube"></i> NEXORA <span class="text-xs text-purple-400 font-normal">| HUB SOCIAL</span></h1>
+  <div class="flex items-center gap-3">
+   <div class="inp !w-auto flex items-center gap-2"><i class="fa-solid fa-user-circle text-purple-400"></i><span id="dashUserEmail" class="font-bold"></span><span id="proBadge" class="hidden bg-amber-400 text-black text-[9px] font-black px-2 py-0.5 rounded-full">PRO</span></div>
+   <button onclick="handleLogout()" class="bg-red-900/40 hover:bg-red-600 border border-red-500/40 text-red-200 text-xs py-2 px-3 rounded-xl font-bold"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
+  </div>
+ </header>
+ <div class="flex-1 flex flex-col md:flex-row max-w-7xl mx-auto w-full p-4 gap-6">
+  <aside class="card w-full md:w-64 flex flex-col gap-2 h-fit">
+   <button class="nav on" data-t="explore" onclick="dashTab('explore')"><i class="fa-solid fa-compass"></i> Minhas Salas</button>
+   <button class="nav" data-t="join" onclick="dashTab('join')"><i class="fa-solid fa-right-to-bracket"></i> Entrar por ID</button>
+   <button class="nav" data-t="create" onclick="dashTab('create')"><i class="fa-solid fa-plus-circle"></i> Criar Sala</button>
+   <button class="nav" data-t="profile" onclick="dashTab('profile')"><i class="fa-solid fa-user"></i> Meu Perfil</button>
+   <button class="nav" data-t="pro" onclick="dashTab('pro')"><i class="fa-solid fa-crown text-amber-400"></i> Assinatura PRO</button>
+   <button class="nav" data-t="settings" onclick="dashTab('settings')"><i class="fa-solid fa-gear"></i> Configurações</button>
+  </aside>
+  <main class="flex-1">
+   <div id="t-explore" class="view on space-y-4">
+    <div class="card flex justify-between items-center"><h2 class="text-sm font-bold uppercase"><i class="fa-solid fa-compass text-purple-400"></i> Salas guardadas neste dispositivo</h2>
+     <input id="searchRoomInput" class="inp !w-48" placeholder="Filtrar..." oninput="renderRooms()"></div>
+    <div id="roomsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+   </div>
+   <div id="t-join" class="view max-w-xl mx-auto"><div class="card pink space-y-4 p-6">
+    <h2 class="text-sm font-bold text-pink-400 uppercase"><i class="fa-solid fa-magnifying-glass"></i> Ligar a uma Sala por ID</h2>
+    <p class="text-xs text-gray-400">Cole o ID (ou o link de convite) da sala. O anfitrião tem de estar dentro da sala.</p>
+    <input id="searchRoomIdInput" class="inp" placeholder="Ex: nex-minha-sala" onkeydown="if(event.key==='Enter')joinById()">
+    <button onclick="joinById()" class="btn2 !bg-pink-600 w-full py-3">LIGAR À SALA</button>
+   </div></div>
+   <div id="t-create" class="view max-w-xl mx-auto"><div class="card glow space-y-3 p-5">
+    <h2 class="text-sm font-bold text-purple-400 uppercase"><i class="fa-solid fa-door-open"></i> Criar Nova Sala</h2>
+    <div><label class="lbl">ID Único da Sala:</label><input id="newRoomId" class="inp" placeholder="ex: minha-sala"></div>
+    <div><label class="lbl">Nome da Sala:</label><input id="newRoomName" class="inp" placeholder="Transmissão de Jogos"></div>
+    <div><label class="lbl">Privacidade:</label><select id="newRoomType" class="inp" onchange="$('passWrap').classList.toggle('hidden',this.value!=='private')"><option value="public">Pública</option><option value="private">Privada (palavra-passe)</option></select></div>
+    <div id="passWrap" class="hidden"><label class="lbl text-pink-400">Palavra-passe:</label><input id="newRoomPassword" type="password" class="inp"></div>
+    <button class="btn" onclick="createRoom()">Criar e Entrar como Anfitrião</button>
+   </div></div>
+   <div id="t-profile" class="view max-w-xl mx-auto"><div class="card space-y-3 p-5">
+    <h2 class="text-sm font-bold text-purple-400 uppercase"><i class="fa-solid fa-user"></i> Perfil</h2>
+    <div><label class="lbl">Nome de Exibição no Chat:</label><input id="profileNickname" class="inp"></div>
+    <div><label class="lbl">Biografia:</label><textarea id="profileBio" rows="2" class="inp resize-none">Criador de conteúdos na Nexora.</textarea></div>
+    <button class="btn2 w-full" onclick="saveProfile()">Guardar Perfil</button>
+   </div></div>
+   <div id="t-pro" class="view max-w-xl mx-auto"><div class="card pink space-y-4 p-5">
+    <h2 class="text-sm font-bold text-pink-400 uppercase"><i class="fa-solid fa-crown"></i> NEXORA PRO (14,90 €/mês)</h2>
+    <p class="text-xs text-gray-300">Desbloqueie 1440p/4K, 120/240 FPS e Watch Together.</p>
+    <button onclick="$('checkoutModal').classList.add('open')" class="w-full bg-gradient-to-r from-amber-500 to-yellow-500 text-black font-extrabold text-xs py-3 rounded-xl">Ativar / Gerir Plano PRO</button>
+   </div></div>
+   <div id="t-settings" class="view max-w-xl mx-auto"><div class="card space-y-3 p-5">
+    <h2 class="text-sm font-bold text-purple-400 uppercase"><i class="fa-solid fa-gear"></i> Configurações</h2>
+    <label class="flex justify-between text-xs text-gray-300">Notificações Sonoras <input type="checkbox" checked class="accent-purple-600"></label>
+   </div></div>
+  </main>
+ </div>
+</div>
 
-      <div id="formLogin" class="space-y-3.5">
-        <div>
-          <label class="block text-xs font-semibold text-gray-300 mb-1">E-mail:</label>
-          <input id="loginEmail" type="email" placeholder="usuario@nexora.com" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-purple-400">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-gray-300 mb-1">Senha:</label>
-          <input id="loginPassword" type="password" placeholder="••••••••" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-purple-400">
-        </div>
-
-        <button type="button" onclick="handleLogin()" class="w-full btn-nexora-gradient text-white font-extrabold text-xs py-3 rounded-xl uppercase tracking-wider">
-          ENTRAR NA NEXORA
-        </button>
-
-        <div class="relative flex py-2 items-center">
-          <div class="flex-grow border-t border-purple-500/20"></div>
-          <span class="flex-shrink mx-3 text-[10px] text-gray-500 uppercase font-bold">ou</span>
-          <div class="flex-grow border-t border-purple-500/20"></div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-2">
-          <button type="button" onclick="handleOAuthLogin('Google')" class="bg-[#08090d] hover:bg-purple-500/10 border border-purple-500/40 text-gray-200 font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2">
-            <i class="fa-brands fa-google text-red-400"></i> Google
-          </button>
-          <button type="button" onclick="handleOAuthLogin('Discord')" class="bg-[#08090d] hover:bg-purple-500/10 border border-purple-500/40 text-gray-200 font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2">
-            <i class="fa-brands fa-discord text-indigo-400"></i> Discord
-          </button>
-        </div>
-      </div>
-
-      <div id="formRegister" class="space-y-3 hidden">
-        <div>
-          <label class="block text-xs font-semibold text-gray-300 mb-1">Nome de Exibição:</label>
-          <input id="regName" type="text" placeholder="CyberPlayer" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-purple-400">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-gray-300 mb-1">E-mail:</label>
-          <input id="regEmail" type="email" placeholder="usuario@nexora.com" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-purple-400">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-gray-300 mb-1">Senha:</label>
-          <input id="regPassword" type="password" placeholder="••••••••" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-purple-400">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-gray-300 mb-1">Data de Nascimento:</label>
-          <input id="regBirthDate" type="date" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-purple-400">
-        </div>
-
-        <button type="button" onclick="handleRegister()" class="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-extrabold text-xs py-3 rounded-xl uppercase tracking-wider shadow-[0_0_15px_rgba(255,0,127,0.4)] mt-1">
-          CRIAR CONTA & ENTRAR
-        </button>
-      </div>
+<!-- ============ SALA ============ -->
+<div id="roomView" class="hidden min-h-screen flex-col">
+ <header class="border-b border-purple-500/20 bg-[#0f111a]/90 py-3 px-6 flex justify-between items-center">
+  <div class="flex items-center gap-3">
+   <button onclick="leaveRoom()" class="inp !w-auto font-bold text-purple-400"><i class="fa-solid fa-arrow-left"></i> Voltar ao Hub</button>
+   <h1 class="text-sm font-black gt">SALA: <span id="currentRoomTitle" class="text-white"></span></h1>
+  </div>
+  <button onclick="toggleCinema()" class="inp !w-auto text-pink-400"><i class="fa-solid fa-expand"></i> Modo Cinema</button>
+ </header>
+ <main class="flex-1 p-4 md:p-6 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <div id="leftCol" class="lg:col-span-2 flex flex-col gap-4">
+   <div class="card !p-2 flex justify-between items-center gap-2">
+    <div class="flex flex-1 gap-1">
+     <button id="tabScreen" class="tabb on" onclick="roomTab('screen')"><i class="fa-solid fa-desktop"></i> Partilha de Ecrã & Apps</button>
+     <button id="tabYoutube" class="tabb" onclick="roomTab('youtube')"><i class="fa-brands fa-youtube text-red-500"></i> Watch Together <span class="text-[9px] bg-pink-500/20 text-pink-400 px-1 rounded">PRO</span></button>
     </div>
-  </div>
-
-
-  <!-- ================= 2. DASHBOARD PRINCIPAL COM SIDEBAR ================= -->
-  <div id="dashboardView" class="hidden min-h-screen flex flex-col">
-    <header class="border-b border-purple-500/20 bg-[#0f111a]/90 backdrop-blur-md py-4 px-6 flex justify-between items-center z-30">
-      <div class="flex items-center space-x-3">
-        <div class="p-2 bg-purple-500/10 border border-purple-400/30 rounded-xl text-purple-400">
-          <i class="fa-solid fa-cube text-lg"></i>
-        </div>
-        <h1 class="text-lg font-black tracking-wider text-gradient-nexora">NEXORA <span class="text-xs text-purple-400 font-normal">| HUB SOCIAL</span></h1>
-      </div>
-
-      <div class="flex items-center gap-4">
-        <div class="flex items-center gap-2 bg-[#08090d] px-3.5 py-1.5 rounded-xl border border-purple-500/30">
-          <i class="fa-solid fa-user-circle text-purple-400 text-sm"></i>
-          <span id="dashUserEmail" class="text-xs font-bold text-white">usuario@nexora.com</span>
-          <span id="proBadge" class="hidden bg-gradient-to-r from-amber-400 to-yellow-500 text-black text-[9px] font-black px-2 py-0.5 rounded-full uppercase ml-1">PRO</span>
-        </div>
-
-        <button onclick="handleLogout()" class="bg-red-900/40 hover:bg-red-600 border border-red-500/40 text-red-200 hover:text-white text-xs py-2 px-3.5 rounded-xl transition font-bold">
-          <i class="fa-solid fa-right-from-bracket"></i> Sair
-        </button>
-      </div>
-    </header>
-
-    <div class="flex-1 flex flex-col md:flex-row max-w-7xl mx-auto w-full p-4 gap-6">
-      
-      <!-- MENU LATERAL (SIDEBAR) -->
-      <aside class="w-full md:w-64 bg-[#0f111a] border border-purple-500/20 rounded-2xl p-4 flex flex-col gap-2 h-fit">
-        <button onclick="switchDashboardTab('explore')" id="navExplore" class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold bg-purple-600 text-white flex items-center gap-2.5 transition">
-          <i class="fa-solid fa-compass"></i> Explorar Salas
-        </button>
-        <button onclick="switchDashboardTab('join')" id="navJoin" class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-pink-400 hover:bg-pink-500/10 flex items-center gap-2.5 transition">
-          <i class="fa-solid fa-right-to-bracket"></i> Entrar por ID
-        </button>
-        <button onclick="switchDashboardTab('create')" id="navCreate" class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-purple-500/10 flex items-center gap-2.5 transition">
-          <i class="fa-solid fa-plus-circle"></i> Criar Sala
-        </button>
-        <button onclick="switchDashboardTab('profile')" id="navProfile" class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-purple-500/10 flex items-center gap-2.5 transition">
-          <i class="fa-solid fa-user"></i> Meu Perfil
-        </button>
-        <button onclick="switchDashboardTab('pro')" id="navPro" class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-amber-400 hover:bg-amber-500/10 flex items-center gap-2.5 transition">
-          <i class="fa-solid fa-crown"></i> Assinatura & Chave OBS
-        </button>
-        <button onclick="switchDashboardTab('settings')" id="navSettings" class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-purple-500/10 flex items-center gap-2.5 transition">
-          <i class="fa-solid fa-gear"></i> Configurações
-        </button>
-      </aside>
-
-      <!-- ÁREA CENTRAL DE CONTEÚDO -->
-      <main class="flex-1 space-y-6">
-
-        <!-- SECÇÃO EXPLORAR SALAS (TODAS AS SALAS) -->
-        <div id="tabContent-explore" class="space-y-4">
-          <div class="flex justify-between items-center bg-[#0f111a] p-4 rounded-2xl border border-purple-500/20">
-            <h2 class="text-sm font-bold text-white uppercase"><i class="fa-solid fa-compass text-purple-400"></i> Todas as Salas Existentes</h2>
-            <input id="searchRoomInput" type="text" placeholder="Filtrar sala por nome ou ID..." onkeyup="filterExploreRooms()" class="bg-[#08090d] border border-purple-500/30 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none">
-          </div>
-
-          <div id="roomsGridContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- As salas (públicas e privadas) são renderizadas via JavaScript -->
-          </div>
-        </div>
-
-        <!-- SECÇÃO ENTRAR POR ID DA SALA -->
-        <div id="tabContent-join" class="hidden space-y-4">
-          <div class="bg-[#0f111a] border-pink-glow rounded-2xl p-6 max-w-xl mx-auto shadow-xl">
-            <h2 class="text-sm font-bold text-pink-400 mb-2 uppercase flex items-center gap-2">
-              <i class="fa-solid fa-magnifying-glass"></i> Buscar e Entrar numa Sala
-            </h2>
-            <p class="text-xs text-gray-400 mb-4">Insira o ID exato da sala gerado pelo anfitrião para se conectar diretamente:</p>
-            <div class="space-y-4">
-              <div>
-                <label class="block text-xs font-semibold text-gray-300 mb-1">ID da Sala:</label>
-                <input id="searchRoomIdInput" type="text" placeholder="Ex: nex-lobby-principal ou sala-teste" onkeydown="if(event.key==='Enter') joinRoomFromSearchTab()" class="w-full bg-[#08090d] border border-pink-500/30 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-pink-400">
-              </div>
-              <button onclick="joinRoomFromSearchTab()" class="w-full bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs py-3 rounded-xl transition shadow-[0_0_15px_rgba(255,0,127,0.3)] flex items-center justify-center gap-2">
-                <i class="fa-solid fa-right-to-bracket"></i> ENTRAR NA SALA
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- SECÇÃO CRIAR SALA -->
-        <div id="tabContent-create" class="hidden space-y-4">
-          <div class="bg-[#0f111a] border-nexora-glow rounded-2xl p-5 max-w-xl mx-auto">
-            <h2 class="text-sm font-bold text-purple-400 mb-4 uppercase flex items-center gap-2">
-              <i class="fa-solid fa-door-open"></i> Criar Nova Sala
-            </h2>
-            <div class="space-y-3.5">
-              <div>
-                <label class="block text-xs font-semibold text-gray-300 mb-1">ID Único da Sala:</label>
-                <input id="newRoomId" type="text" placeholder="ex: sala-teste" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-purple-400">
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-gray-300 mb-1">Nome da Sala:</label>
-                <input id="newRoomName" type="text" placeholder="Transmissão de Jogos e Apps" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-purple-400">
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-gray-300 mb-1">Tipo de Privacidade:</label>
-                <select id="newRoomType" onchange="togglePasswordInputVisibility()" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none">
-                  <option value="public">Pública (Qualquer um pode entrar)</option>
-                  <option value="private">Privada (Protegida por Senha)</option>
-                </select>
-              </div>
-              <div id="passwordFieldContainer" class="hidden">
-                <label class="block text-xs font-semibold text-pink-400 mb-1">Senha de Acesso à Sala:</label>
-                <input id="newRoomPassword" type="password" placeholder="Digite a senha para a sala" class="w-full bg-[#08090d] border border-pink-500/40 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-pink-400">
-              </div>
-              <button onclick="createRoomFromPanel()" class="w-full btn-nexora-gradient text-white font-extrabold text-xs py-3 rounded-xl uppercase tracking-wider mt-2">
-                Criar e Entrar na Sala
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- SECÇÃO PERFIL -->
-        <div id="tabContent-profile" class="hidden space-y-4">
-          <div class="bg-[#0f111a] border border-purple-500/30 rounded-2xl p-5 max-w-xl mx-auto space-y-4">
-            <h2 class="text-sm font-bold text-purple-400 uppercase"><i class="fa-solid fa-user"></i> Configuração de Perfil</h2>
-            <div>
-              <label class="block text-xs font-semibold text-gray-300 mb-1">Nome de Exibição no Chat:</label>
-              <input id="profileNickname" type="text" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl px-3.5 py-2 text-xs text-white">
-            </div>
-            <div>
-              <label class="block text-xs font-semibold text-gray-300 mb-1">Biografia:</label>
-              <textarea id="profileBio" rows="2" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl p-3 text-xs text-white resize-none">Desenvolvedor e criador de conteúdos na Nexora.</textarea>
-            </div>
-            <button onclick="saveProfile()" class="w-full bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold py-2.5 rounded-xl transition">
-              Salvar Perfil
-            </button>
-          </div>
-        </div>
-
-        <!-- SECÇÃO PRO & CHAVE OBS -->
-        <div id="tabContent-pro" class="hidden space-y-4">
-          <div class="bg-[#0f111a] border-pink-glow rounded-2xl p-5 max-w-xl mx-auto space-y-4">
-            <h2 class="text-sm font-bold text-pink-400 uppercase flex items-center gap-2">
-              <i class="fa-solid fa-crown"></i> Assinatura NEXORA PRO (R$ 14,90/mês)
-            </h2>
-            <p class="text-xs text-gray-300">Desbloqueie qualidade 4K, 240 FPS, Watch Together sem restrições e ingestão via OBS Studio.</p>
-            
-            <div class="bg-[#08090d] p-3 rounded-xl border border-pink-500/30 font-mono text-xs space-y-2">
-              <div>Servidor RTMP: <span class="text-purple-300">rtmp://live.nexora.stream/app</span></div>
-              <div>Chave Privada OBS: <span id="obsKeyDisplay" class="text-amber-300">nex_live_sec_9941</span></div>
-            </div>
-
-            <button onclick="openCheckoutModal()" class="w-full bg-gradient-to-r from-amber-500 to-yellow-500 text-black font-extrabold text-xs py-3 rounded-xl shadow">
-              Ativar / Gerenciar Plano PRO
-            </button>
-          </div>
-        </div>
-
-        <!-- SECÇÃO CONFIGURAÇÕES -->
-        <div id="tabContent-settings" class="hidden space-y-4">
-          <div class="bg-[#0f111a] border border-purple-500/30 rounded-2xl p-5 max-w-xl mx-auto space-y-4">
-            <h2 class="text-sm font-bold text-purple-400 uppercase"><i class="fa-solid fa-gear"></i> Configurações da Aplicação</h2>
-            <div class="flex items-center justify-between text-xs text-gray-300">
-              <span>Tema Escuro Automático</span>
-              <input type="checkbox" checked class="accent-purple-600">
-            </div>
-            <div class="flex items-center justify-between text-xs text-gray-300">
-              <span>Notificações Sonoras</span>
-              <input type="checkbox" checked class="accent-purple-600">
-            </div>
-          </div>
-        </div>
-
-      </main>
+    <div class="inp !w-auto flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span><span id="roomParticipantsInfo">A ligar...</span></div>
+   </div>
+   <div id="displayArea" class="card glow relative min-h-[460px] overflow-hidden !p-3">
+    <div id="screenView" class="w-full grid grid-cols-1 md:grid-cols-2 gap-3 content-start overflow-y-auto" style="max-height:540px"></div>
+    <div id="youtubeView" class="hidden flex-col absolute inset-3 bg-[#0f111a] gap-2">
+     <div class="w-full aspect-video bg-black rounded-xl overflow-hidden"><div id="ytPlayer"></div></div>
+     <div id="proYtNotice" class="text-xs text-pink-400 bg-pink-500/10 p-2 rounded-lg"><i class="fa-solid fa-lock"></i> Requer NEXORA PRO para controlar vídeos do YouTube.</div>
+     <div id="ytControlsPro" class="hidden gap-2">
+      <input id="ytUrlInput" class="inp flex-1" placeholder="Cole o link do YouTube...">
+      <button onclick="loadYt()" class="bg-red-600 text-white text-xs px-3 rounded-xl font-bold">Carregar</button>
+      <button onclick="ytAct('play')" class="btn2">Play</button><button onclick="ytAct('pause')" class="btn2">Pausa</button>
+     </div>
     </div>
-  </div>
-
-
-  <!-- ================= 3. TELA DA SALA DE TRANSMISSÃO & MULTI-STREAM ================= -->
-  <div id="roomView" class="hidden min-h-screen flex flex-col">
-    <header class="border-b border-purple-500/20 bg-[#0f111a]/90 backdrop-blur-md py-3 px-6 flex justify-between items-center z-30">
-      <div class="flex items-center space-x-3">
-        <button onclick="returnToDashboard()" class="text-purple-400 hover:text-white text-xs bg-[#08090d] px-3 py-1.5 rounded-xl border border-purple-500/30 flex items-center gap-1.5 font-bold">
-          <i class="fa-solid fa-arrow-left"></i> Voltar ao Hub
-        </button>
-        <h1 class="text-sm font-black tracking-wider text-gradient-nexora">SALA ID: <span id="currentRoomTitle" class="text-white">...</span></h1>
-      </div>
-
-      <div class="flex items-center gap-3">
-        <button onclick="toggleCinemaMode()" id="btnCinema" class="bg-[#08090d] border border-pink-500/30 text-pink-400 text-xs py-1.5 px-3 rounded-xl">
-          <i class="fa-solid fa-expand"></i> Modo Cinema
-        </button>
-      </div>
-    </header>
-
-    <main class="flex-1 p-4 md:p-6 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-      <div id="leftColumn" class="lg:col-span-2 flex flex-col gap-4">
-        
-        <div class="flex justify-between items-center bg-[#0f111a] p-2 rounded-xl border border-purple-500/20 gap-2">
-          <div class="flex flex-1 gap-1">
-            <button id="tabScreen" onclick="switchTab('screen')" class="flex-1 py-1.5 text-xs font-bold rounded-lg bg-purple-600 text-white transition shadow">
-              <i class="fa-solid fa-desktop"></i> Partilha de Mídia & Apps (.exe)
-            </button>
-            <button id="tabYoutube" onclick="switchTab('youtube')" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-400 hover:text-white transition">
-              <i class="fa-brands fa-youtube text-red-500"></i> Watch Together <span class="text-[9px] bg-pink-500/20 text-pink-400 px-1 py-0.5 rounded">PRO</span>
-            </button>
-          </div>
-          <div class="px-3 py-1 bg-[#08090d] rounded-lg border border-purple-500/30 text-xs text-gray-300 flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span id="roomParticipantsInfo">Conectando...</span>
-          </div>
-        </div>
-
-        <div id="displayArea" class="bg-[#0f111a] border-nexora-glow rounded-2xl p-3 relative min-h-[420px] flex items-center justify-center overflow-hidden">
-          
-          <div id="screenView" class="w-full h-full grid grid-cols-1 md:grid-cols-2 gap-3 items-center justify-center overflow-y-auto max-h-[360px]">
-            
-            <div id="slot-local" class="relative bg-black/80 rounded-xl overflow-hidden flex flex-col items-center justify-center min-h-[200px] border border-purple-500/30">
-              <span id="localStreamLabel" class="absolute top-2 left-2 bg-black/80 text-purple-300 text-[10px] px-2 py-0.5 rounded font-bold border border-purple-500/30 z-10">Sua Transmissão</span>
-              <button onclick="toggleVideoFullscreen('localVideo')" class="absolute top-2 right-2 bg-black/80 text-white text-xs px-2 py-0.5 rounded border border-purple-500/20 z-10">
-                <i class="fa-solid fa-expand"></i>
-              </button>
-              <video id="localVideo" autoplay playsinline muted class="w-full max-h-[280px] object-contain hidden"></video>
-              <div id="localPlaceholder" class="text-center p-4 text-gray-500 text-xs">
-                <i class="fa-solid fa-desktop text-3xl mb-1 text-purple-400/40"></i>
-                <p>Nenhuma partilha ativa</p>
-              </div>
-            </div>
-
-            <div id="remoteStreamsGrid" class="contents">
-              <div id="slot-remote-default" class="relative bg-black/80 rounded-xl overflow-hidden flex flex-col items-center justify-center min-h-[200px] border border-pink-500/30">
-                <span class="absolute top-2 left-2 bg-black/80 text-pink-400 text-[10px] px-2 py-0.5 rounded font-bold border border-pink-500/30 z-10">Participante Nexora</span>
-                <div id="remotePlaceholder" class="text-center p-4 text-gray-500 text-xs">
-                  <i class="fa-solid fa-user-slash text-3xl mb-1 text-pink-500/30"></i>
-                  <p id="remoteStatusText">Aguardando outros membros na sala...</p>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          <div id="youtubeView" class="w-full h-full hidden flex-col items-center absolute inset-3 bg-[#0f111a]">
-            <div class="w-full aspect-video bg-black rounded-xl overflow-hidden relative border border-purple-500/30">
-              <div id="ytPlayer"></div>
-            </div>
-
-            <div class="w-full mt-2 p-2.5 bg-[#08090d] rounded-xl border border-purple-500/20 flex flex-col gap-2">
-              <div id="proYtNotice" class="text-xs text-pink-400 bg-pink-500/10 p-2 rounded-lg border border-pink-500/20">
-                <i class="fa-solid fa-lock"></i> Requer licença NEXORA PRO para sincronizar vídeos do YouTube.
-              </div>
-
-              <div id="ytControlsPro" class="hidden flex-col gap-2">
-                <div class="flex gap-2">
-                  <input id="ytUrlInput" type="text" placeholder="Cole o link do YouTube..." class="flex-1 bg-[#0f111a] border border-purple-500/30 rounded-xl px-3 py-1.5 text-xs text-white">
-                  <button onclick="loadProYoutubeVideo()" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded-xl font-bold">
-                    Carregar Vídeo
-                  </button>
-                </div>
-                <div class="flex items-center justify-between text-xs text-gray-400">
-                  <span class="text-purple-400 font-bold">Controles Globais:</span>
-                  <div class="flex gap-2">
-                    <button onclick="syncYtAction('play')" class="bg-purple-500/20 border border-purple-500/40 text-purple-300 px-2.5 py-1 rounded-lg font-bold">Play</button>
-                    <button onclick="syncYtAction('pause')" class="bg-purple-500/20 border border-purple-500/40 text-purple-300 px-2.5 py-1 rounded-lg font-bold">Pausa</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="absolute bottom-3 right-3 bg-[#08090d]/90 border border-purple-500/30 px-3 py-1 rounded-full flex gap-2 shadow-2xl z-20">
-            <button onclick="sendEmoji('❤️')" class="hover:scale-125 transition text-xs">❤️</button>
-            <button onclick="sendEmoji('🔥')" class="hover:scale-125 transition text-xs">🔥</button>
-            <button onclick="sendEmoji('😂')" class="hover:scale-125 transition text-xs">😂</button>
-            <button onclick="sendEmoji('🚀')" class="hover:scale-125 transition text-xs">🚀</button>
-          </div>
-
-        </div>
-
-        <div class="bg-[#0f111a] border border-purple-500/30 rounded-2xl p-3.5 shadow-md">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-            <div>
-              <label class="block text-[10px] font-medium text-gray-400 mb-1">Qualidade de Transmissão</label>
-              <select id="selectResolution" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl px-2.5 py-1.5 text-xs text-white">
-                <option value="480">480p SD (Free)</option>
-                <option value="720">720p HD (Free)</option>
-                <option value="1080" selected>1080p Full HD (Free)</option>
-                <option value="1440" class="pro-option text-pink-400" disabled>1440p 2K 🔒 PRO</option>
-                <option value="2160" class="pro-option text-pink-400" disabled>2160p 4K Ultra HD 🔒 PRO</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="block text-[10px] font-medium text-gray-400 mb-1">Taxa de Quadros (FPS)</label>
-              <select id="selectFps" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl px-2.5 py-1.5 text-xs text-white" onchange="checkFpsSelection(this)">
-                <option value="30">30 FPS (Free)</option>
-                <option value="60" selected>60 FPS (Free)</option>
-                <option value="120" class="pro-option text-pink-400">120 FPS 🔒 PRO</option>
-                <option value="240" class="pro-option text-pink-400">240 FPS 🔒 PRO</option>
-              </select>
-            </div>
-          </div>
-
-          <button id="btnStartStream" onclick="toggleScreenShare()" class="w-full btn-nexora-gradient text-white font-extrabold text-xs py-2.5 px-4 rounded-xl transition flex items-center justify-center gap-2">
-            <i class="fa-solid fa-desktop"></i> COMPARTILHAR TELA, APLICATIVO (.EXE) OU GUIA
-          </button>
-        </div>
-
-      </div>
-
-      <div id="rightColumn" class="flex flex-col gap-4">
-        
-        <div class="bg-[#0f111a] border border-purple-500/30 rounded-2xl p-3.5 shadow-md">
-          <h2 class="text-xs font-bold text-white mb-2 flex items-center justify-between uppercase">
-            <span><i class="fa-solid fa-id-card text-purple-400"></i> ID da Sala Ativa</span>
-            <span id="connectionStatus" class="text-[9px] bg-amber-900/80 text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/30">Conectando</span>
-          </h2>
-
-          <div class="flex items-center gap-2 bg-[#08090d] p-1.5 rounded-xl border border-purple-500/30">
-            <span id="roomLinkDisplay" class="text-[11px] font-mono text-purple-300 truncate flex-1">Nenhum ID</span>
-            <button onclick="copyRoomId()" title="Copiar ID da Sala" class="text-gray-400 hover:text-white text-xs p-1">
-              <i class="fa-solid fa-copy"></i>
-            </button>
-          </div>
-        </div>
-
-        <div class="bg-[#0f111a] border border-purple-500/30 rounded-2xl p-3.5 flex-1 flex flex-col shadow-md min-h-[320px] relative">
-          <h2 class="text-xs font-bold text-white mb-2 flex items-center justify-between uppercase">
-            <span><i class="fa-solid fa-comments text-purple-400"></i> Chat Nexora & IA</span>
-            <span class="text-[9px] text-purple-400">Use <code>/ia [pergunta]</code></span>
-          </h2>
-
-          <div id="chatMessages" class="flex-1 bg-[#08090d] border border-purple-500/20 rounded-xl p-2.5 overflow-y-auto mb-2 text-xs space-y-2 max-h-[220px]">
-            <div class="text-gray-500 italic text-center text-[11px]">Chat P2P seguro ativado. Figurinhas em 50x50px. Digite <strong>/ia</strong> para consultar o assistente!</div>
-          </div>
-
-          <input type="file" id="deviceImageInput" accept="image/*" class="hidden" onchange="handleDeviceImageUpload(event)">
-
-          <div id="stickerPicker" class="hidden absolute bottom-14 left-3 right-3 bg-[#08090d] border border-purple-500/40 p-2.5 rounded-xl shadow-2xl z-30 grid grid-cols-4 gap-2">
-            <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHY5eWJreXVnY241OHI1b3R5bHdqdXJkZXBvZXAxaXNmMXdrODR5MSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l3q2K5jinAlChoCLS/giphy.gif" onclick="sendSticker(this.src)" style="width: 50px; height: 50px;" class="rounded object-cover cursor-pointer border border-purple-500/30">
-            <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNndicm95c2RrbjUzeXZrYjE1ejUxeXh6cWV6NDdpcXlneXB1MWo4OSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/26u4cqiYI30juCOGY/giphy.gif" onclick="sendSticker(this.src)" style="width: 50px; height: 50px;" class="rounded object-cover cursor-pointer border border-purple-500/30">
-            <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3Z0bjJvaWtwYm4zeGtwOHdzdTFneXV6aTFneTBqOWtsaDRocTZ3cCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/13CoXDiaCcCoyk/giphy.gif" onclick="sendSticker(this.src)" style="width: 50px; height: 50px;" class="rounded object-cover cursor-pointer border border-purple-500/30">
-            <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbms0bnFlZWZtdTJseWF4cmtyazU5YXlsMTRjOXRneTZrbTV2NmV2bSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKsjLuL324yPBU4/giphy.gif" onclick="sendSticker(this.src)" style="width: 50px; height: 50px;" class="rounded object-cover cursor-pointer border border-purple-500/30">
-          </div>
-
-          <div class="flex gap-1.5 items-center">
-            <button onclick="toggleStickerPicker()" class="text-gray-400 hover:text-purple-400 text-xs px-1.5 py-1" title="Enviar Sticker">
-              <i class="fa-solid fa-face-smile"></i>
-            </button>
-            <button onclick="document.getElementById('deviceImageInput').click()" class="text-gray-400 hover:text-pink-400 text-xs px-1.5 py-1" title="Enviar Imagem (50x50px)">
-              <i class="fa-solid fa-image"></i>
-            </button>
-            <input id="chatInput" type="text" placeholder="Escreva ou /ia..." onkeydown="if(event.key==='Enter') sendChatMessage()" class="flex-1 bg-[#08090d] border border-purple-500/30 rounded-xl px-2.5 py-1.5 text-xs text-white">
-            <button onclick="sendChatMessage()" class="bg-purple-600 hover:bg-purple-500 text-white text-xs px-2.5 py-1.5 rounded-xl">
-              <i class="fa-solid fa-paper-plane"></i>
-            </button>
-          </div>
-        </div>
-
-      </div>
-
-    </main>
-  </div>
-
-  <!-- MODAL DE VALIDAÇÃO DE SENHA PARA SALAS PRIVADAS -->
-  <div id="roomPasswordModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4 z-50">
-    <div class="bg-[#0f111a] border-pink-glow rounded-2xl max-w-sm w-full p-6 shadow-2xl relative">
-      <button onclick="closePasswordModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-      
-      <div class="text-center mb-4">
-        <div class="inline-flex p-3 bg-pink-500/10 text-pink-400 rounded-2xl mb-2 border border-pink-500/30">
-          <i class="fa-solid fa-lock text-2xl"></i>
-        </div>
-        <h3 class="text-base font-bold text-white">Sala Protegida por Senha</h3>
-        <p class="text-xs text-gray-400 mt-1">A sala <span id="modalTargetRoomId" class="text-pink-400 font-bold">...</span> é privada. Digite a senha para entrar:</p>
-      </div>
-
-      <div class="space-y-3 mb-2">
-        <input id="inputModalPassword" type="password" placeholder="Digite a senha da sala" onkeydown="if(event.key==='Enter') submitRoomPassword()" class="w-full bg-[#08090d] border border-pink-500/30 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-pink-400">
-        
-        <button onclick="submitRoomPassword()" class="w-full bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-[0_0_15px_rgba(255,0,127,0.3)]">
-          AUTENTICAR & ENTRAR
-        </button>
-      </div>
+    <div class="absolute bottom-3 right-3 bg-[#08090d]/90 border border-purple-500/30 px-3 py-1 rounded-full flex gap-2 z-20">
+     <button onclick="sendEmoji('❤️')">❤️</button><button onclick="sendEmoji('🔥')">🔥</button><button onclick="sendEmoji('😂')">😂</button><button onclick="sendEmoji('🚀')">🚀</button>
     </div>
-  </div>
-
-  <!-- MODAL DE CHECKOUT PRO -->
-  <div id="checkoutModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4 z-50">
-    <div class="bg-[#0f111a] border-pink-glow rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
-      <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-      
-      <div class="text-center mb-4">
-        <div class="inline-flex p-3 bg-pink-500/10 text-pink-400 rounded-2xl mb-2 border border-pink-500/30">
-          <i class="fa-solid fa-crown text-2xl"></i>
-        </div>
-        <h3 class="text-base font-bold text-white">NEXORA <span class="text-pink-400">PRO</span></h3>
-        <p class="text-xs text-gray-400 mt-1">Transmissões 4K, 240 FPS, Chave OBS e Watch Together Ilimitado.</p>
-      </div>
-
-      <div class="bg-[#08090d] p-3.5 rounded-xl border border-pink-500/30 mb-4 flex justify-between items-center">
-        <div>
-          <span class="text-[11px] text-gray-400 block">Assinatura Mensal</span>
-          <span class="text-sm font-bold text-white">R$ 14,90 <span class="text-xs text-gray-500 font-normal">/ mês</span></span>
-        </div>
-        <span class="text-[9px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30 font-bold">Ativação Segura</span>
-      </div>
-
-      <div class="space-y-3 mb-4">
-        <div class="text-center bg-white p-3.5 rounded-xl">
-          <div class="w-24 h-24 mx-auto bg-gray-900 flex items-center justify-center text-pink-400 rounded-lg mb-1">
-            <i class="fa-solid fa-qrcode text-4xl"></i>
-          </div>
-          <span class="text-[10px] text-gray-800 font-mono font-bold">Chave Pix: pagamentos@nexora.stream</span>
-        </div>
-
-        <button onclick="simulateSuccessfulPayment()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.4)]">
-          <i class="fa-solid fa-bolt"></i> SIMULAR PAGAMENTO APROVADO
-        </button>
-      </div>
+   </div>
+   <div class="card">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+     <div><label class="lbl">Qualidade de Transmissão</label><select id="selectResolution" class="inp">
+      <option value="480">480p</option><option value="720">720p HD</option><option value="1080" selected>1080p Full HD</option>
+      <option class="pro" value="1440" disabled>1440p 2K 🔒 PRO</option><option class="pro" value="2160" disabled>2160p 4K 🔒 PRO</option></select></div>
+     <div><label class="lbl">Taxa de Quadros (FPS)</label><select id="selectFps" class="inp" onchange="checkFps(this)">
+      <option value="30">30 FPS</option><option value="60" selected>60 FPS</option><option value="120">120 FPS 🔒 PRO</option><option value="240">240 FPS 🔒 PRO</option></select></div>
     </div>
+    <button id="btnStartStream" onclick="toggleShare()" class="btn"></button>
+    <p class="text-[10px] text-gray-500 mt-2">Escolha "Ecrã inteiro", "Janela" (aplicativo/.exe) ou "Guia" do navegador. Marque "partilhar áudio" para enviar o som.</p>
+   </div>
   </div>
-
-  <script>
-    let currentUser = null;
-    let isPro = false;
-    let peer = null;
-    let connections = {};
-    let localStream = null;
-    let ytPlayer = null;
-    let isYtReady = false;
-    let isCinema = false;
-    let currentRoomId = null;
-    let pendingJoinRoomId = null;
-
-    let globalRooms = [
-      { id: 'nex-lobby-principal', name: 'Lobby Principal Nexora', isPrivate: false, password: '' },
-      { id: 'nex-jogos-e-apps', name: 'Transmissão de Jogos e Apps', isPrivate: false, password: '' },
-      { id: 'nex-sala-vip', name: 'Sala VIP Privada', isPrivate: true, password: '123' }
-    ];
-
-    const peerConfig = {
-      config: {
-        iceServers: [
-          { urls: 'stun:stun.l.google.com:19302' },
-          { urls: 'stun:stun1.l.google.com:19302' },
-          { urls: 'stun:stun2.l.google.com:19302' }
-        ]
-      }
-    };
-
-    window.addEventListener('DOMContentLoaded', () => {
-      const savedRooms = localStorage.getItem('nexora_global_rooms');
-      if (savedRooms) {
-        try { globalRooms = JSON.parse(savedRooms); } catch(e) {}
-      } else {
-        localStorage.setItem('nexora_global_rooms', JSON.stringify(globalRooms));
-      }
-
-      const savedUser = localStorage.getItem('nexora_current_user');
-      if (savedUser) {
-        currentUser = JSON.parse(savedUser);
-        isPro = currentUser.isPro || false;
-        if (isPro) activateProUI();
-        showDashboardView();
-      } else {
-        showAuthScreen();
-      }
-    });
-
-    function switchAuthTab(tab) {
-      if (tab === 'login') {
-        document.getElementById('formLogin').classList.remove('hidden');
-        document.getElementById('formRegister').classList.add('hidden');
-        document.getElementById('tabLoginBtn').className = 'flex-1 py-2 text-xs font-bold rounded-lg bg-purple-600 text-white transition shadow-[0_0_10px_rgba(139,92,246,0.3)]';
-        document.getElementById('tabRegisterBtn').className = 'flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 hover:text-white transition';
-      } else {
-        document.getElementById('formLogin').classList.add('hidden');
-        document.getElementById('formRegister').classList.remove('hidden');
-        document.getElementById('tabRegisterBtn').className = 'flex-1 py-2 text-xs font-bold rounded-lg bg-purple-600 text-white transition shadow-[0_0_10px_rgba(139,92,246,0.3)]';
-        document.getElementById('tabLoginBtn').className = 'flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 hover:text-white transition';
-      }
-    }
-
-    function switchDashboardTab(tabName) {
-      ['explore', 'join', 'create', 'profile', 'pro', 'settings'].forEach(t => {
-        const el = document.getElementById(`tabContent-${t}`);
-        const nav = document.getElementById(`nav${t.charAt(0).toUpperCase() + t.slice(1)}`);
-        if (el) el.classList.add('hidden');
-        if (nav) {
-          nav.className = 'w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-purple-500/10 flex items-center gap-2.5 transition';
-        }
-      });
-
-      const activeEl = document.getElementById(`tabContent-${tabName}`);
-      const activeNav = document.getElementById(`nav${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`);
-      if (activeEl) activeEl.classList.remove('hidden');
-      if (activeNav) {
-        activeNav.className = 'w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold bg-purple-600 text-white flex items-center gap-2.5 transition';
-      }
-
-      if (tabName === 'explore') renderExploreRooms();
-    }
-
-    function renderExploreRooms(filterText = '') {
-      const container = document.getElementById('roomsGridContainer');
-      container.innerHTML = '';
-
-      const filtered = globalRooms.filter(r => 
-        r.name.toLowerCase().includes(filterText.toLowerCase()) || 
-        r.id.toLowerCase().includes(filterText.toLowerCase())
-      );
-
-      if (filtered.length === 0) {
-        container.innerHTML = `<div class="col-span-2 text-center text-xs text-gray-500 py-8">Nenhuma sala encontrada.</div>`;
-        return;
-      }
-
-      filtered.forEach(room => {
-        const card = document.createElement('div');
-        card.className = room.isPrivate 
-          ? 'bg-[#0f111a] border border-pink-500/40 rounded-2xl p-4 flex flex-col justify-between shadow-lg' 
-          : 'bg-[#0f111a] border border-purple-500/30 rounded-2xl p-4 flex flex-col justify-between shadow-lg';
-
-        const badge = room.isPrivate 
-          ? `<span class="text-[9px] bg-pink-500/20 text-pink-400 border border-pink-500/30 px-2 py-0.5 rounded-full font-bold flex items-center gap-1 w-fit"><i class="fa-solid fa-lock text-[8px]"></i> PRIVADA</span>`
-          : `<span class="text-[9px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold flex items-center gap-1 w-fit"><i class="fa-solid fa-globe text-[8px]"></i> PÚBLICA</span>`;
-
-        card.innerHTML = `
-          <div>
-            ${badge}
-            <h3 class="text-sm font-bold text-white mt-2.5">${room.name}</h3>
-            <p class="text-[11px] font-mono text-purple-300 mt-1 truncate">ID: ${room.id}</p>
-          </div>
-          <button onclick="attemptJoinRoom('${room.id}')" class="${room.isPrivate ? 'bg-pink-600 hover:bg-pink-500' : 'bg-purple-600 hover:bg-purple-500'} mt-4 w-full text-white font-bold text-xs py-2 rounded-xl transition shadow">
-            ${room.isPrivate ? '<i class="fa-solid fa-key"></i> Entrar com Senha' : 'Entrar na Sala'}
-          </button>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    function filterExploreRooms() {
-      const query = document.getElementById('searchRoomInput').value.trim();
-      renderExploreRooms(query);
-    }
-
-    function togglePasswordInputVisibility() {
-      const type = document.getElementById('newRoomType').value;
-      const container = document.getElementById('passwordFieldContainer');
-      if (type === 'private') container.classList.remove('hidden');
-      else container.classList.add('hidden');
-    }
-
-    function attemptJoinRoom(roomId) {
-      const cleanId = roomId.startsWith('nex-') ? roomId : 'nex-' + roomId.toLowerCase().replace(/[^a-z0-9-_]/g, '');
-      const room = globalRooms.find(r => r.id === cleanId);
-
-      if (room && room.isPrivate) {
-        pendingJoinRoomId = cleanId;
-        document.getElementById('modalTargetRoomId').innerText = cleanId;
-        document.getElementById('inputModalPassword').value = '';
-        document.getElementById('roomPasswordModal').classList.remove('hidden');
-        document.getElementById('roomPasswordModal').classList.add('flex');
-      } else {
-        enterRoom(cleanId);
-      }
-    }
-
-    function submitRoomPassword() {
-      const pass = document.getElementById('inputModalPassword').value.trim();
-      const room = globalRooms.find(r => r.id === pendingJoinRoomId);
-
-      if (room && room.isPrivate && room.password !== pass) {
-        alert('Senha incorreta! Acesso negado à sala privada.');
-        return;
-      }
-
-      closePasswordModal();
-      enterRoom(pendingJoinRoomId);
-    }
-
-    function closePasswordModal() {
-      document.getElementById('roomPasswordModal').classList.add('hidden');
-      document.getElementById('roomPasswordModal').classList.remove('flex');
-      pendingJoinRoomId = null;
-    }
-
-    function joinRoomFromSearchTab() {
-      const roomId = document.getElementById('searchRoomIdInput').value.trim();
-      if (!roomId) return alert('Por favor, informe o ID da sala.');
-      attemptJoinRoom(roomId);
-    }
-
-    function handleLogin() {
-      const email = document.getElementById('loginEmail').value.trim();
-      const password = document.getElementById('loginPassword').value.trim();
-      if (!email || !password) return alert('Informe seu e-mail e senha.');
-      currentUser = { email, nickname: email.split('@')[0], isPro: false };
-      localStorage.setItem('nexora_current_user', JSON.stringify(currentUser));
-      showDashboardView();
-    }
-
-    function handleRegister() {
-      const name = document.getElementById('regName').value.trim();
-      const email = document.getElementById('regEmail').value.trim();
-      const pass = document.getElementById('regPassword').value.trim();
-      const birth = document.getElementById('regBirthDate').value;
-      if (!name || !email || !pass || !birth) return alert('Preencha todos os campos.');
-      currentUser = { email, nickname: name, birthDate: birth, isPro: false };
-      localStorage.setItem('nexora_current_user', JSON.stringify(currentUser));
-      showDashboardView();
-    }
-
-    function handleOAuthLogin(provider) {
-      const randomId = Math.floor(Math.random() * 1000);
-      currentUser = { email: `${provider.toLowerCase()}_user_${randomId}@nexora.com`, nickname: `${provider}User_${randomId}`, isPro: false };
-      localStorage.setItem('nexora_current_user', JSON.stringify(currentUser));
-      showDashboardView();
-    }
-
-    function handleLogout() {
-      localStorage.removeItem('nexora_current_user');
-      currentUser = null;
-      if (peer) peer.destroy();
-      showAuthScreen();
-    }
-
-    function showAuthScreen() {
-      document.getElementById('authScreen').classList.remove('hidden');
-      document.getElementById('dashboardView').classList.add('hidden');
-      document.getElementById('roomView').classList.add('hidden');
-    }
-
-    function showDashboardView() {
-      document.getElementById('authScreen').classList.add('hidden');
-      document.getElementById('dashboardView').classList.remove('hidden');
-      document.getElementById('roomView').classList.add('hidden');
-      document.getElementById('dashUserEmail').innerText = currentUser.email;
-      document.getElementById('profileNickname').value = currentUser.nickname;
-      if (currentUser.isPro) document.getElementById('proBadge').classList.remove('hidden');
-      switchDashboardTab('explore');
-    }
-
-    function saveProfile() {
-      const newName = document.getElementById('profileNickname').value.trim();
-      if (!newName) return alert('Informe um nome válido.');
-      currentUser.nickname = newName;
-      localStorage.setItem('nexora_current_user', JSON.stringify(currentUser));
-      alert('Perfil atualizado com sucesso!');
-    }
-
-    function createRoomFromPanel() {
-      const roomId = document.getElementById('newRoomId').value.trim();
-      const roomName = document.getElementById('newRoomName').value.trim() || 'Sala Privada';
-      const isPrivate = document.getElementById('newRoomType').value === 'private';
-      const password = document.getElementById('newRoomPassword').value.trim();
-
-      if (!roomId) return alert('Informe um ID válido para a sala.');
-      if (isPrivate && !password) return alert('Por favor, defina uma senha para a sala privada.');
-
-      const cleanId = 'nex-' + roomId.toLowerCase().replace(/[^a-z0-9-_]/g, '');
-
-      if (!globalRooms.some(r => r.id === cleanId)) {
-        globalRooms.push({ id: cleanId, name: roomName, isPrivate, password });
-        localStorage.setItem('nexora_global_rooms', JSON.stringify(globalRooms));
-      }
-
-      enterRoom(cleanId);
-    }
-
-    function enterRoom(roomId) {
-      currentRoomId = roomId;
-      document.getElementById('dashboardView').classList.add('hidden');
-      document.getElementById('roomView').classList.remove('hidden');
-      document.getElementById('currentRoomTitle').innerText = currentRoomId;
-      document.getElementById('roomLinkDisplay').innerText = currentRoomId;
-
-      initPeerRoom(currentRoomId);
-      loadYouTubeAPI();
-    }
-
-    function returnToDashboard() {
-      if (peer) peer.destroy();
-      connections = {};
-      document.getElementById('roomView').classList.add('hidden');
-      document.getElementById('dashboardView').classList.remove('hidden');
-      switchDashboardTab('explore');
-    }
-
-    function initPeerRoom(roomId) {
-      if (peer) peer.destroy();
-      connections = {};
-
-      peer = new Peer(roomId, peerConfig);
-
-      peer.on('open', (id) => {
-        document.getElementById('connectionStatus').innerText = 'Anfitrião';
-        document.getElementById('connectionStatus').className = 'text-[9px] bg-emerald-900/80 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30';
-        document.getElementById('roomParticipantsInfo').innerText = 'Aguardando amigos na sala...';
-      });
-
-      peer.on('error', (err) => {
-        if (err.type === 'unavailable-id') {
-          const guestPeerId = roomId + "-guest-" + Math.random().toString(36).substring(2, 6);
-          peer = new Peer(guestPeerId, peerConfig);
-
-          peer.on('open', () => {
-            document.getElementById('connectionStatus').innerText = 'Sincronizado';
-            document.getElementById('connectionStatus').className = 'text-[9px] bg-emerald-900/80 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30';
-            document.getElementById('roomParticipantsInfo').innerText = 'Conectado ao anfitrião...';
-
-            const conn = peer.connect(roomId, { reliable: true });
-            bindConnection(conn);
-          });
-
-          peer.on('connection', (conn) => bindConnection(conn));
-          peer.on('call', (call) => answerVideoCall(call));
-        }
-      });
-
-      peer.on('connection', (conn) => bindConnection(conn));
-      peer.on('call', (call) => answerVideoCall(call));
-    }
-
-    function bindConnection(conn) {
-      connections[conn.peer] = conn;
-
-      conn.on('open', () => {
-        conn.send({ type: 'nickname', name: currentUser.nickname });
-
-        if (localStream) {
-          const call = peer.call(conn.peer, localStream);
-          call.on('stream', (remoteStream) => handleRemoteStream(remoteStream, conn.peer));
-        }
-      });
-
-      conn.on('data', (data) => {
-        if (data.type === 'chat') appendChatMessage(data.sender, data.text, data.isSticker);
-        if (data.type === 'ai_response') appendChatMessage(data.sender, data.text, false);
-        if (data.type === 'nickname') {
-          document.getElementById('roomParticipantsInfo').innerText = `Conectado com ${data.name}`;
-          conn.send({ type: 'nickname_ack', name: currentUser.nickname });
-          if (localStream) peer.call(conn.peer, localStream);
-        }
-        if (data.type === 'nickname_ack') {
-          document.getElementById('roomParticipantsInfo').innerText = `Conectado com ${data.name}`;
-        }
-        if (data.type === 'ytSync') handleRemoteYtSync(data);
-        if (data.type === 'emoji') showFloatingEmoji(data.emoji);
-      });
-
-      conn.on('close', () => {
-        delete connections[conn.peer];
-        removeRemoteStreamElement(conn.peer);
-        document.getElementById('roomParticipantsInfo').innerText = 'Participante desconectado';
-      });
-    }
-
-    function answerVideoCall(call) {
-      call.answer(localStream);
-      call.on('stream', (remoteStream) => handleRemoteStream(remoteStream, call.peer));
-    }
-
-    function handleRemoteStream(remoteStream, peerId) {
-      const grid = document.getElementById('remoteStreamsGrid');
-      const defaultPlaceholder = document.getElementById('slot-remote-default');
-      if (defaultPlaceholder) defaultPlaceholder.remove();
-
-      let videoContainer = document.getElementById(`remote-slot-${peerId}`);
-      if (!videoContainer) {
-        videoContainer = document.createElement('div');
-        videoContainer.id = `remote-slot-${peerId}`;
-        videoContainer.className = 'relative bg-black/80 rounded-xl overflow-hidden flex flex-col items-center justify-center min-h-[200px] border border-pink-500/30';
-        videoContainer.innerHTML = `
-          <span class="absolute top-2 left-2 bg-black/80 text-pink-400 text-[10px] px-2 py-0.5 rounded font-bold border border-pink-500/30 z-10">Partilha Ativa</span>
-          <video autoplay playsinline class="w-full max-h-[280px] object-contain"></video>
-        `;
-        grid.appendChild(videoContainer);
-      }
-      const vid = videoContainer.querySelector('video');
-      vid.srcObject = remoteStream;
-    }
-
-    function removeRemoteStreamElement(peerId) {
-      const el = document.getElementById(`remote-slot-${peerId}`);
-      if (el) el.remove();
-    }
-
-    function copyRoomId() {
-      navigator.clipboard.writeText(currentRoomId);
-      alert('ID da sala copiado!');
-    }
-
-    function toggleStickerPicker() {
-      document.getElementById('stickerPicker').classList.toggle('hidden');
-    }
-
-    function sendSticker(imgUrl) {
-      const myName = currentUser ? currentUser.nickname : 'Membro';
-      appendChatMessage(myName, imgUrl, true);
-      broadcastData({ type: 'chat', sender: myName, text: imgUrl, isSticker: true });
-      toggleStickerPicker();
-    }
-
-    function handleDeviceImageUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const base64Img = e.target.result;
-        const myName = currentUser ? currentUser.nickname : 'Membro';
-        appendChatMessage(myName, base64Img, true);
-        broadcastData({ type: 'chat', sender: myName, text: base64Img, isSticker: true });
-      };
-      reader.readAsDataURL(file);
-    }
-
-    async function sendChatMessage() {
-      const input = document.getElementById('chatInput');
-      const text = input.value.trim();
-      if (!text) return;
-
-      const myName = currentUser ? currentUser.nickname : 'Membro';
-      appendChatMessage(myName, text, false);
-
-      broadcastData({ type: 'chat', sender: myName, text: text, isSticker: false });
-      input.value = '';
-
-      if (text.toLowerCase().startsWith('/ia')) {
-        const query = text.replace(/^\/ia\s*/i, '').trim();
-        if (!query) {
-          appendChatMessage('🤖 Nexora AI', 'Digite `/ia [sua pergunta]` para consultar a inteligência artificial!');
-          return;
-        }
-
-        appendChatMessage('🤖 Nexora AI', 'Processando requisição...');
-        try {
-          const aiResponse = await getGeminiAIResponse(query);
-          const chatBox = document.getElementById('chatMessages');
-          chatBox.lastChild.remove();
-          
-          appendChatMessage('🤖 Nexora AI', aiResponse);
-          broadcastData({ type: 'ai_response', sender: '🤖 Nexora AI', text: aiResponse });
-        } catch (e) {
-          const chatBox = document.getElementById('chatMessages');
-          chatBox.lastChild.remove();
-          appendChatMessage('🤖 Nexora AI', 'Erro ao processar resposta.');
-        }
-      }
-    }
-
-    function broadcastData(data) {
-      Object.values(connections).forEach(conn => {
-        if (conn && conn.open) conn.send(data);
-      });
-    }
-
-    async function getGeminiAIResponse(prompt) {
-      return `Resposta para "${prompt}": Nexora AI analisou sua solicitação na sala virtual com sucesso!`;
-    }
-
-    function appendChatMessage(sender, content, isSticker = false) {
-      const chatBox = document.getElementById('chatMessages');
-      const msgDiv = document.createElement('div');
-      msgDiv.className = 'bg-[#08090d] p-2 rounded-xl border border-purple-500/20 flex flex-col gap-1 shadow';
-      const isAI = sender.includes('AI');
-      const colorClass = isAI ? 'text-amber-400 font-bold' : 'text-purple-400 font-bold';
-
-      if (isSticker) {
-        msgDiv.innerHTML = `<span class="${colorClass}">${sender}:</span><img src="${content}" style="width: 50px; height: 50px;" class="rounded-lg border border-purple-500/40 object-cover mt-1 shadow">`;
-      } else {
-        msgDiv.innerHTML = `<span class="${colorClass}">${sender}:</span> <span class="text-gray-200">${content}</span>`;
-      }
-
-      chatBox.appendChild(msgDiv);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    function sendEmoji(emoji) {
-      showFloatingEmoji(emoji);
-      broadcastData({ type: 'emoji', emoji: emoji });
-    }
-
-    function showFloatingEmoji(emoji) {
-      const area = document.getElementById('displayArea');
-      const span = document.createElement('span');
-      span.className = 'floating-emoji text-2xl md:text-4xl';
-      span.innerText = emoji;
-      span.style.left = Math.random() * 80 + 10 + '%';
-      area.appendChild(span);
-      setTimeout(() => span.remove(), 2200);
-    }
-
-    function openCheckoutModal() { document.getElementById('checkoutModal').classList.remove('hidden'); document.getElementById('checkoutModal').classList.add('flex'); }
-    function closeCheckoutModal() { document.getElementById('checkoutModal').classList.add('hidden'); document.getElementById('checkoutModal').classList.remove('flex'); }
-
-    function simulateSuccessfulPayment() {
-      isPro = true;
-      currentUser.isPro = true;
-      localStorage.setItem('nexora_current_user', JSON.stringify(currentUser));
-      closeCheckoutModal();
-      activateProUI();
-      alert('Assinatura NEXORA PRO ativada!');
-    }
-
-    function activateProUI() {
-      document.getElementById('proBadge').classList.remove('hidden');
-      document.getElementById('proYtNotice').classList.add('hidden');
-      document.getElementById('ytControlsPro').classList.remove('hidden');
-      document.getElementById('ytControlsPro').classList.add('flex');
-      document.querySelectorAll('.pro-option').forEach(opt => opt.disabled = false);
-    }
-
-    function checkFpsSelection(selectElem) {
-      const val = parseInt(selectElem.value);
-      if ((val === 120 || val === 240) && !isPro) {
-        alert('120 FPS e 240 FPS são recursos exclusivos do plano NEXORA PRO!');
-        selectElem.value = "60";
-        openCheckoutModal();
-      }
-    }
-
-    function toggleCinemaMode() {
-      isCinema = !isCinema;
-      const rightCol = document.getElementById('rightColumn');
-      const leftCol = document.getElementById('leftColumn');
-      if (isCinema) {
-        rightCol.classList.add('hidden');
-        leftCol.className = 'lg:col-span-3 flex flex-col gap-4';
-      } else {
-        rightCol.classList.remove('hidden');
-        leftCol.className = 'lg:col-span-2 flex flex-col gap-4';
-      }
-    }
-
-    async function toggleScreenShare() {
-      if (localStream) {
-        localStream.getTracks().forEach(track => track.stop());
-        localStream = null;
-        document.getElementById('localVideo').classList.add('hidden');
-        document.getElementById('localPlaceholder').classList.remove('hidden');
-        document.getElementById('btnStartStream').innerHTML = `<i class="fa-solid fa-desktop"></i> COMPARTILHAR TELA, APLICATIVO (.EXE) OU GUIA`;
-        return;
-      }
-
-      const fpsVal = parseInt(document.getElementById('selectFps').value);
-
-      try {
-        localStream = await navigator.mediaDevices.getDisplayMedia({
-          video: { width: { ideal: 1920 }, height: { ideal: 1080 }, frameRate: { ideal: fpsVal } },
-          audio: true
-        });
-
-        displayLocalStream(localStream);
-        document.getElementById('btnStartStream').innerHTML = `<i class="fa-solid fa-stop"></i> PARAR PARTILHA`;
-
-        Object.keys(connections).forEach(peerId => {
-          const call = peer.call(peerId, localStream);
-          call.on('stream', (remoteStream) => handleRemoteStream(remoteStream, peerId));
-        });
-
-        localStream.getVideoTracks()[0].onended = () => { toggleScreenShare(); };
-      } catch (err) { console.error("Erro ao capturar partilha:", err); }
-    }
-
-    function displayLocalStream(stream) {
-      const videoElem = document.getElementById('localVideo');
-      videoElem.srcObject = stream;
-      videoElem.muted = true;
-      videoElem.classList.remove('hidden');
-      document.getElementById('localPlaceholder').classList.add('hidden');
-    }
-
-    function toggleVideoFullscreen(videoId) {
-      const videoElem = document.getElementById(videoId);
-      if (!document.fullscreenElement) {
-        if (videoElem.requestFullscreen) videoElem.requestFullscreen();
-      } else {
-        if (document.exitFullscreen) document.exitFullscreen();
-      }
-    }
-
-    function switchTab(tab) {
-      if (tab === 'screen') {
-        document.getElementById('screenView').classList.remove('hidden');
-        document.getElementById('youtubeView').classList.add('hidden');
-        document.getElementById('tabScreen').className = 'flex-1 py-1.5 text-xs font-bold rounded-lg bg-purple-600 text-white transition shadow';
-        document.getElementById('tabYoutube').className = 'flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-400 hover:text-white transition';
-      } else {
-        document.getElementById('screenView').classList.add('hidden');
-        document.getElementById('youtubeView').classList.remove('hidden');
-        document.getElementById('tabYoutube').className = 'flex-1 py-1.5 text-xs font-bold rounded-lg bg-purple-600 text-white transition shadow';
-        document.getElementById('tabScreen').className = 'flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-400 hover:text-white transition';
-      }
-    }
-
-    function loadYouTubeAPI() {
-      if (window.YT) return;
-      const tag = document.createElement('script');
-      tag.src = "https://www.youtube.com/iframe_api";
-      document.getElementsByTagName('script')[0].parentNode.insertBefore(tag, document.getElementsByTagName('script')[0]);
-    }
-
-    function onYouTubeIframeAPIReady() {
-      ytPlayer = new YT.Player('ytPlayer', {
-        height: '100%', width: '100%', videoId: 'dQw4w9WgXcQ',
-        playerVars: { 'playsinline': 1, 'controls': 1 },
-        events: { 'onReady': () => { isYtReady = true; } }
-      });
-    }
-
-    function extractYtVideoId(url) {
-      const match = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
-      return (match && match[2].length === 11) ? match[2] : null;
-    }
-
-    function loadProYoutubeVideo() {
-      if (!isPro) return;
-      const videoId = extractYtVideoId(document.getElementById('ytUrlInput').value.trim());
-      if (!videoId) return alert('Insira um link do YouTube válido.');
-      if (isYtReady && ytPlayer) {
-        ytPlayer.loadVideoById(videoId);
-        syncYtAction('load', videoId);
-      }
-    }
-
-    function syncYtAction(action, extraData = null) {
-      if (!isPro || !ytPlayer) return;
-      const currentTime = ytPlayer.getCurrentTime();
-      if (action === 'play') ytPlayer.playVideo();
-      if (action === 'pause') ytPlayer.pauseVideo();
-
-      broadcastData({ type: 'ytSync', action: action, time: currentTime, videoId: extraData });
-    }
-
-    function handleRemoteYtSync(data) {
-      if (!isYtReady || !ytPlayer) return;
-      if (data.action === 'load' && data.videoId) ytPlayer.loadVideoById(data.videoId);
-      else if (data.action === 'play') { ytPlayer.seekTo(data.time, true); ytPlayer.playVideo(); }
-      else if (data.action === 'pause') { ytPlayer.seekTo(data.time, true); ytPlayer.pauseVideo(); }
-    }
-  </script>
+  <div id="rightCol" class="flex flex-col gap-4">
+   <div class="card">
+    <h2 class="text-xs font-bold mb-2 flex justify-between uppercase"><span><i class="fa-solid fa-link text-purple-400"></i> Link de convite</span><span id="connectionStatus" class="text-[9px] px-2 rounded-full border"></span></h2>
+    <div class="flex items-center gap-2 bg-[#08090d] p-1.5 rounded-xl border border-purple-500/30">
+     <span id="roomLinkDisplay" class="text-[11px] font-mono text-purple-300 truncate flex-1"></span>
+     <button onclick="copyLink()" class="text-gray-400 hover:text-white p-1" title="Copiar"><i class="fa-solid fa-copy"></i></button>
+    </div>
+   </div>
+   <div class="card flex-1 flex flex-col min-h-[320px] relative">
+    <h2 class="text-xs font-bold mb-2 flex justify-between uppercase"><span><i class="fa-solid fa-comments text-purple-400"></i> Chat & IA</span><span class="text-[9px] text-purple-400">/ia [pergunta]</span></h2>
+    <div id="chatMessages" class="flex-1 bg-[#08090d] rounded-xl p-2 overflow-y-auto mb-2 text-xs space-y-2" style="max-height:240px"></div>
+    <input type="file" id="imgInput" accept="image/*" class="hidden" onchange="sendImage(event)">
+    <div id="stickerPicker" class="hidden absolute bottom-14 left-3 right-3 bg-[#08090d] border border-purple-500/40 p-2 rounded-xl z-30 grid grid-cols-6 gap-1 text-2xl text-center">
+     <button onclick="sendSticker('😎')">😎</button><button onclick="sendSticker('🎉')">🎉</button><button onclick="sendSticker('👍')">👍</button><button onclick="sendSticker('😭')">😭</button><button onclick="sendSticker('🤯')">🤯</button><button onclick="sendSticker('💜')">💜</button>
+    </div>
+    <div class="flex gap-1.5 items-center">
+     <button onclick="$('stickerPicker').classList.toggle('hidden')" class="text-gray-400 hover:text-purple-400 px-1"><i class="fa-solid fa-face-smile"></i></button>
+     <button onclick="$('imgInput').click()" class="text-gray-400 hover:text-pink-400 px-1"><i class="fa-solid fa-image"></i></button>
+     <input id="chatInput" class="inp flex-1" placeholder="Escreva ou /ia..." onkeydown="if(event.key==='Enter')sendChat()">
+     <button onclick="sendChat()" class="btn2"><i class="fa-solid fa-paper-plane"></i></button>
+    </div>
+   </div>
+  </div>
+ </main>
+</div>
+
+<!-- MODAIS -->
+<div id="pwModal" class="modal"><div class="card pink max-w-sm w-full p-6 relative">
+ <button onclick="$('pwModal').classList.remove('open')" class="absolute top-4 right-4 text-gray-400"><i class="fa-solid fa-xmark"></i></button>
+ <div class="text-center mb-4"><i class="fa-solid fa-lock text-2xl text-pink-400"></i><h3 class="font-bold">Sala Protegida</h3>
+  <p class="text-xs text-gray-400">A sala <b id="pwRoom" class="text-pink-400"></b> é privada.</p></div>
+ <input id="pwInput" type="password" class="inp mb-3" placeholder="Palavra-passe" onkeydown="if(event.key==='Enter')submitPw()">
+ <button class="btn2 !bg-pink-600 w-full py-2.5" onclick="submitPw()">AUTENTICAR & ENTRAR</button>
+</div></div>
+<div id="checkoutModal" class="modal"><div class="card pink max-w-md w-full p-6 relative">
+ <button onclick="$('checkoutModal').classList.remove('open')" class="absolute top-4 right-4 text-gray-400"><i class="fa-solid fa-xmark"></i></button>
+ <div class="text-center mb-4"><i class="fa-solid fa-crown text-2xl text-pink-400"></i><h3 class="font-bold">NEXORA <span class="text-pink-400">PRO</span></h3>
+  <p class="text-xs text-gray-400">1440p/4K, 120/240 FPS e Watch Together. 14,90 €/mês.</p></div>
+ <p class="text-[11px] text-amber-300 mb-3">Modo demonstração: o pagamento real ainda não está integrado.</p>
+ <button onclick="fakePay()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 rounded-xl"><i class="fa-solid fa-bolt"></i> SIMULAR PAGAMENTO APROVADO</button>
+</div></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const PFX='nexora-v2-';
+const ICE={iceServers:[
+ {urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'},
+ // TURN gratuito de teste. Para produção use o SEU servidor TURN (Metered, Cloudflare, coturn).
+ {urls:'turn:openrelay.metered.ca:80',username:'openrelayproject',credential:'openrelayproject'},
+ {urls:'turn:openrelay.metered.ca:443',username:'openrelayproject',credential:'openrelayproject'},
+ {urls:'turns:openrelay.metered.ca:443?transport=tcp',username:'openrelayproject',credential:'openrelayproject'}]};
+let currentUser=null,isPro=false,peer=null,connections={},activeCalls={},outCalls={},members={},localStream=null,
+    ytPlayer=null,isYtReady=false,isCinema=false,currentRoomId=null,pendingRoom=null,isHost=false,roomInfo=null,hostRetry=0,joinPass='';
+let rooms=[];
+const save=()=>localStorage.setItem('nexora_rooms_v2',JSON.stringify(rooms));
+
+window.addEventListener('DOMContentLoaded',()=>{
+ try{rooms=JSON.parse(localStorage.getItem('nexora_rooms_v2')||'[]')}catch(e){rooms=[]}
+ try{currentUser=JSON.parse(localStorage.getItem('nexora_current_user')||'null')}catch(e){}
+ ['selectResolution','selectFps'].forEach(i=>$(i).addEventListener('change',applyLive));
+ $('btnStartStream').innerHTML=SHARE_HTML;
+ if(currentUser){isPro=!!currentUser.isPro;if(isPro)activatePro();showDash();}
+});
+window.addEventListener('beforeunload',()=>{if(peer)peer.destroy()});
+const SHARE_HTML='<i class="fa-solid fa-desktop"></i> PARTILHAR ECRÃ, APLICATIVO (.EXE) OU GUIA';
+
+/* ---------- Auth (demonstração, guardado só no navegador) ---------- */
+function authTab(t){const l=t==='login';
+ $('formLogin').classList.toggle('hidden',!l);$('formRegister').classList.toggle('hidden',l);
+ $('tabLoginBtn').classList.toggle('on',l);$('tabRegisterBtn').classList.toggle('on',!l);}
+function setUser(u){currentUser=u;isPro=!!u.isPro;localStorage.setItem('nexora_current_user',JSON.stringify(u));showDash();}
+function handleLogin(){const e=$('loginEmail').value.trim(),p=$('loginPassword').value.trim();
+ if(!e||!p)return alert('Informe e-mail e palavra-passe.');setUser({email:e,nickname:e.split('@')[0],isPro:false});}
+function handleRegister(){const n=$('regName').value.trim(),e=$('regEmail').value.trim(),p=$('regPassword').value.trim(),b=$('regBirthDate').value;
+ if(!n||!e||!p||!b)return alert('Preencha todos os campos.');setUser({email:e,nickname:n,birthDate:b,isPro:false});}
+function oauth(p){const r=Math.floor(Math.random()*1000);setUser({email:p.toLowerCase()+'_'+r+'@nexora.com',nickname:p+'User_'+r,isPro:false});}
+function handleLogout(){localStorage.removeItem('nexora_current_user');currentUser=null;if(peer){peer.destroy();peer=null}
+ $('authScreen').classList.remove('hidden');$('dashboardView').classList.add('hidden');$('dashboardView').classList.remove('flex');}
+function showDash(){
+ $('authScreen').classList.add('hidden');$('roomView').classList.add('hidden');$('roomView').classList.remove('flex');
+ $('dashboardView').classList.remove('hidden');$('dashboardView').classList.add('flex');
+ $('dashUserEmail').innerText=currentUser.email;$('profileNickname').value=currentUser.nickname;
+ if(isPro)activatePro();
+ dashTab('explore');
+ const p=new URLSearchParams(location.search).get('sala');
+ if(p){history.replaceState(null,'',location.pathname);joinRoom(p);}
+}
+function dashTab(t){
+ document.querySelectorAll('#dashboardView .view').forEach(v=>v.classList.remove('on'));
+ document.querySelectorAll('#dashboardView .nav').forEach(n=>n.classList.toggle('on',n.dataset.t===t));
+ $('t-'+t).classList.add('on');if(t==='explore')renderRooms();}
+function saveProfile(){const n=$('profileNickname').value.trim();if(!n)return alert('Nome inválido.');
+ currentUser.nickname=n;localStorage.setItem('nexora_current_user',JSON.stringify(currentUser));alert('Perfil guardado!');}
+
+/* ---------- PRO ---------- */
+function activatePro(){isPro=true;$('proBadge').classList.remove('hidden');$('proYtNotice').classList.add('hidden');
+ $('ytControlsPro').classList.remove('hidden');$('ytControlsPro').classList.add('flex');
+ document.querySelectorAll('.pro').forEach(o=>o.disabled=false);}
+function fakePay(){currentUser.isPro=true;localStorage.setItem('nexora_current_user',JSON.stringify(currentUser));
+ $('checkoutModal').classList.remove('open');activatePro();alert('NEXORA PRO ativado (demonstração)!');}
+function checkFps(s){if(+s.value>=120&&!isPro){alert('120/240 FPS são exclusivos do plano PRO.');s.value='60';$('checkoutModal').classList.add('open');}}
+
+/* ---------- Lista de salas ---------- */
+function renderRooms(){
+ const q=$('searchRoomInput').value.toLowerCase(),c=$('roomsGrid');c.innerHTML='';
+ const list=rooms.filter(r=>(r.name+r.id).toLowerCase().includes(q));
+ if(!list.length){c.innerHTML='<div class="col-span-2 text-center text-xs text-gray-500 py-8">Sem salas ainda. Crie uma ou entre por ID / link de convite.</div>';return;}
+ list.forEach(r=>{const d=document.createElement('div');d.className='card flex flex-col justify-between';
+  d.innerHTML='<div class="flex justify-between"><span class="text-[9px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full font-bold"></span><button class="text-gray-500 hover:text-red-400 text-xs"><i class="fa-solid fa-trash"></i></button></div><h3 class="text-sm font-bold mt-2"></h3><p class="text-[11px] font-mono text-purple-300 truncate"></p><button class="btn2 mt-3 w-full"></button>';
+  const b=d.querySelectorAll('button');
+  d.querySelector('span').textContent=r.mine?(r.isPrivate?'MINHA · PRIVADA':'MINHA · PÚBLICA'):'VISITADA';
+  d.querySelector('h3').textContent=r.name;d.querySelector('p').textContent='ID: '+r.id;
+  b[0].onclick=()=>{if(confirm('Remover "'+r.id+'" da lista?')){rooms=rooms.filter(x=>x.id!==r.id);save();renderRooms();}};
+  b[1].textContent=r.mine?'Abrir como anfitrião':'Entrar na sala';b[1].onclick=()=>joinRoom(r.id);
+  c.appendChild(d);});}
+const cleanId=id=>{id=id.trim().split('sala=').pop();return id.startsWith('nex-')?id:'nex-'+id.toLowerCase().replace(/[^a-z0-9-_]/g,'');};
+function joinById(){const v=$('searchRoomIdInput').value.trim();if(!v)return alert('Informe o ID da sala.');joinRoom(v);}
+function joinRoom(raw){const id=cleanId(raw);const mine=rooms.find(r=>r.id===id&&r.mine);enterRoom(id,!!mine,'');}
+function createRoom(){
+ const rid=$('newRoomId').value.trim(),name=$('newRoomName').value.trim()||'Sala Nexora',
+  isPrivate=$('newRoomType').value==='private',password=$('newRoomPassword').value.trim();
+ if(!rid)return alert('Informe um ID para a sala.');if(isPrivate&&!password)return alert('Defina uma palavra-passe.');
+ const id=cleanId(rid);rooms=rooms.filter(r=>r.id!==id);rooms.push({id,name,isPrivate,password,mine:true});save();enterRoom(id,true,'');}
+function askPw(id){pendingRoom=id;$('pwRoom').innerText=id;$('pwInput').value='';$('pwModal').classList.add('open');}
+function submitPw(){const p=$('pwInput').value.trim(),id=pendingRoom;$('pwModal').classList.remove('open');enterRoom(id,false,p);}
+
+/* ---------- Entrar / sair da sala ---------- */
+function enterRoom(id,asHost,pass){
+ currentRoomId=id;isHost=asHost;joinPass=pass||'';hostRetry=0;roomInfo=asHost?rooms.find(r=>r.id===id):null;
+ $('dashboardView').classList.add('hidden');$('dashboardView').classList.remove('flex');
+ $('roomView').classList.remove('hidden');$('roomView').classList.add('flex');
+ $('currentRoomTitle').innerText=id;$('roomLinkDisplay').innerText=location.href.split('?')[0].split('#')[0]+'?sala='+id;
+ $('chatMessages').innerHTML='<div class="text-gray-500 italic text-center text-[11px]">Chat P2P ativo. Use /ia para a IA.</div>';
+ initStage();loadYT();initPeer(id,asHost);}
+function leaveRoom(){stopShare();if(peer){const p=peer;peer=null;p.destroy();}
+ connections={};activeCalls={};outCalls={};members={};showDash();}
+function copyLink(){const l=$('roomLinkDisplay').innerText;navigator.clipboard.writeText(l).then(()=>alert('Link de convite copiado!\n'+l));}
+function toggleCinema(){isCinema=!isCinema;$('rightCol').classList.toggle('hidden',isCinema);$('leftCol').className=(isCinema?'lg:col-span-3':'lg:col-span-2')+' flex flex-col gap-4';}
+function roomTab(t){const y=t==='youtube';$('screenView').classList.toggle('hidden',y);
+ $('youtubeView').classList.toggle('hidden',!y);$('youtubeView').classList.toggle('flex',y);
+ $('tabYoutube').classList.toggle('on',y);$('tabScreen').classList.toggle('on',!y);}
+
+/* ---------- Palco ---------- */
+function initStage(){$('screenView').innerHTML='<div id="emptyStage" class="col-span-full text-center p-10 text-gray-500 text-xs"><i class="fa-solid fa-desktop text-4xl mb-2 text-purple-400/40"></i><p>Ninguém está a partilhar. Clique em "Partilhar" para começar.</p></div>';}
+function addTile(id,label,stream,muted){
+ const e=$('emptyStage');if(e)e.remove();
+ let t=$('tile-'+id);
+ if(!t){t=document.createElement('div');t.id='tile-'+id;t.className='tile';
+  t.innerHTML='<span class="lb"></span><div class="ac"><button title="Ampliar"><i class="fa-solid fa-up-right-and-down-left-from-center"></i></button><button title="Ecrã inteiro"><i class="fa-solid fa-expand"></i></button></div><video autoplay playsinline></video>';
+  const v=t.querySelector('video'),b=t.querySelectorAll('button');v.muted=muted;
+  b[0].onclick=()=>t.classList.toggle('md:col-span-2');b[1].onclick=()=>v.requestFullscreen&&v.requestFullscreen();
+  v.onclick=()=>v.play();$('screenView').appendChild(t);}
+ t.querySelector('.lb').textContent=label;
+ const v=t.querySelector('video');if(v.srcObject!==stream)v.srcObject=stream;v.play().catch(()=>{});}
+function removeTile(id){const t=$('tile-'+id);if(t)t.remove();
+ if(!$('screenView').querySelector('.tile')&&!$('emptyStage'))initStage();}
+
+/* ---------- Rede P2P em malha ---------- */
+function setStatus(t,ok){const s=$('connectionStatus');s.innerText=t;
+ s.className='text-[9px] px-2 rounded-full border '+(ok?'bg-emerald-900/80 text-emerald-300 border-emerald-500/30':'bg-amber-900/80 text-amber-300 border-amber-500/30');}
+function updateMembers(){const n=Object.values(members);$('roomParticipantsInfo').innerText=(n.length+1)+' na sala'+(n.length?': '+n.join(', '):'');}
+function initPeer(roomId,hostMode){
+ if(peer){const o=peer;peer=null;o.destroy();}
+ connections={};activeCalls={};outCalls={};members={};
+ const id=hostMode?PFX+roomId:PFX+roomId+'-g'+Math.random().toString(36).slice(2,8);
+ const me=new Peer(id,{config:ICE});peer=me;setStatus('A ligar...',false);
+ me.on('open',()=>{hostRetry=0;updateMembers();if(hostMode)setStatus('Anfitrião',true);else connectTo(PFX+roomId,true);});
+ me.on('disconnected',()=>{if(peer===me&&!me.destroyed)me.reconnect();});
+ me.on('error',err=>{
+  if(peer!==me)return;
+  if(err.type==='unavailable-id'){
+   if(hostMode&&hostRetry<6){hostRetry++;setStatus('A reservar sala...',false);setTimeout(()=>peer===me&&initPeer(roomId,true),2500);return;}
+   alert('Este ID de sala já está a ser usado por outro anfitrião.');leaveRoom();
+  }else if(err.type==='peer-unavailable'&&!hostMode&&String(err.message).endsWith(PFX+roomId)){
+   alert('Sala offline: o anfitrião precisa estar dentro da sala.');leaveRoom();
+  }else console.warn('PeerJS:',err);});
+ me.on('connection',c=>setupConn(c,false,false));
+ me.on('call',call=>{call.answer();setupCall(call);}); // só recebemos; quem partilha é que liga
+}
+function connectTo(pid,toHost){if(!peer||connections[pid])return;setupConn(peer.connect(pid,{reliable:true}),true,toHost);}
+function setupConn(c,out,toHost){
+ connections[c.peer]=c;
+ c.on('open',()=>{if(out)c.send({type:'hello',name:currentUser.nickname,password:toHost?joinPass:''});});
+ c.on('data',d=>onData(c,d));c.on('close',()=>dropPeer(c.peer));c.on('error',()=>dropPeer(c.peer));}
+function addMember(pid,name){members[pid]=name||'Convidado';updateMembers();if(localStream)callPeer(pid);}
+function dropPeer(pid){delete connections[pid];delete members[pid];delete activeCalls[pid];delete outCalls[pid];removeTile(pid);updateMembers();}
+function onData(c,d){const pid=c.peer;
+ switch(d.type){
+  case 'hello':
+   if(isHost&&roomInfo&&roomInfo.isPrivate&&d.password!==roomInfo.password){c.send({type:'auth_failed'});setTimeout(()=>c.close(),300);return;}
+   c.send({type:'hello_ack',name:currentUser.nickname});
+   if(isHost)c.send({type:'welcome',room:roomInfo?roomInfo.name:currentRoomId,peers:Object.keys(members)});
+   addMember(pid,d.name);break;
+  case 'hello_ack':addMember(pid,d.name);break;
+  case 'welcome':setStatus('Conectado',true);
+   if(!rooms.some(r=>r.id===currentRoomId)){rooms.push({id:currentRoomId,name:d.room,isPrivate:false,password:'',mine:false});save();}
+   d.peers.forEach(p=>connectTo(p,false));break;
+  case 'auth_failed':{const had=!!joinPass,rid=currentRoomId;leaveRoom();if(had)alert('Palavra-passe incorreta!');askPw(rid);break;}
+  case 'chat':case 'ai_response':addChat(d.sender,d.text,!!d.isImg);break;
+  case 'ytSync':remoteYt(d);break;
+  case 'emoji':floatEmoji(d.emoji);break;
+  case 'share_stopped':removeTile(pid);break;}}
+const broadcast=d=>Object.values(connections).forEach(c=>{if(c&&c.open)c.send(d)});
+
+/* ---------- Partilha de ecrã ---------- */
+function setupCall(call){activeCalls[call.peer]=call;
+ call.on('stream',s=>addTile(call.peer,'Ecrã de '+(members[call.peer]||(call.metadata&&call.metadata.name)||'participante'),s,false));
+ call.on('close',()=>{if(activeCalls[call.peer]===call)removeTile(call.peer);});}
+function targetBitrate(){const h=+$('selectResolution').value,f=+$('selectFps').value;
+ const b={480:1.5e6,720:3e6,1080:6e6,1440:12e6,2160:20e6}[h]||6e6;return Math.round(b*(f>=240?2.5:f>=120?2:f>=60?1.4:1));}
+async function tune(call){try{const f=+$('selectFps').value;
+ for(const s of call.peerConnection.getSenders()){if(!s.track||s.track.kind!=='video')continue;
+  const p=s.getParameters();if(!p.encodings||!p.encodings.length)p.encodings=[{}];
+  p.encodings[0].maxBitrate=targetBitrate();p.encodings[0].maxFramerate=f;
+  p.degradationPreference=f>=60?'maintain-framerate':'maintain-resolution';await s.setParameters(p);}}
+ catch(e){console.warn('tune',e)}}
+function callPeer(pid){if(!localStream||!peer)return;
+ try{if(outCalls[pid])outCalls[pid].close();}catch(e){}
+ const call=peer.call(pid,localStream,{metadata:{name:currentUser.nickname}});outCalls[pid]=call;
+ [800,2500,6000].forEach(ms=>setTimeout(()=>tune(call),ms));}
+function constr(){const h=+$('selectResolution').value,f=+$('selectFps').value;
+ return{width:{ideal:Math.round(h*16/9)},height:{ideal:h},frameRate:{ideal:f,max:f}};}
+async function toggleShare(){
+ if(localStream)return stopShare();
+ if(!navigator.mediaDevices||!navigator.mediaDevices.getDisplayMedia)
+  return alert('Este navegador/dispositivo não suporta partilha de ecrã. Use Chrome, Edge ou Firefox no computador, com HTTPS.');
+ try{localStream=await navigator.mediaDevices.getDisplayMedia({video:constr(),
+  audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false},selfBrowserSurface:'exclude',systemAudio:'include'});}
+ catch(e){localStream=null;if(e.name!=='NotAllowedError')alert('Não foi possível partilhar: '+e.message);return;}
+ const vt=localStream.getVideoTracks()[0];vt.contentHint=(+$('selectFps').value>=60)?'motion':'detail';vt.onended=stopShare;
+ addTile('local','O seu ecrã (pré-visualização)',localStream,true);
+ $('btnStartStream').innerHTML='<i class="fa-solid fa-stop"></i> PARAR PARTILHA';
+ Object.keys(members).forEach(callPeer);}
+function stopShare(){if(!localStream)return;
+ localStream.getTracks().forEach(t=>{t.onended=null;t.stop();});localStream=null;
+ Object.values(outCalls).forEach(c=>{try{c.close()}catch(e){}});outCalls={};
+ broadcast({type:'share_stopped'});removeTile('local');$('btnStartStream').innerHTML=SHARE_HTML;}
+async function applyLive(){if(!localStream)return;
+ try{await localStream.getVideoTracks()[0].applyConstraints(constr());}catch(e){}
+ Object.values(outCalls).forEach(tune);}
+
+/* ---------- Chat (sem innerHTML) ---------- */
+function addChat(sender,content,isImg){
+ const box=$('chatMessages'),d=document.createElement('div');d.className='bg-[#08090d] p-2 rounded-xl border border-purple-500/20 flex flex-col gap-1';
+ const n=document.createElement('span');n.className=String(sender).includes('AI')?'text-amber-400 font-bold':'text-purple-400 font-bold';n.textContent=sender+':';d.appendChild(n);
+ if(isImg){if(/^data:image\//.test(content)){const i=document.createElement('img');i.src=content;i.style.cssText='width:90px;height:90px';i.className='rounded-lg object-cover';d.appendChild(i);}}
+ else{const s=document.createElement('span');s.className='text-gray-200 break-words';s.textContent=content;d.appendChild(s);}
+ box.appendChild(d);box.scrollTop=box.scrollHeight;}
+function sendSticker(e){$('stickerPicker').classList.add('hidden');const n=currentUser.nickname;
+ addChat(n,e,false);broadcast({type:'chat',sender:n,text:e,isImg:false});}
+function sendImage(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();
+ r.onload=e=>{const im=new Image();im.onload=()=>{const k=Math.min(1,160/Math.max(im.width,im.height));
+  const c=document.createElement('canvas');c.width=im.width*k;c.height=im.height*k;c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+  const u=c.toDataURL('image/jpeg',.7),n=currentUser.nickname;addChat(n,u,true);broadcast({type:'chat',sender:n,text:u,isImg:true});};im.src=e.target.result;};
+ r.readAsDataURL(f);ev.target.value='';}
+function sendChat(){const i=$('chatInput'),t=i.value.trim();if(!t)return;const n=currentUser.nickname;
+ addChat(n,t,false);broadcast({type:'chat',sender:n,text:t,isImg:false});i.value='';
+ if(t.toLowerCase().startsWith('/ia')){const q=t.replace(/^\/ia\s*/i,'').trim();
+  const a=q?'Resposta para "'+q+'": (IA de demonstração — ligue aqui a sua API de IA.)':'Digite /ia [pergunta].';
+  addChat('🤖 Nexora AI',a,false);broadcast({type:'ai_response',sender:'🤖 Nexora AI',text:a});}}
+function sendEmoji(e){floatEmoji(e);broadcast({type:'emoji',emoji:e});}
+function floatEmoji(e){const s=document.createElement('span');s.className='fe text-2xl md:text-4xl';s.innerText=e;
+ s.style.left=(Math.random()*80+10)+'%';$('displayArea').appendChild(s);setTimeout(()=>s.remove(),2200);}
+
+/* ---------- YouTube Watch Together (PRO) ---------- */
+function loadYT(){if(window.YT&&window.YT.Player){if(!ytPlayer)onYouTubeIframeAPIReady();return;}
+ if($('ytApi'))return;const t=document.createElement('script');t.id='ytApi';t.src='https://www.youtube.com/iframe_api';document.head.appendChild(t);}
+function onYouTubeIframeAPIReady(){ytPlayer=new YT.Player('ytPlayer',{height:'100%',width:'100%',playerVars:{playsinline:1},events:{onReady:()=>{isYtReady=true}}});}
+function ytId(u){const m=u.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);return(m&&m[2].length===11)?m[2]:null;}
+function loadYt(){if(!isPro)return;const id=ytId($('ytUrlInput').value.trim());if(!id)return alert('Link do YouTube inválido.');
+ if(isYtReady){ytPlayer.loadVideoById(id);broadcast({type:'ytSync',action:'load',time:0,videoId:id});}}
+function ytAct(a){if(!isPro||!isYtReady)return;const t=ytPlayer.getCurrentTime();
+ if(a==='play')ytPlayer.playVideo();else ytPlayer.pauseVideo();broadcast({type:'ytSync',action:a,time:t});}
+function remoteYt(d){if(!isYtReady)return;
+ if(d.action==='load'&&d.videoId)ytPlayer.loadVideoById(d.videoId);
+ else{ytPlayer.seekTo(d.time,true);d.action==='play'?ytPlayer.playVideo():ytPlayer.pauseVideo();}}
+</script>
 </body>
 </html>
