@@ -176,6 +176,9 @@
         <button onclick="switchDashboardTab('home')" id="navHome" class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold bg-purple-600 text-white flex items-center gap-2.5 transition">
           <i class="fa-solid fa-house"></i> Início & Feed
         </button>
+        <button onclick="switchDashboardTab('join')" id="navJoin" class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-pink-400 hover:bg-pink-500/10 flex items-center gap-2.5 transition">
+          <i class="fa-solid fa-right-to-bracket"></i> Entrar por ID
+        </button>
         <button onclick="switchDashboardTab('explore')" id="navExplore" class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-purple-500/10 flex items-center gap-2.5 transition">
           <i class="fa-solid fa-compass"></i> Explorar Salas
         </button>
@@ -198,6 +201,19 @@
         
         <!-- SECÇÃO INÍCIO / FEED SOCIAL -->
         <div id="tabContent-home" class="space-y-4">
+          <!-- CARD RÁPIDO PARA ENTRAR POR ID -->
+          <div class="bg-[#0f111a] border-pink-glow rounded-2xl p-4 flex flex-col sm:flex-row items-center gap-3">
+            <div class="flex-1 w-full">
+              <label class="block text-xs font-bold text-pink-400 mb-1 flex items-center gap-1.5">
+                <i class="fa-solid fa-key"></i> Entrar Rapidamente numa Sala por ID:
+              </label>
+              <input id="quickRoomIdInput" type="text" placeholder="Digite o ID da sala (ex: nexora-lobby ou salaandin)" onkeydown="if(event.key==='Enter') joinRoomByQuickInput()" class="w-full bg-[#08090d] border border-pink-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-pink-400">
+            </div>
+            <button onclick="joinRoomByQuickInput()" class="w-full sm:w-auto bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs py-2.5 px-5 rounded-xl transition flex items-center justify-center gap-2 shadow-[0_0_10px_rgba(255,0,127,0.3)]">
+              <i class="fa-solid fa-right-to-bracket"></i> Entrar
+            </button>
+          </div>
+
           <div class="bg-[#0f111a] border-nexora-glow rounded-2xl p-5">
             <h2 class="text-sm font-bold text-purple-400 mb-3 uppercase flex items-center gap-2">
               <i class="fa-solid fa-bullhorn"></i> Criar Publicação na Comunidade
@@ -229,6 +245,25 @@
                 <button class="hover:text-pink-400"><i class="fa-solid fa-heart"></i> 12 Curtidas</button>
                 <button class="hover:text-purple-400"><i class="fa-solid fa-comment"></i> 3 Comentários</button>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECÇÃO BUSCAR / ENTRAR POR ID DA SALA -->
+        <div id="tabContent-join" class="hidden space-y-4">
+          <div class="bg-[#0f111a] border-pink-glow rounded-2xl p-6 max-w-xl mx-auto shadow-xl">
+            <h2 class="text-sm font-bold text-pink-400 mb-2 uppercase flex items-center gap-2">
+              <i class="fa-solid fa-magnifying-glass"></i> Buscar e Entrar numa Sala
+            </h2>
+            <p class="text-xs text-gray-400 mb-4">Insira o ID exato da sala gerado pelo anfitrião para se conectar diretamente:</p>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1">ID da Sala Privada:</label>
+                <input id="searchRoomIdInput" type="text" placeholder="Ex: nexora-lobby ou salaandin" onkeydown="if(event.key==='Enter') joinRoomFromSearchTab()" class="w-full bg-[#08090d] border border-pink-500/30 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-pink-400">
+              </div>
+              <button onclick="joinRoomFromSearchTab()" class="w-full bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs py-3 rounded-xl transition shadow-[0_0_15px_rgba(255,0,127,0.3)] flex items-center justify-center gap-2">
+                <i class="fa-solid fa-right-to-bracket"></i> LIGAR À SALA POR ID
+              </button>
             </div>
           </div>
         </div>
@@ -603,7 +638,7 @@
     }
 
     function switchDashboardTab(tabName) {
-      ['home', 'explore', 'create', 'profile', 'pro', 'settings'].forEach(t => {
+      ['home', 'join', 'explore', 'create', 'profile', 'pro', 'settings'].forEach(t => {
         const el = document.getElementById(`tabContent-${t}`);
         const nav = document.getElementById(`nav${t.charAt(0).toUpperCase() + t.slice(1)}`);
         if (el) el.classList.add('hidden');
@@ -618,6 +653,20 @@
       if (activeNav) {
         activeNav.className = 'w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold bg-purple-600 text-white flex items-center gap-2.5 transition';
       }
+    }
+
+    function joinRoomByQuickInput() {
+      const roomId = document.getElementById('quickRoomIdInput').value.trim();
+      if (!roomId) return alert('Por favor, informe o ID da sala.');
+      const cleanId = roomId.startsWith('nex-') ? roomId : 'nex-' + roomId.toLowerCase().replace(/[^a-z0-9-_]/g, '');
+      enterRoom(cleanId);
+    }
+
+    function joinRoomFromSearchTab() {
+      const roomId = document.getElementById('searchRoomIdInput').value.trim();
+      if (!roomId) return alert('Por favor, informe o ID da sala.');
+      const cleanId = roomId.startsWith('nex-') ? roomId : 'nex-' + roomId.toLowerCase().replace(/[^a-z0-9-_]/g, '');
+      enterRoom(cleanId);
     }
 
     function handleLogin() {
@@ -667,7 +716,6 @@
       document.getElementById('dashboardView').classList.remove('hidden');
       document.getElementById('roomView').classList.add('hidden');
       document.getElementById('dashUserEmail').innerText = currentUser.email;
-      document.getElementById('dashNicknameInput').value = currentUser.nickname;
       document.getElementById('profileNickname').value = currentUser.nickname;
       if (currentUser.isPro) document.getElementById('proBadge').classList.remove('hidden');
     }
