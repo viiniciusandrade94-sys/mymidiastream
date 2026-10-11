@@ -74,7 +74,7 @@
 </head>
 <body class="min-h-screen flex flex-col relative overflow-x-hidden">
 
-  <!-- ================= TELA DE LOGIN & CADASTRO ================= -->
+  <!-- ================= 1. TELA DE AUTENTICAÇÃO ================= -->
   <div id="authScreen" class="fixed inset-0 bg-[#08090d]/95 backdrop-blur-xl flex items-center justify-center p-4 z-50">
     <div class="bg-[#0f111a] border-nexora-glow rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
       <div class="text-center mb-5">
@@ -146,7 +146,7 @@
   </div>
 
 
-  <!-- ================= DASHBOARD PRINCIPAL ================= -->
+  <!-- ================= 2. DASHBOARD PRINCIPAL COM SIDEBAR ================= -->
   <div id="dashboardView" class="hidden min-h-screen flex flex-col">
     <header class="border-b border-purple-500/20 bg-[#0f111a]/90 backdrop-blur-md py-4 px-6 flex justify-between items-center z-30">
       <div class="flex items-center space-x-3">
@@ -169,66 +169,178 @@
       </div>
     </header>
 
-    <main class="flex-1 p-6 max-w-6xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="flex-1 flex flex-col md:flex-row max-w-7xl mx-auto w-full p-4 gap-6">
       
-      <div class="bg-[#0f111a] border-nexora-glow rounded-2xl p-5 flex flex-col justify-between">
-        <div>
-          <h3 class="text-sm font-bold text-purple-400 mb-3 uppercase flex items-center gap-2">
-            <i class="fa-solid fa-user-pen"></i> Perfil & Comunidade
-          </h3>
-          <p class="text-xs text-gray-400 mb-4">Gerencie seu nome de exibição visível nas salas e feeds sociais da Nexora:</p>
-          <label class="block text-[11px] text-gray-300 mb-1 font-semibold">Nome de Exibição:</label>
-          <input id="dashNicknameInput" type="text" placeholder="Ex: CyberPlayer" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:border-purple-400">
-        </div>
-        <button onclick="saveDashNickname()" class="w-full bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold py-2.5 rounded-xl transition mt-4">
-          Salvar Alterações
+      <!-- MENU LATERAL (SIDEBAR) -->
+      <aside class="w-full md:w-64 bg-[#0f111a] border border-purple-500/20 rounded-2xl p-4 flex flex-col gap-2 h-fit">
+        <button onclick="switchDashboardTab('home')" id="navHome" class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold bg-purple-600 text-white flex items-center gap-2.5 transition">
+          <i class="fa-solid fa-house"></i> Início & Feed
         </button>
-      </div>
-
-      <div class="bg-[#0f111a] border-pink-glow rounded-2xl p-5 flex flex-col justify-between">
-        <div>
-          <h3 class="text-sm font-bold text-pink-400 mb-3 uppercase flex items-center gap-2">
-            <i class="fa-solid fa-door-open"></i> Entrar por ID de Sala
-          </h3>
-          <p class="text-xs text-gray-400 mb-3">Digite o ID da sala privada (ex: `nexora-lobby`) para se conectar com amigos:</p>
-          <label class="block text-[11px] text-gray-300 mb-1 font-semibold">ID Exclusivo da Sala:</label>
-          <input id="dashRoomIdInput" type="text" placeholder="Ex: nexora-lobby" class="w-full bg-[#08090d] border border-pink-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:border-pink-400">
-        </div>
-        <button onclick="createOrJoinRoom()" class="w-full bg-pink-600 hover:bg-pink-500 text-white text-xs font-bold py-2.5 rounded-xl transition mt-4 shadow-[0_0_10px_rgba(255,0,127,0.3)]">
-          <i class="fa-solid fa-right-to-bracket"></i> Entrar na Sala Privada
+        <button onclick="switchDashboardTab('explore')" id="navExplore" class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-purple-500/10 flex items-center gap-2.5 transition">
+          <i class="fa-solid fa-compass"></i> Explorar Salas
         </button>
-      </div>
+        <button onclick="switchDashboardTab('create')" id="navCreate" class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-purple-500/10 flex items-center gap-2.5 transition">
+          <i class="fa-solid fa-plus-circle"></i> Criar Sala Privada
+        </button>
+        <button onclick="switchDashboardTab('profile')" id="navProfile" class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-purple-500/10 flex items-center gap-2.5 transition">
+          <i class="fa-solid fa-user"></i> Meu Perfil
+        </button>
+        <button onclick="switchDashboardTab('pro')" id="navPro" class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-amber-400 hover:bg-amber-500/10 flex items-center gap-2.5 transition">
+          <i class="fa-solid fa-crown"></i> Assinatura & Chave OBS
+        </button>
+        <button onclick="switchDashboardTab('settings')" id="navSettings" class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-purple-500/10 flex items-center gap-2.5 transition">
+          <i class="fa-solid fa-gear"></i> Configurações
+        </button>
+      </aside>
 
-      <div class="bg-[#0f111a] border border-purple-500/30 rounded-2xl p-5 flex flex-col justify-between">
-        <div>
-          <h3 class="text-sm font-bold text-amber-400 mb-3 uppercase flex items-center gap-2">
-            <i class="fa-solid fa-crown"></i> Assinatura NEXORA PRO
-          </h3>
-          <p class="text-xs text-gray-400 mb-3">Desbloqueie transmissão em 4K, 240 FPS, chave OBS Studio integrada e salas sem limites.</p>
-          
-          <div class="bg-[#08090d] p-2.5 rounded-xl border border-purple-500/20 text-[11px] space-y-1.5 font-mono">
-            <div class="text-gray-400">Ingestão RTMP: <span class="text-purple-300">rtmp://live.nexora.stream/app</span></div>
-            <div class="text-gray-400">Chave OBS: <span id="dashObsKey" class="text-amber-300">nex_live_sec_7792</span></div>
+      <!-- ÁREA CENTRAL DE CONTEÚDO -->
+      <main class="flex-1 space-y-6">
+        
+        <!-- SECÇÃO INÍCIO / FEED SOCIAL -->
+        <div id="tabContent-home" class="space-y-4">
+          <div class="bg-[#0f111a] border-nexora-glow rounded-2xl p-5">
+            <h2 class="text-sm font-bold text-purple-400 mb-3 uppercase flex items-center gap-2">
+              <i class="fa-solid fa-bullhorn"></i> Criar Publicação na Comunidade
+            </h2>
+            <textarea id="socialPostInput" placeholder="O que você está transmitindo ou criando hoje?" rows="3" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-purple-400 mb-3 resize-none"></textarea>
+            <div class="flex justify-between items-center">
+              <div class="flex gap-2 text-xs text-gray-400">
+                <button class="hover:text-purple-400"><i class="fa-solid fa-image"></i> Imagem</button>
+                <button class="hover:text-purple-400"><i class="fa-solid fa-film"></i> GIF</button>
+              </div>
+              <button onclick="publishSocialPost()" class="bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs py-2 px-4 rounded-xl transition">
+                Publicar
+              </button>
+            </div>
+          </div>
+
+          <div id="socialFeedContainer" class="space-y-4">
+            <!-- Feed Dinâmico -->
+            <div class="bg-[#0f111a] border border-purple-500/20 rounded-2xl p-4">
+              <div class="flex items-center gap-2.5 mb-2">
+                <div class="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 font-bold text-xs">C</div>
+                <div>
+                  <h4 class="text-xs font-bold text-white">CyberAdmin</h4>
+                  <span class="text-[10px] text-gray-500">Há 15 minutos</span>
+                </div>
+              </div>
+              <p class="text-xs text-gray-300 mb-3">Bem-vindos à Nexora! Compartilhem suas janelas de aplicativos (.exe) ou ecrãs nas salas privadas. O Watch Together com YouTube já está ativo!</p>
+              <div class="flex gap-4 text-xs text-gray-400 border-t border-purple-500/10 pt-2">
+                <button class="hover:text-pink-400"><i class="fa-solid fa-heart"></i> 12 Curtidas</button>
+                <button class="hover:text-purple-400"><i class="fa-solid fa-comment"></i> 3 Comentários</button>
+              </div>
+            </div>
           </div>
         </div>
 
-        <button onclick="openCheckoutModal()" class="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-black font-extrabold text-xs py-2.5 rounded-xl transition mt-4 shadow-[0_0_10px_rgba(255,183,0,0.3)]">
-          <i class="fa-solid fa-bolt"></i> Assinar PRO (R$ 14,90/mês)
-        </button>
-      </div>
+        <!-- SECÇÃO EXPLORAR SALAS -->
+        <div id="tabContent-explore" class="hidden space-y-4">
+          <div class="flex justify-between items-center bg-[#0f111a] p-4 rounded-2xl border border-purple-500/20">
+            <h2 class="text-sm font-bold text-white uppercase"><i class="fa-solid fa-compass text-purple-400"></i> Salas Públicas Ativas</h2>
+            <input id="searchRoomInput" type="text" placeholder="Buscar sala..." class="bg-[#08090d] border border-purple-500/30 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none">
+          </div>
 
-    </main>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-[#0f111a] border border-purple-500/30 rounded-2xl p-4 flex flex-col justify-between">
+              <div>
+                <span class="text-[9px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full font-bold">AO VIVO</span>
+                <h3 class="text-sm font-bold text-white mt-2">Lobby Principal Nexora</h3>
+                <p class="text-xs text-gray-400 mt-1">Sala oficial para testes de partilha de ecrã e chat em tempo real.</p>
+              </div>
+              <button onclick="enterRoom('nexora-lobby')" class="mt-4 w-full bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs py-2 rounded-xl transition">
+                Entrar na Sala
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECÇÃO CRIAR SALA -->
+        <div id="tabContent-create" class="hidden space-y-4">
+          <div class="bg-[#0f111a] border-nexora-glow rounded-2xl p-5 max-w-xl mx-auto">
+            <h2 class="text-sm font-bold text-purple-400 mb-4 uppercase flex items-center gap-2">
+              <i class="fa-solid fa-door-open"></i> Criar Nova Sala Privada
+            </h2>
+            <div class="space-y-3.5">
+              <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1">ID Único da Sala:</label>
+                <input id="newRoomId" type="text" placeholder="ex: salaandin" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-purple-400">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1">Nome da Sala:</label>
+                <input id="newRoomName" type="text" placeholder="Transmissão de Jogos e Apps" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-purple-400">
+              </div>
+              <button onclick="createRoomFromPanel()" class="w-full btn-nexora-gradient text-white font-extrabold text-xs py-3 rounded-xl uppercase tracking-wider mt-2">
+                Criar e Entrar na Sala
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECÇÃO PERFIL -->
+        <div id="tabContent-profile" class="hidden space-y-4">
+          <div class="bg-[#0f111a] border border-purple-500/30 rounded-2xl p-5 max-w-xl mx-auto space-y-4">
+            <h2 class="text-sm font-bold text-purple-400 uppercase"><i class="fa-solid fa-user"></i> Configuração de Perfil</h2>
+            <div>
+              <label class="block text-xs font-semibold text-gray-300 mb-1">Nome de Exibição no Chat:</label>
+              <input id="profileNickname" type="text" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl px-3.5 py-2 text-xs text-white">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-300 mb-1">Biografia:</label>
+              <textarea id="profileBio" rows="2" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl p-3 text-xs text-white resize-none">Desenvolvedor e criador de conteúdos na Nexora.</textarea>
+            </div>
+            <button onclick="saveProfile()" class="w-full bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold py-2.5 rounded-xl transition">
+              Salvar Perfil
+            </button>
+          </div>
+        </div>
+
+        <!-- SECÇÃO PRO & CHAVE OBS -->
+        <div id="tabContent-pro" class="hidden space-y-4">
+          <div class="bg-[#0f111a] border-pink-glow rounded-2xl p-5 max-w-xl mx-auto space-y-4">
+            <h2 class="text-sm font-bold text-pink-400 uppercase flex items-center gap-2">
+              <i class="fa-solid fa-crown"></i> Assinatura NEXORA PRO (R$ 14,90/mês)
+            </h2>
+            <p class="text-xs text-gray-300">Desbloqueie qualidade 4K, 240 FPS, Watch Together sem restrições e ingestão via OBS Studio.</p>
+            
+            <div class="bg-[#08090d] p-3 rounded-xl border border-pink-500/30 font-mono text-xs space-y-2">
+              <div>Servidor RTMP: <span class="text-purple-300">rtmp://live.nexora.stream/app</span></div>
+              <div>Chave Privada OBS: <span id="obsKeyDisplay" class="text-amber-300">nex_live_sec_9941</span></div>
+            </div>
+
+            <button onclick="openCheckoutModal()" class="w-full bg-gradient-to-r from-amber-500 to-yellow-500 text-black font-extrabold text-xs py-3 rounded-xl shadow">
+              Ativar / Gerenciar Plano PRO
+            </button>
+          </div>
+        </div>
+
+        <!-- SECÇÃO CONFIGURAÇÕES -->
+        <div id="tabContent-settings" class="hidden space-y-4">
+          <div class="bg-[#0f111a] border border-purple-500/30 rounded-2xl p-5 max-w-xl mx-auto space-y-4">
+            <h2 class="text-sm font-bold text-purple-400 uppercase"><i class="fa-solid fa-gear"></i> Configurações da Aplicação</h2>
+            <div class="flex items-center justify-between text-xs text-gray-300">
+              <span>Tema Escuro Automático</span>
+              <input type="checkbox" checked class="accent-purple-600">
+            </div>
+            <div class="flex items-center justify-between text-xs text-gray-300">
+              <span>Notificações Sonoras</span>
+              <input type="checkbox" checked class="accent-purple-600">
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
   </div>
 
 
-  <!-- ================= TELA DA SALA DE TRANSMISSÃO ================= -->
+  <!-- ================= 3. TELA DA SALA DE TRANSMISSÃO & MULTI-STREAM ================= -->
   <div id="roomView" class="hidden min-h-screen flex flex-col">
     <header class="border-b border-purple-500/20 bg-[#0f111a]/90 backdrop-blur-md py-3 px-6 flex justify-between items-center z-30">
       <div class="flex items-center space-x-3">
         <button onclick="returnToDashboard()" class="text-purple-400 hover:text-white text-xs bg-[#08090d] px-3 py-1.5 rounded-xl border border-purple-500/30 flex items-center gap-1.5 font-bold">
           <i class="fa-solid fa-arrow-left"></i> Voltar ao Hub
         </button>
-        <h1 class="text-sm font-black tracking-wider text-gradient-nexora">SALA PRIVADA NEXORA ID: <span id="currentRoomTitle" class="text-white">...</span></h1>
+        <h1 class="text-sm font-black tracking-wider text-gradient-nexora">SALA ID: <span id="currentRoomTitle" class="text-white">...</span></h1>
       </div>
 
       <div class="flex items-center gap-3">
@@ -253,7 +365,7 @@
           </div>
           <div class="px-3 py-1 bg-[#08090d] rounded-lg border border-purple-500/30 text-xs text-gray-300 flex items-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span id="roomParticipantsInfo">Sincronizando Sala...</span>
+            <span id="roomParticipantsInfo">Conectando...</span>
           </div>
         </div>
 
@@ -262,14 +374,14 @@
           <div id="screenView" class="w-full h-full grid grid-cols-1 md:grid-cols-2 gap-3 items-center justify-center overflow-y-auto max-h-[360px]">
             
             <div id="slot-local" class="relative bg-black/80 rounded-xl overflow-hidden flex flex-col items-center justify-center min-h-[200px] border border-purple-500/30">
-              <span id="localStreamLabel" class="absolute top-2 left-2 bg-black/80 text-purple-300 text-[10px] px-2 py-0.5 rounded font-bold border border-purple-500/30 z-10">Sua Transmissão (.exe ou Tela)</span>
+              <span id="localStreamLabel" class="absolute top-2 left-2 bg-black/80 text-purple-300 text-[10px] px-2 py-0.5 rounded font-bold border border-purple-500/30 z-10">Sua Transmissão</span>
               <button onclick="toggleVideoFullscreen('localVideo')" class="absolute top-2 right-2 bg-black/80 text-white text-xs px-2 py-0.5 rounded border border-purple-500/20 z-10">
                 <i class="fa-solid fa-expand"></i>
               </button>
               <video id="localVideo" autoplay playsinline muted class="w-full max-h-[280px] object-contain hidden"></video>
               <div id="localPlaceholder" class="text-center p-4 text-gray-500 text-xs">
                 <i class="fa-solid fa-desktop text-3xl mb-1 text-purple-400/40"></i>
-                <p>Nenhuma partilha ativa no momento</p>
+                <p>Nenhuma partilha ativa</p>
               </div>
             </div>
 
@@ -278,7 +390,7 @@
                 <span class="absolute top-2 left-2 bg-black/80 text-pink-400 text-[10px] px-2 py-0.5 rounded font-bold border border-pink-500/30 z-10">Participante Nexora</span>
                 <div id="remotePlaceholder" class="text-center p-4 text-gray-500 text-xs">
                   <i class="fa-solid fa-user-slash text-3xl mb-1 text-pink-500/30"></i>
-                  <p id="remoteStatusText">Aguardando participantes na sala...</p>
+                  <p id="remoteStatusText">Aguardando outros membros na sala...</p>
                 </div>
               </div>
             </div>
@@ -303,7 +415,7 @@
                   </button>
                 </div>
                 <div class="flex items-center justify-between text-xs text-gray-400">
-                  <span class="text-purple-400 font-bold">Controles Globais Watch Together:</span>
+                  <span class="text-purple-400 font-bold">Controles Globais:</span>
                   <div class="flex gap-2">
                     <button onclick="syncYtAction('play')" class="bg-purple-500/20 border border-purple-500/40 text-purple-300 px-2.5 py-1 rounded-lg font-bold">Play</button>
                     <button onclick="syncYtAction('pause')" class="bg-purple-500/20 border border-purple-500/40 text-purple-300 px-2.5 py-1 rounded-lg font-bold">Pausa</button>
@@ -376,7 +488,7 @@
           </h2>
 
           <div id="chatMessages" class="flex-1 bg-[#08090d] border border-purple-500/20 rounded-xl p-2.5 overflow-y-auto mb-2 text-xs space-y-2 max-h-[220px]">
-            <div class="text-gray-500 italic text-center text-[11px]">Chat P2P seguro ativado. Figurinhas renderizadas em 50x50px. Digite <strong>/ia</strong> para consultar o assistente!</div>
+            <div class="text-gray-500 italic text-center text-[11px]">Chat P2P seguro ativado. Figurinhas em 50x50px. Digite <strong>/ia</strong> para consultar o assistente!</div>
           </div>
 
           <input type="file" id="deviceImageInput" accept="image/*" class="hidden" onchange="handleDeviceImageUpload(event)">
@@ -389,7 +501,7 @@
           </div>
 
           <div class="flex gap-1.5 items-center">
-            <button onclick="toggleStickerPicker()" class="text-gray-400 hover:text-purple-400 text-xs px-1.5 py-1" title="Enviar Sticker/GIF">
+            <button onclick="toggleStickerPicker()" class="text-gray-400 hover:text-purple-400 text-xs px-1.5 py-1" title="Enviar Sticker">
               <i class="fa-solid fa-face-smile"></i>
             </button>
             <button onclick="document.getElementById('deviceImageInput').click()" class="text-gray-400 hover:text-pink-400 text-xs px-1.5 py-1" title="Enviar Imagem (50x50px)">
@@ -490,6 +602,24 @@
       }
     }
 
+    function switchDashboardTab(tabName) {
+      ['home', 'explore', 'create', 'profile', 'pro', 'settings'].forEach(t => {
+        const el = document.getElementById(`tabContent-${t}`);
+        const nav = document.getElementById(`nav${t.charAt(0).toUpperCase() + t.slice(1)}`);
+        if (el) el.classList.add('hidden');
+        if (nav) {
+          nav.className = 'w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-purple-500/10 flex items-center gap-2.5 transition';
+        }
+      });
+
+      const activeEl = document.getElementById(`tabContent-${tabName}`);
+      const activeNav = document.getElementById(`nav${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`);
+      if (activeEl) activeEl.classList.remove('hidden');
+      if (activeNav) {
+        activeNav.className = 'w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold bg-purple-600 text-white flex items-center gap-2.5 transition';
+      }
+    }
+
     function handleLogin() {
       const email = document.getElementById('loginEmail').value.trim();
       const password = document.getElementById('loginPassword').value.trim();
@@ -538,20 +668,45 @@
       document.getElementById('roomView').classList.add('hidden');
       document.getElementById('dashUserEmail').innerText = currentUser.email;
       document.getElementById('dashNicknameInput').value = currentUser.nickname;
+      document.getElementById('profileNickname').value = currentUser.nickname;
       if (currentUser.isPro) document.getElementById('proBadge').classList.remove('hidden');
     }
 
-    function saveDashNickname() {
-      const newName = document.getElementById('dashNicknameInput').value.trim();
+    function saveProfile() {
+      const newName = document.getElementById('profileNickname').value.trim();
       if (!newName) return alert('Informe um nome válido.');
       currentUser.nickname = newName;
       localStorage.setItem('nexora_current_user', JSON.stringify(currentUser));
-      alert('Nome de exibição atualizado com sucesso!');
+      alert('Perfil atualizado com sucesso!');
     }
 
-    function createOrJoinRoom() {
-      const roomId = document.getElementById('dashRoomIdInput').value.trim();
-      if (!roomId) return alert('Informe o ID da sala (ex: nexora-lobby).');
+    function publishSocialPost() {
+      const text = document.getElementById('socialPostInput').value.trim();
+      if (!text) return;
+      const feed = document.getElementById('socialFeedContainer');
+      const postDiv = document.createElement('div');
+      postDiv.className = 'bg-[#0f111a] border border-purple-500/20 rounded-2xl p-4';
+      postDiv.innerHTML = `
+        <div class="flex items-center gap-2.5 mb-2">
+          <div class="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 font-bold text-xs">${currentUser.nickname.charAt(0).toUpperCase()}</div>
+          <div>
+            <h4 class="text-xs font-bold text-white">${currentUser.nickname}</h4>
+            <span class="text-[10px] text-gray-500">Agora mesmo</span>
+          </div>
+        </div>
+        <p class="text-xs text-gray-300 mb-3">${text}</p>
+        <div class="flex gap-4 text-xs text-gray-400 border-t border-purple-500/10 pt-2">
+          <button class="hover:text-pink-400"><i class="fa-solid fa-heart"></i> 0 Curtidas</button>
+          <button class="hover:text-purple-400"><i class="fa-solid fa-comment"></i> 0 Comentários</button>
+        </div>
+      `;
+      feed.prepend(postDiv);
+      document.getElementById('socialPostInput').value = '';
+    }
+
+    function createRoomFromPanel() {
+      const roomId = document.getElementById('newRoomId').value.trim();
+      if (!roomId) return alert('Informe um ID válido para a sala.');
       const cleanId = 'nex-' + roomId.toLowerCase().replace(/[^a-z0-9-_]/g, '');
       enterRoom(cleanId);
     }
@@ -582,9 +737,9 @@
       peer = new Peer(roomId, peerConfig);
 
       peer.on('open', (id) => {
-        document.getElementById('connectionStatus').innerText = 'Anfitrião da Sala';
+        document.getElementById('connectionStatus').innerText = 'Anfitrião';
         document.getElementById('connectionStatus').className = 'text-[9px] bg-emerald-900/80 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30';
-        document.getElementById('roomParticipantsInfo').innerText = 'Aguardando amigos entrarem...';
+        document.getElementById('roomParticipantsInfo').innerText = 'Aguardando amigos na sala...';
       });
 
       peer.on('error', (err) => {
@@ -595,7 +750,7 @@
           peer.on('open', () => {
             document.getElementById('connectionStatus').innerText = 'Sincronizado';
             document.getElementById('connectionStatus').className = 'text-[9px] bg-emerald-900/80 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30';
-            document.getElementById('roomParticipantsInfo').innerText = 'Conectando ao anfitrião...';
+            document.getElementById('roomParticipantsInfo').innerText = 'Conectado ao anfitrião...';
 
             const conn = peer.connect(roomId, { reliable: true });
             bindConnection(conn);
@@ -614,9 +769,6 @@
       connections[conn.peer] = conn;
 
       conn.on('open', () => {
-        document.getElementById('connectionStatus').innerText = 'Conectado';
-        document.getElementById('connectionStatus').className = 'text-[9px] bg-emerald-900/80 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30';
-        
         conn.send({ type: 'nickname', name: currentUser.nickname });
 
         if (localStream) {
@@ -626,18 +778,12 @@
       });
 
       conn.on('data', (data) => {
-        if (data.type === 'chat') {
-          appendChatMessage(data.sender, data.text, data.isSticker);
-        }
-        if (data.type === 'ai_response') {
-          appendChatMessage(data.sender, data.text, false);
-        }
+        if (data.type === 'chat') appendChatMessage(data.sender, data.text, data.isSticker);
+        if (data.type === 'ai_response') appendChatMessage(data.sender, data.text, false);
         if (data.type === 'nickname') {
           document.getElementById('roomParticipantsInfo').innerText = `Conectado com ${data.name}`;
           conn.send({ type: 'nickname_ack', name: currentUser.nickname });
-          if (localStream) {
-            peer.call(conn.peer, localStream);
-          }
+          if (localStream) peer.call(conn.peer, localStream);
         }
         if (data.type === 'nickname_ack') {
           document.getElementById('roomParticipantsInfo').innerText = `Conectado com ${data.name}`;
@@ -649,15 +795,13 @@
       conn.on('close', () => {
         delete connections[conn.peer];
         removeRemoteStreamElement(conn.peer);
-        document.getElementById('roomParticipantsInfo').innerText = 'Participante saiu';
+        document.getElementById('roomParticipantsInfo').innerText = 'Participante desconectado';
       });
     }
 
     function answerVideoCall(call) {
       call.answer(localStream);
-      call.on('stream', (remoteStream) => {
-        handleRemoteStream(remoteStream, call.peer);
-      });
+      call.on('stream', (remoteStream) => handleRemoteStream(remoteStream, call.peer));
     }
 
     function handleRemoteStream(remoteStream, peerId) {
@@ -756,13 +900,7 @@
     }
 
     async function getGeminiAIResponse(prompt) {
-      const p = prompt.toLowerCase();
-      if (p.includes('nexora') || p.includes('plataforma')) {
-        return 'A Nexora é uma plataforma social avançada que integra salas virtuais, partilha de janelas .exe, WebRTC e Watch Together.';
-      } else if (p.includes('pro') || p.includes('preco')) {
-        return 'O plano Nexora Pro custa R$ 14,90 mensais e inclui 4K, 240 FPS e chaves OBS dedicadas.';
-      }
-      return `Resposta para "${prompt}": Nexora AI analisou sua dúvida e está operando perfeitamente na sala!`;
+      return `Resposta para "${prompt}": Nexora AI analisou sua solicitação na sala virtual com sucesso!`;
     }
 
     function appendChatMessage(sender, content, isSticker = false) {
@@ -773,7 +911,7 @@
       const colorClass = isAI ? 'text-amber-400 font-bold' : 'text-purple-400 font-bold';
 
       if (isSticker) {
-        // RENDERIZAÇÃO RIGOROSA DE 50x50 PIXELS CONFORME ESPECIFICADO NO PROMPT MASTER
+        // RENDERIZAÇÃO RIGOROSA DE 50x50 PIXELS
         msgDiv.innerHTML = `<span class="${colorClass}">${sender}:</span><img src="${content}" style="width: 50px; height: 50px;" class="rounded-lg border border-purple-500/40 object-cover mt-1 shadow">`;
       } else {
         msgDiv.innerHTML = `<span class="${colorClass}">${sender}:</span> <span class="text-gray-200">${content}</span>`;
@@ -807,7 +945,7 @@
       localStorage.setItem('nexora_current_user', JSON.stringify(currentUser));
       closeCheckoutModal();
       activateProUI();
-      alert('Assinatura NEXORA PRO ativada com sucesso!');
+      alert('Assinatura NEXORA PRO ativada!');
     }
 
     function activateProUI() {
