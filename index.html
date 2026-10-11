@@ -586,6 +586,7 @@
     function initPeerRoom(roomId) {
       if (peer) peer.destroy();
 
+      // Tenta criar o Peer com o ID exato da sala (anfitrião)
       peer = new Peer(roomId, peerConfig);
 
       peer.on('open', (id) => {
@@ -594,13 +595,14 @@
         document.getElementById('roomParticipantsInfo').innerText = 'Sala Pronta (Esperando Conexão)';
       });
 
+      // Se o ID já estiver em uso, significa que o outro usuário já criou a sala; logo, entramos como convidado
       peer.on('error', (err) => {
         if (err.type === 'unavailable-id') {
           const guestPeerId = roomId + "-guest-" + Math.random().toString(36).substring(2, 6);
           peer = new Peer(guestPeerId, peerConfig);
 
           peer.on('open', () => {
-            document.getElementById('connectionStatus').innerText = 'Conectando ao Amigo...';
+            document.getElementById('connectionStatus').innerText = 'Conectando ao Anfitrião...';
             connectToHost(roomId);
           });
 
@@ -627,9 +629,12 @@
         
         conn.send({ type: 'nickname', name: currentUser.nickname });
 
-        // Se você já estiver a partilhar ecrã, reenvia automaticamente ao conectar
+        // Simetria bidirecional: se já estiver transmitindo tela, dispara a chamada imediatamente
         if (localStream) {
-          peer.call(conn.peer, localStream);
+          const call = peer.call(conn.peer, localStream);
+          call.on('stream', (remoteStream) => {
+            handleRemoteStream(remoteStream);
+          });
         }
       });
 
@@ -647,6 +652,10 @@
 
           if (activeConnection && activeConnection.open) {
             activeConnection.send({ type: 'nickname_ack', name: currentUser.nickname });
+          }
+          // Garante reciprocidade de chamada se o anfitrião já estiver a partilhar ecrã
+          if (localStream) {
+            peer.call(conn.peer, localStream);
           }
         }
         if (data.type === 'nickname_ack') {
@@ -668,11 +677,15 @@
     function answerVideoCall(call) {
       call.answer(localStream);
       call.on('stream', (remoteStream) => {
-        const videoElem = document.getElementById('remoteVideo');
-        videoElem.srcObject = remoteStream;
-        videoElem.classList.remove('hidden');
-        document.getElementById('remotePlaceholder').classList.add('hidden');
+        handleRemoteStream(remoteStream);
       });
+    }
+
+    function handleRemoteStream(remoteStream) {
+      const videoElem = document.getElementById('remoteVideo');
+      videoElem.srcObject = remoteStream;
+      videoElem.classList.remove('hidden');
+      document.getElementById('remotePlaceholder').classList.add('hidden');
     }
 
     function copyRoomLink() {
@@ -733,11 +746,10 @@
         try {
           const aiResponse = await getGeminiAIResponse(query);
           const chatBox = document.getElementById('chatMessages');
-          chatBox.lastChild.remove(); // Remove "A processar..."
+          chatBox.lastChild.remove();
           
           appendChatMessage('🤖 Gemini AI', aiResponse);
           
-          // Envia a resposta da IA para todos na sala
           if (activeConnection && activeConnection.open) {
             activeConnection.send({ type: 'ai_response', sender: '🤖 Gemini AI', text: aiResponse });
           }
@@ -758,7 +770,7 @@
       } else if (p.includes('godot') || p.includes('gdscript')) {
         return 'No Godot 4, utilize `CharacterBody3D` com `move_and_slide()` para movimentação precisa.';
       }
-      return `Resposta para "${prompt}": Como assistente Gemini no M.Y.MIDIASTREAM, estou a analisar a sua questão para fornecer todo o suporte necessário na transmissão!`;
+      return `Resposta para "${prompt}": Como assistente Gemini no M.Y.MIDIASTREAM, estou a analisar a sua questão para fornecer todo o suporte necessário!`;
     }
 
     function appendChatMessage(sender, content, isSticker = false) {
@@ -858,14 +870,10 @@
         displayLocalStream(localStream);
         document.getElementById('btnStartStream').innerHTML = `<i class="fa-solid fa-stop"></i> PARAR PARTILHA`;
 
-        // Garante que a chamada WebRTC seja disparada para o parceiro conectado
         if (activeConnection && activeConnection.peer) {
           const call = peer.call(activeConnection.peer, localStream);
           call.on('stream', (remoteStream) => {
-            const videoElem = document.getElementById('remoteVideo');
-            videoElem.srcObject = remoteStream;
-            videoElem.classList.remove('hidden');
-            document.getElementById('remotePlaceholder').classList.add('hidden');
+            handleRemoteStream(remoteStream);
           });
         }
 
