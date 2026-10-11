@@ -11,6 +11,9 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- PeerJS para conexões P2P WebRTC -->
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+  <!-- Firebase Auth (login Google/e-mail) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -42,6 +45,14 @@
 
     <!-- Status & Botão Pro & Modo Cinema -->
     <div class="flex items-center gap-3">
+      <div id="authArea" class="flex items-center gap-2">
+        <button id="btnLogin" onclick="openLoginModal()" class="bg-card-custom border border-custom hover:border-indigo-500 text-gray-300 hover:text-white text-xs py-2 px-3 rounded-lg transition flex items-center gap-1.5"><i class="fa-solid fa-right-to-bracket"></i> <span>Entrar</span></button>
+        <div id="userBox" class="hidden items-center gap-2">
+          <img id="userPhoto" alt="" class="w-7 h-7 rounded-full border border-custom bg-dark-custom">
+          <button id="btnLinkGoogle" onclick="linkGoogle()" class="hidden text-[11px] text-amber-400 hover:underline"><i class="fa-brands fa-google"></i> Vincular Google</button>
+          <button onclick="doLogout()" class="text-[11px] text-gray-400 hover:text-white">Sair</button>
+        </div>
+      </div>
       <button onclick="toggleCinemaMode()" id="btnCinema" class="bg-card-custom border border-custom hover:border-indigo-500 text-gray-300 hover:text-white text-xs py-2 px-3 rounded-lg transition flex items-center gap-1.5" title="Modo Cinema">
         <i class="fa-solid fa-expand"></i> <span class="hidden md:inline">Modo Cinema</span>
       </button>
@@ -50,6 +61,10 @@
       </button>
     </div>
   </header>
+  <div id="httpsBanner" class="hidden bg-red-900/40 border-b border-red-700 text-red-200 text-xs px-4 py-2 text-center">
+    ⚠️ Você está em uma conexão <b>HTTP</b> (sem cadeado). Por segurança do navegador, <b>compartilhar tela, copiar link e login não funcionam</b>.
+    <a id="httpsLink" href="#" class="underline font-semibold">Abrir a versão segura (HTTPS)</a>
+  </div>
 
   <!-- Conteúdo Principal -->
   <main id="mainContainer" class="flex-1 p-4 md:p-6 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-3 gap-6 transition-all duration-300">
@@ -176,38 +191,28 @@
     <!-- Coluna Direita: Conexão, ID Personalizado e Chat -->
     <div id="rightColumn" class="flex flex-col gap-4 transition-all duration-300">
       
-      <!-- Cartão de Conexão PeerJS & Salas PRO -->
+      <!-- Cartão de Sala Privada -->
       <div class="bg-card-custom border border-custom rounded-xl p-4 shadow-md">
         <h2 class="text-sm font-semibold text-white mb-2 flex items-center justify-between">
-          <span><i class="fa-solid fa-network-wired text-indigo-400"></i> Gerenciar Sala</span>
+          <span><i class="fa-solid fa-lock text-indigo-400"></i> Sala Privada</span>
           <span id="connectionStatus" class="text-[10px] bg-red-900 text-red-300 px-2 py-0.5 rounded-full">Desconectado</span>
         </h2>
-
         <div class="mb-3">
           <div class="flex justify-between items-center mb-1">
-            <span class="text-xs text-gray-400">Seu ID de Sala:</span>
-            <button id="btnCustomRoom" onclick="openCustomRoomPrompt()" class="text-[10px] text-amber-400 hover:underline hidden">
-              <i class="fa-solid fa-wand-magic-sparkles"></i> Personalizar sala (PRO)
-            </button>
+            <span class="text-xs text-gray-400">Link da sua sala:</span>
+            <button id="btnCustomRoom" onclick="openCustomRoomPrompt()" class="text-[10px] text-amber-400 hover:underline hidden"><i class="fa-solid fa-wand-magic-sparkles"></i> Nome personalizado (PRO)</button>
           </div>
           <div class="flex items-center gap-2 bg-dark-custom p-2 rounded-lg border border-custom">
-            <span id="myPeerId" class="text-xs font-mono text-indigo-300 truncate flex-1">Carregando...</span>
-            <button onclick="copyPeerId()" title="Copiar ID" class="text-gray-400 hover:text-white text-xs p-1">
-              <i class="fa-solid fa-copy"></i>
-            </button>
-            <button onclick="copyInviteLink()" title="Copiar link de convite" aria-label="Copiar link de convite" class="text-gray-400 hover:text-white text-xs p-1">
-              <i class="fa-solid fa-link"></i>
-            </button>
+            <span id="roomLink" class="text-xs font-mono text-indigo-300 truncate flex-1">Gerando link...</span>
+            <button onclick="copyInviteLink()" title="Copiar link" aria-label="Copiar link da sala" class="text-gray-400 hover:text-white text-xs p-1"><i class="fa-solid fa-copy"></i></button>
           </div>
+          <p class="text-[10px] text-gray-500 mt-1">Só entra quem tiver este link. <button onclick="newPrivateRoom()" class="text-indigo-300 hover:underline">Criar nova sala</button></p>
         </div>
-
         <div>
           <span class="text-xs text-gray-400 block mb-1">Entrar na sala de um amigo:</span>
           <div class="flex gap-2">
-            <input id="remotePeerIdInput" type="text" placeholder="Cole o ID da sala..." class="flex-1 bg-dark-custom border border-custom rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
-            <button onclick="connectToRemotePeer()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded-lg transition">
-              Entrar
-            </button>
+            <input id="remotePeerIdInput" type="text" placeholder="Cole o link da sala..." class="flex-1 bg-dark-custom border border-custom rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+            <button onclick="connectToRemotePeer()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded-lg transition">Entrar</button>
           </div>
         </div>
       </div>
@@ -233,6 +238,24 @@
     </div>
 
   </main>
+
+  <!-- Modal de Login -->
+  <div id="loginModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-card-custom border border-custom rounded-2xl max-w-sm w-full p-6 shadow-2xl relative">
+      <button onclick="closeLoginModal()" aria-label="Fechar" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      <h3 class="text-lg font-bold text-white mb-1">Entrar</h3>
+      <p class="text-xs text-gray-400 mb-4">Salve seu perfil e seu plano PRO na sua conta.</p>
+      <button onclick="loginGoogle()" class="w-full bg-white hover:bg-gray-100 text-gray-800 font-medium text-sm py-2.5 rounded-lg flex items-center justify-center gap-2 mb-4"><i class="fa-brands fa-google"></i> Continuar com Google</button>
+      <div class="text-center text-[10px] text-gray-500 mb-3">ou com e-mail</div>
+      <input id="loginEmail" type="email" placeholder="E-mail" autocomplete="email" class="w-full bg-dark-custom border border-custom rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 mb-2">
+      <input id="loginPass" type="password" placeholder="Senha (mín. 6 caracteres)" autocomplete="current-password" class="w-full bg-dark-custom border border-custom rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 mb-3">
+      <div class="flex gap-2">
+        <button onclick="loginEmail(false)" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white text-sm py-2 rounded-lg">Entrar</button>
+        <button onclick="loginEmail(true)" class="flex-1 border border-custom hover:border-indigo-500 text-gray-200 text-sm py-2 rounded-lg">Criar conta</button>
+      </div>
+      <button onclick="resetPassword()" class="mt-3 w-full text-[11px] text-indigo-300 hover:underline">Esqueci a senha</button>
+    </div>
+  </div>
 
   <!-- Modal de Checkout / Assinatura PRO (Pix & Cartão) -->
   <div id="checkoutModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
@@ -267,6 +290,10 @@
   <script>
     // ===== CONFIGURAÇÃO =====
     const CONFIG = {
+      // LOGIN: cole aqui a config do seu projeto Firebase (Console Firebase > Configurações do projeto > Seus apps > Web).
+      // Enquanto estiver vazio, o site funciona normalmente como visitante e o botão Entrar avisa que falta configurar.
+      FIREBASE: { apiKey: '', authDomain: '', projectId: '', appId: '' },
+      FALLBACK_URL: 'https://viiniciusandrade94-sys.github.io/', // versão HTTPS usada enquanto o domínio próprio não tem certificado
       DEMO_MODE: true,      // true = qualquer pessoa ativa o PRO de graça (apenas demonstração!). Ponha false ao vender de verdade.
       PAYMENT_URL: '',      // Link de pagamento real (ex.: link do Mercado Pago). Se preenchido, o botão abre este link.
       ROOM_PREFIX: 'mms-',  // Evita colisão de nomes de sala com outros usuários do servidor público do PeerJS
@@ -285,10 +312,79 @@
     window.addEventListener('DOMContentLoaded', () => {
       try { $('nicknameInput').value = localStorage.getItem('mms_nick') || 'Visitante'; } catch (e) {}
       $('nicknameInput').addEventListener('change', () => { try { localStorage.setItem('mms_nick', $('nicknameInput').value.trim().slice(0, 20)); } catch (e) {} });
-      pendingRoom = new URLSearchParams(location.search).get('sala');
-      initPeerJS();
+      checkSecureContext();
+      initAuth();
+      pendingRoom = parseRoomId(new URLSearchParams(location.search).get('sala'));
+      let stored = null; try { stored = localStorage.getItem('mms_room'); } catch (e) {}
+      if (pendingRoom && pendingRoom === stored) { initPeerJS(pendingRoom); pendingRoom = null; }   // reabrindo o próprio link
+      else if (pendingRoom) initPeerJS(null);                                                         // entrando na sala de alguém
+      else initPeerJS(stored && stored.startsWith(CONFIG.ROOM_PREFIX) ? stored : newHostId());        // criando a própria sala
       loadYouTubeAPI();
     });
+
+    function checkSecureContext() {
+      if (window.isSecureContext) return;
+      const host = location.hostname;
+      $('httpsLink').href = host.endsWith('github.io') ? 'https://' + location.host + location.pathname + location.search : CONFIG.FALLBACK_URL + location.search;
+      $('httpsBanner').classList.remove('hidden');
+    }
+
+    function copyText(t) {
+      if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(t).then(() => true, () => false);
+      const a = document.createElement('textarea'); a.value = t; a.style.position = 'fixed'; a.style.opacity = '0';
+      document.body.appendChild(a); a.select(); let ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) {}
+      a.remove(); return Promise.resolve(ok);
+    }
+
+    // ===== Autenticação (Firebase: Google e e-mail/senha) =====
+    let auth = null, currentUser = null;
+    function initAuth() {
+      const f = CONFIG.FIREBASE;
+      if (!(f && f.apiKey && window.firebase)) return;
+      firebase.initializeApp(f);
+      auth = firebase.auth();
+      auth.onAuthStateChanged(onAuthChanged);
+    }
+    function onAuthChanged(user) {
+      currentUser = user;
+      $('btnLogin').classList.toggle('hidden', !!user);
+      $('userBox').classList.toggle('hidden', !user); $('userBox').classList.toggle('flex', !!user);
+      if (!user) return;
+      $('userPhoto').src = user.photoURL || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%2212%22 fill=%22%236366f1%22/%3E%3C/svg%3E';
+      $('nicknameInput').value = (user.displayName || (user.email || 'Usuário').split('@')[0]).slice(0, 20);
+      $('btnLinkGoogle').classList.toggle('hidden', user.providerData.some((p) => p.providerId === 'google.com'));
+      try { if (localStorage.getItem('mms_pro_' + user.uid) === '1' && !isPro) activatePro(true); } catch (e) {}
+    }
+    function openLoginModal() {
+      if (!auth) return toast('Login ainda não configurado: preencha CONFIG.FIREBASE no código.');
+      $('loginModal').classList.remove('hidden'); $('loginModal').classList.add('flex');
+    }
+    function closeLoginModal() { $('loginModal').classList.add('hidden'); $('loginModal').classList.remove('flex'); }
+    function authError(e) {
+      const m = { 'auth/popup-closed-by-user': 'Login cancelado.', 'auth/invalid-credential': 'E-mail ou senha incorretos.', 'auth/wrong-password': 'E-mail ou senha incorretos.',
+        'auth/user-not-found': 'Conta não encontrada.', 'auth/email-already-in-use': 'Esse e-mail já tem conta. Use Entrar.', 'auth/weak-password': 'A senha precisa de ao menos 6 caracteres.',
+        'auth/invalid-email': 'E-mail inválido.', 'auth/unauthorized-domain': 'Domínio não autorizado no Firebase (Authentication > Configurações > Domínios autorizados).',
+        'auth/credential-already-in-use': 'Essa conta Google já está vinculada a outro usuário.', 'auth/operation-not-supported-in-this-environment': 'Login exige HTTPS.' };
+      toast(m[e.code] || 'Erro no login: ' + (e.code || e.message));
+    }
+    async function loginGoogle() {
+      try { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); closeLoginModal(); } catch (e) { authError(e); }
+    }
+    async function loginEmail(create) {
+      const email = $('loginEmail').value.trim(), pass = $('loginPass').value;
+      if (!email || !pass) return toast('Preencha e-mail e senha.');
+      try { await (create ? auth.createUserWithEmailAndPassword(email, pass) : auth.signInWithEmailAndPassword(email, pass)); closeLoginModal(); } catch (e) { authError(e); }
+    }
+    async function resetPassword() {
+      const email = $('loginEmail').value.trim();
+      if (!email) return toast('Digite seu e-mail para receber o link de redefinição.');
+      try { await auth.sendPasswordResetEmail(email); toast('Enviamos um e-mail para redefinir a senha.'); } catch (e) { authError(e); }
+    }
+    async function linkGoogle() {
+      try { await currentUser.linkWithPopup(new firebase.auth.GoogleAuthProvider()); onAuthChanged(auth.currentUser); toast('Conta Google vinculada!'); } catch (e) { authError(e); }
+    }
+    function doLogout() { auth.signOut().then(() => location.reload()); }
 
     // ===== Utilitários =====
     function toast(msg) {
@@ -324,22 +420,37 @@
       conns.forEach((c, id) => { if (id !== exceptId && c.open) c.send(data); });
     }
 
-    // ===== 1. PeerJS & Salas =====
-    function initPeerJS(customId = null) {
-      if (peer) { peer.destroy(); conns.clear(); calls.clear(); }
-      setStatus('off');
-      $('myPeerId').textContent = 'Carregando...';
-      peer = new Peer(customId ? CONFIG.ROOM_PREFIX + customId : undefined, { config: { iceServers: CONFIG.ICE_SERVERS } });
+    // ===== 1. PeerJS & Salas privadas (acesso só pelo link) =====
+    let roomId = null;   // sala atual (como anfitrião ou convidado)
+    function genToken(n) {
+      const a = new Uint8Array(n); crypto.getRandomValues(a);
+      return Array.from(a, (b) => 'abcdefghijklmnopqrstuvwxyz0123456789'[b % 36]).join('');
+    }
+    function newHostId(custom) { return CONFIG.ROOM_PREFIX + (custom ? custom + '-' + genToken(8) : genToken(16)); }
+    function roomUrl(id) { return location.origin + location.pathname + '?sala=' + encodeURIComponent(id); }
+    function parseRoomId(v) {
+      if (!v) return null;
+      v = v.trim();
+      try { v = new URL(v).searchParams.get('sala') || ''; } catch (e) {}
+      return /^[A-Za-z0-9][A-Za-z0-9_-]{5,62}$/.test(v) ? v : null;
+    }
+    function renderRoomLink() { $('roomLink').textContent = roomId ? roomUrl(roomId) : 'Gerando link...'; }
+
+    function initPeerJS(hostId = null) {
+      if (peer) peer.destroy();
+      conns.clear(); calls.clear();
+      setStatus('off'); roomId = null; renderRoomLink();
+      peer = new Peer(hostId || undefined, { config: { iceServers: CONFIG.ICE_SERVERS } });
 
       peer.on('open', (id) => {
-        $('myPeerId').textContent = id;
-        updateViewers();
-        if (pendingRoom) { $('remotePeerIdInput').value = pendingRoom; connectToRemotePeer(); pendingRoom = null; }
+        if (hostId) { roomId = id; try { localStorage.setItem('mms_room', id); } catch (e) {} }
+        renderRoomLink(); updateViewers();
+        if (pendingRoom) { const r = pendingRoom; pendingRoom = null; joinRoom(r); }
       });
 
       peer.on('error', (err) => {
-        if (err.type === 'unavailable-id') { toast('Esse nome de sala já está em uso. Escolha outro.'); initPeerJS(); }
-        else if (err.type === 'peer-unavailable') toast('Sala não encontrada. Confira o ID.');
+        if (err.type === 'unavailable-id') { initPeerJS(newHostId()); }
+        else if (err.type === 'peer-unavailable') toast('Sala não encontrada. O anfitrião precisa estar com a página aberta.');
         else if (err.type === 'network' || err.type === 'server-error') toast('Falha de rede com o servidor. Tentando reconectar...');
         else toast('Erro de conexão: ' + err.type);
       });
@@ -354,13 +465,25 @@
       });
     }
 
+    function joinRoom(id) {
+      roomId = id; renderRoomLink();
+      registerConn(peer.connect(id, { reliable: true }));
+    }
+
     function connectToRemotePeer() {
-      const remoteId = $('remotePeerIdInput').value.trim();
-      if (!remoteId) return toast('Insira o ID da sala para entrar.');
+      const id = parseRoomId($('remotePeerIdInput').value);
+      if (!id) return toast('Cole o link completo da sala.');
       if (!peer || !peer.open) return toast('Aguarde, a conexão ainda está iniciando.');
-      if (remoteId === peer.id) return toast('Esse é o seu próprio ID.');
-      if (conns.has(remoteId)) return toast('Você já está conectado a essa sala.');
-      registerConn(peer.connect(remoteId, { reliable: true }));
+      if (id === peer.id) return toast('Esse é o link da sua própria sala.');
+      if (conns.has(id)) return toast('Você já está nessa sala.');
+      joinRoom(id);
+    }
+
+    function newPrivateRoom(custom) {
+      stopShare();
+      history.replaceState(null, '', location.pathname);
+      initPeerJS(newHostId(custom));
+      toast('Nova sala privada criada. O link anterior deixou de funcionar.');
     }
 
     function registerConn(c) {
@@ -393,14 +516,9 @@
       }
     }
 
-    function copyPeerId() {
-      navigator.clipboard.writeText($('myPeerId').textContent).then(() => toast('ID da sala copiado!'), () => toast('Não foi possível copiar.'));
-    }
     function copyInviteLink() {
-      const id = $('myPeerId').textContent;
-      if (!peer || !peer.open) return toast('Aguarde o ID ser gerado.');
-      const url = location.origin + location.pathname + '?sala=' + encodeURIComponent(id);
-      navigator.clipboard.writeText(url).then(() => toast('Link de convite copiado!'), () => toast('Não foi possível copiar.'));
+      if (!roomId) return toast('Aguarde o link ser gerado.');
+      copyText(roomUrl(roomId)).then((ok) => toast(ok ? 'Link da sala copiado!' : 'Não foi possível copiar. Selecione o link manualmente.'));
     }
 
     // ===== 2. Chat & Emojis =====
@@ -449,7 +567,7 @@
       if (CONFIG.DEMO_MODE) activatePro(); else toast('Pagamento indisponível no momento.');
     }
 
-    function activatePro() {
+    function activatePro(silent = false) {
       isPro = true;
       closeCheckoutModal();
       $('proBadge').classList.remove('hidden');
@@ -460,14 +578,14 @@
       $('proYtNotice').classList.add('hidden');
       $('ytControlsPro').classList.remove('hidden'); $('ytControlsPro').classList.add('flex');
       $('btnCustomRoom').classList.remove('hidden');
-      toast('Plano PRO ativado!');
+      if (!silent) { toast('Plano PRO ativado!'); if (currentUser) { try { localStorage.setItem('mms_pro_' + currentUser.uid, '1'); } catch (e) {} } }
     }
 
     // ===== 4. Sala personalizada (PRO) =====
     function openCustomRoomPrompt() {
-      const name = prompt('Escolha o nome da sua sala (ex.: minha-sala-vip):');
+      const name = prompt('Nome da sala (ex.: noite-de-filme). Um código secreto é adicionado ao final do link:');
       const clean = (name || '').toLowerCase().replace(/[^a-z0-9-_]/g, '').slice(0, 30);
-      if (clean.length >= 3) initPeerJS(clean);
+      if (clean.length >= 3) newPrivateRoom(clean);
       else if (name) toast('Use ao menos 3 caracteres (letras, números, - ou _).');
     }
 
@@ -510,7 +628,8 @@
 
     async function toggleScreenShare() {
       if (currentStream) return stopShare();
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) return toast('Seu navegador não suporta compartilhar tela (use um computador).');
+      if (!window.isSecureContext) { $('httpsBanner').classList.remove('hidden'); return toast('Compartilhar tela exige HTTPS (conexão segura). Use o link seguro do aviso vermelho.'); }
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) return toast('Seu navegador não suporta compartilhar tela (use Chrome/Edge/Firefox no computador).');
 
       const res = $('selectResolution').value, fps = parseInt($('selectFps').value);
       let w = 1280, h = 720;
@@ -523,11 +642,12 @@
         });
       } catch (err) {
         currentStream = null;
-        if (err.name !== 'NotAllowedError') toast('Não foi possível compartilhar a tela.');
+        toast(err.name === 'NotAllowedError' ? 'Compartilhamento cancelado ou bloqueado. Escolha uma tela/janela na janelinha do navegador.' : 'Não foi possível compartilhar a tela (' + err.name + ').');
         return;
       }
       const vt = currentStream.getVideoTracks()[0];
       if (vt) { vt.contentHint = 'motion'; vt.addEventListener('ended', stopShare); }
+      switchTab('screen');
       displayStream(currentStream, true);
       setStreamBtn(true);
       conns.forEach((c, id) => callPeer(id));
