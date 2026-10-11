@@ -452,6 +452,7 @@
     let isYtReady = false;
     let isCinema = false;
     let currentRoomId = null;
+    let connectionTimeout = null;
 
     const peerConfig = {
       config: {
@@ -577,6 +578,7 @@
     function returnToDashboard() {
       if (peer) peer.destroy();
       activeConnection = null;
+      if (connectionTimeout) clearTimeout(connectionTimeout);
       const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
       window.history.replaceState({path: newUrl}, '', newUrl);
       document.getElementById('roomView').classList.add('hidden');
@@ -586,7 +588,6 @@
     function initPeerRoom(roomId) {
       if (peer) peer.destroy();
 
-      // Tenta criar o Peer com o ID exato da sala (anfitrião)
       peer = new Peer(roomId, peerConfig);
 
       peer.on('open', (id) => {
@@ -595,7 +596,6 @@
         document.getElementById('roomParticipantsInfo').innerText = 'Sala Pronta (Esperando Conexão)';
       });
 
-      // Se o ID já estiver em uso, significa que o outro usuário já criou a sala; logo, entramos como convidado
       peer.on('error', (err) => {
         if (err.type === 'unavailable-id') {
           const guestPeerId = roomId + "-guest-" + Math.random().toString(36).substring(2, 6);
@@ -616,20 +616,33 @@
     }
 
     function connectToHost(hostId) {
-      const conn = peer.connect(hostId);
+      if (activeConnection) {
+        activeConnection.close();
+      }
+
+      const conn = peer.connect(hostId, { reliable: true });
       bindConnection(conn);
+
+      // Sistema de Auto-Retry caso a conexão fique pendente por mais de 3.5 segundos
+      if (connectionTimeout) clearTimeout(connectionTimeout);
+      connectionTimeout = setTimeout(() => {
+        if (!activeConnection || !activeConnection.open) {
+          console.warn("Tentando reconectar ao anfitrião...");
+          connectToHost(hostId);
+        }
+      }, 3500);
     }
 
     function bindConnection(conn) {
       activeConnection = conn;
 
       conn.on('open', () => {
+        if (connectionTimeout) clearTimeout(connectionTimeout);
         document.getElementById('connectionStatus').innerText = 'Conectado à Sala!';
         document.getElementById('connectionStatus').className = 'text-[9px] bg-emerald-900/80 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30';
         
         conn.send({ type: 'nickname', name: currentUser.nickname });
 
-        // Simetria bidirecional: se já estiver transmitindo tela, dispara a chamada imediatamente
         if (localStream) {
           const call = peer.call(conn.peer, localStream);
           call.on('stream', (remoteStream) => {
@@ -653,7 +666,6 @@
           if (activeConnection && activeConnection.open) {
             activeConnection.send({ type: 'nickname_ack', name: currentUser.nickname });
           }
-          // Garante reciprocidade de chamada se o anfitrião já estiver a partilhar ecrã
           if (localStream) {
             peer.call(conn.peer, localStream);
           }
