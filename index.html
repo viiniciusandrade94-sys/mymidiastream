@@ -173,17 +173,14 @@
       
       <!-- MENU LATERAL (SIDEBAR) -->
       <aside class="w-full md:w-64 bg-[#0f111a] border border-purple-500/20 rounded-2xl p-4 flex flex-col gap-2 h-fit">
-        <button onclick="switchDashboardTab('home')" id="navHome" class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold bg-purple-600 text-white flex items-center gap-2.5 transition">
-          <i class="fa-solid fa-house"></i> Início & Feed
+        <button onclick="switchDashboardTab('explore')" id="navExplore" class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold bg-purple-600 text-white flex items-center gap-2.5 transition">
+          <i class="fa-solid fa-compass"></i> Explorar Salas
         </button>
         <button onclick="switchDashboardTab('join')" id="navJoin" class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-pink-400 hover:bg-pink-500/10 flex items-center gap-2.5 transition">
           <i class="fa-solid fa-right-to-bracket"></i> Entrar por ID
         </button>
-        <button onclick="switchDashboardTab('explore')" id="navExplore" class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-purple-500/10 flex items-center gap-2.5 transition">
-          <i class="fa-solid fa-compass"></i> Explorar Salas
-        </button>
         <button onclick="switchDashboardTab('create')" id="navCreate" class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-purple-500/10 flex items-center gap-2.5 transition">
-          <i class="fa-solid fa-plus-circle"></i> Criar Sala Privada
+          <i class="fa-solid fa-plus-circle"></i> Criar Sala
         </button>
         <button onclick="switchDashboardTab('profile')" id="navProfile" class="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-gray-400 hover:text-white hover:bg-purple-500/10 flex items-center gap-2.5 transition">
           <i class="fa-solid fa-user"></i> Meu Perfil
@@ -198,58 +195,20 @@
 
       <!-- ÁREA CENTRAL DE CONTEÚDO -->
       <main class="flex-1 space-y-6">
-        
-        <!-- SECÇÃO INÍCIO / FEED SOCIAL -->
-        <div id="tabContent-home" class="space-y-4">
-          <!-- CARD RÁPIDO PARA ENTRAR POR ID -->
-          <div class="bg-[#0f111a] border-pink-glow rounded-2xl p-4 flex flex-col sm:flex-row items-center gap-3">
-            <div class="flex-1 w-full">
-              <label class="block text-xs font-bold text-pink-400 mb-1 flex items-center gap-1.5">
-                <i class="fa-solid fa-key"></i> Entrar Rapidamente numa Sala por ID:
-              </label>
-              <input id="quickRoomIdInput" type="text" placeholder="Digite o ID da sala (ex: nexora-lobby ou salaandin)" onkeydown="if(event.key==='Enter') joinRoomByQuickInput()" class="w-full bg-[#08090d] border border-pink-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-pink-400">
-            </div>
-            <button onclick="joinRoomByQuickInput()" class="w-full sm:w-auto bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs py-2.5 px-5 rounded-xl transition flex items-center justify-center gap-2 shadow-[0_0_10px_rgba(255,0,127,0.3)]">
-              <i class="fa-solid fa-right-to-bracket"></i> Entrar
-            </button>
+
+        <!-- SECÇÃO EXPLORAR SALAS (TODAS AS SALAS) -->
+        <div id="tabContent-explore" class="space-y-4">
+          <div class="flex justify-between items-center bg-[#0f111a] p-4 rounded-2xl border border-purple-500/20">
+            <h2 class="text-sm font-bold text-white uppercase"><i class="fa-solid fa-compass text-purple-400"></i> Todas as Salas Existentes</h2>
+            <input id="searchRoomInput" type="text" placeholder="Filtrar sala por nome ou ID..." onkeyup="filterExploreRooms()" class="bg-[#08090d] border border-purple-500/30 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none">
           </div>
 
-          <div class="bg-[#0f111a] border-nexora-glow rounded-2xl p-5">
-            <h2 class="text-sm font-bold text-purple-400 mb-3 uppercase flex items-center gap-2">
-              <i class="fa-solid fa-bullhorn"></i> Criar Publicação na Comunidade
-            </h2>
-            <textarea id="socialPostInput" placeholder="O que você está transmitindo ou criando hoje?" rows="3" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-purple-400 mb-3 resize-none"></textarea>
-            <div class="flex justify-between items-center">
-              <div class="flex gap-2 text-xs text-gray-400">
-                <button class="hover:text-purple-400"><i class="fa-solid fa-image"></i> Imagem</button>
-                <button class="hover:text-purple-400"><i class="fa-solid fa-film"></i> GIF</button>
-              </div>
-              <button onclick="publishSocialPost()" class="bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs py-2 px-4 rounded-xl transition">
-                Publicar
-              </button>
-            </div>
-          </div>
-
-          <div id="socialFeedContainer" class="space-y-4">
-            <!-- Feed Dinâmico -->
-            <div class="bg-[#0f111a] border border-purple-500/20 rounded-2xl p-4">
-              <div class="flex items-center gap-2.5 mb-2">
-                <div class="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 font-bold text-xs">C</div>
-                <div>
-                  <h4 class="text-xs font-bold text-white">CyberAdmin</h4>
-                  <span class="text-[10px] text-gray-500">Há 15 minutos</span>
-                </div>
-              </div>
-              <p class="text-xs text-gray-300 mb-3">Bem-vindos à Nexora! Compartilhem suas janelas de aplicativos (.exe) ou ecrãs nas salas privadas. O Watch Together com YouTube já está ativo!</p>
-              <div class="flex gap-4 text-xs text-gray-400 border-t border-purple-500/10 pt-2">
-                <button class="hover:text-pink-400"><i class="fa-solid fa-heart"></i> 12 Curtidas</button>
-                <button class="hover:text-purple-400"><i class="fa-solid fa-comment"></i> 3 Comentários</button>
-              </div>
-            </div>
+          <div id="roomsGridContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- As salas (públicas e privadas) são renderizadas via JavaScript -->
           </div>
         </div>
 
-        <!-- SECÇÃO BUSCAR / ENTRAR POR ID DA SALA -->
+        <!-- SECÇÃO ENTRAR POR ID DA SALA -->
         <div id="tabContent-join" class="hidden space-y-4">
           <div class="bg-[#0f111a] border-pink-glow rounded-2xl p-6 max-w-xl mx-auto shadow-xl">
             <h2 class="text-sm font-bold text-pink-400 mb-2 uppercase flex items-center gap-2">
@@ -258,32 +217,11 @@
             <p class="text-xs text-gray-400 mb-4">Insira o ID exato da sala gerado pelo anfitrião para se conectar diretamente:</p>
             <div class="space-y-4">
               <div>
-                <label class="block text-xs font-semibold text-gray-300 mb-1">ID da Sala Privada:</label>
+                <label class="block text-xs font-semibold text-gray-300 mb-1">ID da Sala:</label>
                 <input id="searchRoomIdInput" type="text" placeholder="Ex: nexora-lobby ou salaandin" onkeydown="if(event.key==='Enter') joinRoomFromSearchTab()" class="w-full bg-[#08090d] border border-pink-500/30 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-pink-400">
               </div>
               <button onclick="joinRoomFromSearchTab()" class="w-full bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs py-3 rounded-xl transition shadow-[0_0_15px_rgba(255,0,127,0.3)] flex items-center justify-center gap-2">
-                <i class="fa-solid fa-right-to-bracket"></i> LIGAR À SALA POR ID
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- SECÇÃO EXPLORAR SALAS -->
-        <div id="tabContent-explore" class="hidden space-y-4">
-          <div class="flex justify-between items-center bg-[#0f111a] p-4 rounded-2xl border border-purple-500/20">
-            <h2 class="text-sm font-bold text-white uppercase"><i class="fa-solid fa-compass text-purple-400"></i> Salas Públicas Ativas</h2>
-            <input id="searchRoomInput" type="text" placeholder="Buscar sala..." class="bg-[#08090d] border border-purple-500/30 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none">
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="bg-[#0f111a] border border-purple-500/30 rounded-2xl p-4 flex flex-col justify-between">
-              <div>
-                <span class="text-[9px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full font-bold">AO VIVO</span>
-                <h3 class="text-sm font-bold text-white mt-2">Lobby Principal Nexora</h3>
-                <p class="text-xs text-gray-400 mt-1">Sala oficial para testes de partilha de ecrã e chat em tempo real.</p>
-              </div>
-              <button onclick="enterRoom('nexora-lobby')" class="mt-4 w-full bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs py-2 rounded-xl transition">
-                Entrar na Sala
+                <i class="fa-solid fa-right-to-bracket"></i> ENTRAR NA SALA
               </button>
             </div>
           </div>
@@ -293,7 +231,7 @@
         <div id="tabContent-create" class="hidden space-y-4">
           <div class="bg-[#0f111a] border-nexora-glow rounded-2xl p-5 max-w-xl mx-auto">
             <h2 class="text-sm font-bold text-purple-400 mb-4 uppercase flex items-center gap-2">
-              <i class="fa-solid fa-door-open"></i> Criar Nova Sala Privada
+              <i class="fa-solid fa-door-open"></i> Criar Nova Sala
             </h2>
             <div class="space-y-3.5">
               <div>
@@ -303,6 +241,17 @@
               <div>
                 <label class="block text-xs font-semibold text-gray-300 mb-1">Nome da Sala:</label>
                 <input id="newRoomName" type="text" placeholder="Transmissão de Jogos e Apps" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-purple-400">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-gray-300 mb-1">Tipo de Privacidade:</label>
+                <select id="newRoomType" onchange="togglePasswordInputVisibility()" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none">
+                  <option value="public">Pública (Qualquer um pode entrar)</option>
+                  <option value="private">Privada (Protegida por Senha)</option>
+                </select>
+              </div>
+              <div id="passwordFieldContainer" class="hidden">
+                <label class="block text-xs font-semibold text-pink-400 mb-1">Senha de Acesso à Sala:</label>
+                <input id="newRoomPassword" type="password" placeholder="Digite a senha para a sala" class="w-full bg-[#08090d] border border-pink-500/40 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-pink-400">
               </div>
               <button onclick="createRoomFromPanel()" class="w-full btn-nexora-gradient text-white font-extrabold text-xs py-3 rounded-xl uppercase tracking-wider mt-2">
                 Criar e Entrar na Sala
@@ -554,6 +503,29 @@
     </main>
   </div>
 
+  <!-- MODAL DE VALIDAÇÃO DE SENHA PARA SALAS PRIVADAS -->
+  <div id="roomPasswordModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+    <div class="bg-[#0f111a] border-pink-glow rounded-2xl max-w-sm w-full p-6 shadow-2xl relative">
+      <button onclick="closePasswordModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      
+      <div class="text-center mb-4">
+        <div class="inline-flex p-3 bg-pink-500/10 text-pink-400 rounded-2xl mb-2 border border-pink-500/30">
+          <i class="fa-solid fa-lock text-2xl"></i>
+        </div>
+        <h3 class="text-base font-bold text-white">Sala Protegida por Senha</h3>
+        <p class="text-xs text-gray-400 mt-1">A sala <span id="modalTargetRoomId" class="text-pink-400 font-bold">...</span> é privada. Digite a senha para entrar:</p>
+      </div>
+
+      <div class="space-y-3 mb-2">
+        <input id="inputModalPassword" type="password" placeholder="Digite a senha da sala" onkeydown="if(event.key==='Enter') submitRoomPassword()" class="w-full bg-[#08090d] border border-pink-500/30 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-pink-400">
+        
+        <button onclick="submitRoomPassword()" class="w-full bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-[0_0_15px_rgba(255,0,127,0.3)]">
+          AUTENTICAR & ENTRAR
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL DE CHECKOUT PRO -->
   <div id="checkoutModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4 z-50">
     <div class="bg-[#0f111a] border-pink-glow rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
@@ -600,6 +572,14 @@
     let isYtReady = false;
     let isCinema = false;
     let currentRoomId = null;
+    let pendingJoinRoomId = null;
+
+    // BANCO DE SALAS REGISTRADAS (Simulação Local Persistida)
+    let globalRooms = [
+      { id: 'nex-lobby-principal', name: 'Lobby Principal Nexora', isPrivate: false, password: '' },
+      { id: 'nex-jogos-e-apps', name: 'Transmissão de Jogos e Apps', isPrivate: false, password: '' },
+      { id: 'nex-sala-vip', name: 'Sala VIP Privada', isPrivate: true, password: '123' }
+    ];
 
     const peerConfig = {
       config: {
@@ -612,6 +592,13 @@
     };
 
     window.addEventListener('DOMContentLoaded', () => {
+      const savedRooms = localStorage.getItem('nexora_global_rooms');
+      if (savedRooms) {
+        globalRooms = JSON.parse(savedRooms);
+      } else {
+        localStorage.setItem('nexora_global_rooms', JSON.stringify(globalRooms));
+      }
+
       const savedUser = localStorage.getItem('nexora_current_user');
       if (savedUser) {
         currentUser = JSON.parse(savedUser);
@@ -638,7 +625,7 @@
     }
 
     function switchDashboardTab(tabName) {
-      ['home', 'join', 'explore', 'create', 'profile', 'pro', 'settings'].forEach(t => {
+      ['explore', 'join', 'create', 'profile', 'pro', 'settings'].forEach(t => {
         const el = document.getElementById(`tabContent-${t}`);
         const nav = document.getElementById(`nav${t.charAt(0).toUpperCase() + t.slice(1)}`);
         if (el) el.classList.add('hidden');
@@ -653,20 +640,98 @@
       if (activeNav) {
         activeNav.className = 'w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold bg-purple-600 text-white flex items-center gap-2.5 transition';
       }
+
+      if (tabName === 'explore') renderExploreRooms();
     }
 
-    function joinRoomByQuickInput() {
-      const roomId = document.getElementById('quickRoomIdInput').value.trim();
-      if (!roomId) return alert('Por favor, informe o ID da sala.');
+    function renderExploreRooms(filterText = '') {
+      const container = document.getElementById('roomsGridContainer');
+      container.innerHTML = '';
+
+      const filtered = globalRooms.filter(r => 
+        r.name.toLowerCase().includes(filterText.toLowerCase()) || 
+        r.id.toLowerCase().includes(filterText.toLowerCase())
+      );
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="col-span-2 text-center text-xs text-gray-500 py-8">Nenhuma sala encontrada.</div>`;
+        return;
+      }
+
+      filtered.forEach(room => {
+        const card = document.createElement('div');
+        card.className = room.isPrivate 
+          ? 'bg-[#0f111a] border border-pink-500/40 rounded-2xl p-4 flex flex-col justify-between shadow-lg' 
+          : 'bg-[#0f111a] border border-purple-500/30 rounded-2xl p-4 flex flex-col justify-between shadow-lg';
+
+        const badge = room.isPrivate 
+          ? `<span class="text-[9px] bg-pink-500/20 text-pink-400 border border-pink-500/30 px-2 py-0.5 rounded-full font-bold flex items-center gap-1 w-fit"><i class="fa-solid fa-lock text-[8px]"></i> PRIVADA</span>`
+          : `<span class="text-[9px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold flex items-center gap-1 w-fit"><i class="fa-solid fa-globe text-[8px]"></i> PÚBLICA</span>`;
+
+        card.innerHTML = `
+          <div>
+            ${badge}
+            <h3 class="text-sm font-bold text-white mt-2.5">${room.name}</h3>
+            <p class="text-[11px] font-mono text-purple-300 mt-1 truncate">ID: ${room.id}</p>
+          </div>
+          <button onclick="attemptJoinRoom('${room.id}')" class="${room.isPrivate ? 'bg-pink-600 hover:bg-pink-500' : 'bg-purple-600 hover:bg-purple-500'} mt-4 w-full text-white font-bold text-xs py-2 rounded-xl transition shadow">
+            ${room.isPrivate ? '<i class="fa-solid fa-key"></i> Entrar com Senha' : 'Entrar na Sala'}
+          </button>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function filterExploreRooms() {
+      const query = document.getElementById('searchRoomInput').value.trim();
+      renderExploreRooms(query);
+    }
+
+    function togglePasswordInputVisibility() {
+      const type = document.getElementById('newRoomType').value;
+      const container = document.getElementById('passwordFieldContainer');
+      if (type === 'private') container.classList.remove('hidden');
+      else container.classList.add('hidden');
+    }
+
+    function attemptJoinRoom(roomId) {
       const cleanId = roomId.startsWith('nex-') ? roomId : 'nex-' + roomId.toLowerCase().replace(/[^a-z0-9-_]/g, '');
-      enterRoom(cleanId);
+      const room = globalRooms.find(r => r.id === cleanId);
+
+      if (room && room.isPrivate) {
+        pendingJoinRoomId = cleanId;
+        document.getElementById('modalTargetRoomId').innerText = cleanId;
+        document.getElementById('inputModalPassword').value = '';
+        document.getElementById('roomPasswordModal').classList.remove('hidden');
+        document.getElementById('roomPasswordModal').classList.add('flex');
+      } else {
+        enterRoom(cleanId);
+      }
+    }
+
+    function submitRoomPassword() {
+      const pass = document.getElementById('inputModalPassword').value.trim();
+      const room = globalRooms.find(r => r.id === pendingJoinRoomId);
+
+      if (room && room.isPrivate && room.password !== pass) {
+        alert('Senha incorreta! Acesso negado à sala privada.');
+        return;
+      }
+
+      closePasswordModal();
+      enterRoom(pendingJoinRoomId);
+    }
+
+    function closePasswordModal() {
+      document.getElementById('roomPasswordModal').classList.add('hidden');
+      document.getElementById('roomPasswordModal').classList.remove('flex');
+      pendingJoinRoomId = null;
     }
 
     function joinRoomFromSearchTab() {
       const roomId = document.getElementById('searchRoomIdInput').value.trim();
       if (!roomId) return alert('Por favor, informe o ID da sala.');
-      const cleanId = roomId.startsWith('nex-') ? roomId : 'nex-' + roomId.toLowerCase().replace(/[^a-z0-9-_]/g, '');
-      enterRoom(cleanId);
+      attemptJoinRoom(roomId);
     }
 
     function handleLogin() {
@@ -718,6 +783,7 @@
       document.getElementById('dashUserEmail').innerText = currentUser.email;
       document.getElementById('profileNickname').value = currentUser.nickname;
       if (currentUser.isPro) document.getElementById('proBadge').classList.remove('hidden');
+      switchDashboardTab('explore');
     }
 
     function saveProfile() {
@@ -728,34 +794,24 @@
       alert('Perfil atualizado com sucesso!');
     }
 
-    function publishSocialPost() {
-      const text = document.getElementById('socialPostInput').value.trim();
-      if (!text) return;
-      const feed = document.getElementById('socialFeedContainer');
-      const postDiv = document.createElement('div');
-      postDiv.className = 'bg-[#0f111a] border border-purple-500/20 rounded-2xl p-4';
-      postDiv.innerHTML = `
-        <div class="flex items-center gap-2.5 mb-2">
-          <div class="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 font-bold text-xs">${currentUser.nickname.charAt(0).toUpperCase()}</div>
-          <div>
-            <h4 class="text-xs font-bold text-white">${currentUser.nickname}</h4>
-            <span class="text-[10px] text-gray-500">Agora mesmo</span>
-          </div>
-        </div>
-        <p class="text-xs text-gray-300 mb-3">${text}</p>
-        <div class="flex gap-4 text-xs text-gray-400 border-t border-purple-500/10 pt-2">
-          <button class="hover:text-pink-400"><i class="fa-solid fa-heart"></i> 0 Curtidas</button>
-          <button class="hover:text-purple-400"><i class="fa-solid fa-comment"></i> 0 Comentários</button>
-        </div>
-      `;
-      feed.prepend(postDiv);
-      document.getElementById('socialPostInput').value = '';
-    }
-
     function createRoomFromPanel() {
       const roomId = document.getElementById('newRoomId').value.trim();
+      const roomName = document.getElementById('newRoomName').value.trim() || 'Sala Privada';
+      const isPrivate = document.getElementById('newRoomType').value === 'private';
+      const password = document.getElementById('newRoomPassword').value.trim();
+
       if (!roomId) return alert('Informe um ID válido para a sala.');
+      if (isPrivate && !password) return alert('Por favor, defina uma senha para a sala privada.');
+
       const cleanId = 'nex-' + roomId.toLowerCase().replace(/[^a-z0-9-_]/g, '');
+
+      // Registra no catálogo global
+      const existing = globalRooms.find(r => r.id === cleanId);
+      if (!existing) {
+        globalRooms.push({ id: cleanId, name: roomName, isPrivate, password });
+        localStorage.setItem('nexora_global_rooms', JSON.stringify(globalRooms));
+      }
+
       enterRoom(cleanId);
     }
 
@@ -775,6 +831,7 @@
       connections = {};
       document.getElementById('roomView').classList.add('hidden');
       document.getElementById('dashboardView').classList.remove('hidden');
+      switchDashboardTab('explore');
     }
 
     // ARQUITETURA HOST/CONVIDADO COM TRATAMENTO DE ID
@@ -959,7 +1016,6 @@
       const colorClass = isAI ? 'text-amber-400 font-bold' : 'text-purple-400 font-bold';
 
       if (isSticker) {
-        // RENDERIZAÇÃO RIGOROSA DE 50x50 PIXELS
         msgDiv.innerHTML = `<span class="${colorClass}">${sender}:</span><img src="${content}" style="width: 50px; height: 50px;" class="rounded-lg border border-purple-500/40 object-cover mt-1 shadow">`;
       } else {
         msgDiv.innerHTML = `<span class="${colorClass}">${sender}:</span> <span class="text-gray-200">${content}</span>`;
