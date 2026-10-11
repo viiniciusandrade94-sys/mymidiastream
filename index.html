@@ -467,7 +467,7 @@
     </div>
   </div>
 
-  <!-- Lógica da Aplicação com Conexão ID Direta Garantida -->
+  <!-- Lógica de Conexão Bidirecional Restaurada -->
   <script>
     let currentUser = null;
     let isPro = false;
@@ -635,18 +635,15 @@
     function initPeerRoom(roomId) {
       if (peer) peer.destroy();
 
-      // Primeiro tenta criar o ID da sala no servidor
       peer = new Peer(roomId, peerConfig);
 
       peer.on('open', (id) => {
-        // Criador da sala
         document.getElementById('connectionStatus').innerText = 'Sala Ativa (Aguardando Amigo)';
         document.getElementById('connectionStatus').className = 'text-[9px] bg-amber-900/80 text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/30';
-        document.getElementById('roomParticipantsInfo').innerText = 'Sala Pronta (Esperando Entrada do Amigo)';
+        document.getElementById('roomParticipantsInfo').innerText = 'Sala Pronta (Esperando Conexão)';
       });
 
       peer.on('error', (err) => {
-        // Se o ID já estiver ocupado pelo criador, conecta nele como convidado
         if (err.type === 'unavailable-id') {
           const guestPeerId = roomId + "-guest-" + Math.random().toString(36).substring(2, 6);
           peer = new Peer(guestPeerId, peerConfig);
@@ -677,20 +674,32 @@
         document.getElementById('connectionStatus').innerText = 'Conectado à Sala!';
         document.getElementById('connectionStatus').className = 'text-[9px] bg-emerald-900/80 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30';
         
+        // Handshake do apelido
         conn.send({ type: 'nickname', name: currentUser.nickname });
 
-        // Se você já iniciou compartilhamento de tela, disca para ele
+        // Envia imediatamente a stream local se você já estiver transmitindo
         if (localStream) {
           peer.call(conn.peer, localStream);
         }
       });
 
       conn.on('data', (data) => {
-        if (data.type === 'chat') appendChatMessage(data.sender, data.text, data.isSticker);
+        if (data.type === 'chat') {
+          appendChatMessage(data.sender, data.text, data.isSticker);
+        }
         if (data.type === 'nickname') {
           document.getElementById('remoteStreamLabel').innerText = `Tela de ${data.name}`;
           document.getElementById('roomParticipantsInfo').innerText = `Conectado com ${data.name}`;
-          document.getElementById('remoteStatusText').innerText = `${data.name} não está transmitindo no momento.`;
+          document.getElementById('remoteStatusText').innerText = `${data.name} ainda não ligou a transmissão.`;
+
+          // Se a conexão veio do amigo, envia de volta o seu apelido para confirmar o canal nos dois lados
+          if (activeConnection && activeConnection.open) {
+            activeConnection.send({ type: 'nickname_ack', name: currentUser.nickname });
+          }
+        }
+        if (data.type === 'nickname_ack') {
+          document.getElementById('remoteStreamLabel').innerText = `Tela de ${data.name}`;
+          document.getElementById('roomParticipantsInfo').innerText = `Conectado com ${data.name}`;
         }
         if (data.type === 'ytSync') handleRemoteYtSync(data);
         if (data.type === 'emoji') showFloatingEmoji(data.emoji);
@@ -892,7 +901,6 @@
         displayLocalStream(localStream);
         document.getElementById('btnStartStream').innerHTML = `<i class="fa-solid fa-stop"></i> PARAR PARTILHA`;
 
-        // Se você tiver um parceiro na sala, liga para ele imediatamente para mandar a tela
         if (activeConnection && activeConnection.peer) {
           peer.call(activeConnection.peer, localStream);
         }
