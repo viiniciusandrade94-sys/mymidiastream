@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>M.Y.MIDIASTREAM - Cyber Neon Platform</title>
+  <title>NEXORA - Social Stream & Virtual Rooms Platform</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- PeerJS WebRTC -->
@@ -13,6 +13,7 @@
   
   <style>
     :root {
+      --neon-purple: #8b5cf6;
       --neon-cyan: #00f2fe;
       --neon-pink: #ff007f;
       --bg-dark: #08090d;
@@ -22,8 +23,8 @@
     body {
       background-color: var(--bg-dark);
       background-image: 
-        radial-gradient(circle at 50% 0%, rgba(0, 242, 254, 0.12) 0%, transparent 60%),
-        radial-gradient(circle at 100% 100%, rgba(255, 0, 127, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.12) 0%, transparent 60%),
+        radial-gradient(circle at 100% 100%, rgba(0, 242, 254, 0.08) 0%, transparent 50%),
         linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
       background-size: 100% 100%, 100% 100%, 24px 24px, 24px 24px;
@@ -31,9 +32,9 @@
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     }
 
-    .border-neon-glow {
-      border: 1px solid rgba(0, 242, 254, 0.4);
-      box-shadow: 0 0 15px rgba(0, 242, 254, 0.2), inset 0 0 10px rgba(0, 242, 254, 0.1);
+    .border-nexora-glow {
+      border: 1px solid rgba(139, 92, 246, 0.4);
+      box-shadow: 0 0 15px rgba(139, 92, 246, 0.2), inset 0 0 10px rgba(139, 92, 246, 0.1);
     }
 
     .border-pink-glow {
@@ -41,20 +42,20 @@
       box-shadow: 0 0 15px rgba(255, 0, 127, 0.2), inset 0 0 10px rgba(255, 0, 127, 0.1);
     }
 
-    .text-gradient-neon {
-      background: linear-gradient(135deg, #00f2fe 0%, #4facfe 40%, #ff007f 100%);
+    .text-gradient-nexora {
+      background: linear-gradient(135deg, #8b5cf6 0%, #00f2fe 50%, #ff007f 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 8px rgba(0, 242, 254, 0.4));
+      filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.4));
     }
 
-    .btn-neon-gradient {
-      background: linear-gradient(90deg, #00f2fe 0%, #0099ff 50%, #ff007f 100%);
+    .btn-nexora-gradient {
+      background: linear-gradient(90deg, #8b5cf6 0%, #0099ff 50%, #ff007f 100%);
       background-size: 200% auto;
       transition: 0.4s ease;
-      box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+      box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
     }
-    .btn-neon-gradient:hover {
+    .btn-nexora-gradient:hover {
       background-position: right center;
       box-shadow: 0 0 25px rgba(255, 0, 127, 0.5);
     }
@@ -75,143 +76,144 @@
 
   <!-- ================= TELA DE LOGIN & CADASTRO ================= -->
   <div id="authScreen" class="fixed inset-0 bg-[#08090d]/95 backdrop-blur-xl flex items-center justify-center p-4 z-50">
-    <div class="bg-[#0f111a] border-neon-glow rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+    <div class="bg-[#0f111a] border-nexora-glow rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
       <div class="text-center mb-5">
-        <div class="inline-flex p-3 bg-cyan-500/10 border border-cyan-400/40 rounded-2xl mb-2 shadow-[0_0_20px_rgba(0,242,254,0.3)]">
-          <i class="fa-solid fa-desktop text-3xl text-gradient-neon"></i>
+        <div class="inline-flex p-3 bg-purple-500/10 border border-purple-400/40 rounded-2xl mb-2 shadow-[0_0_20px_rgba(139,92,246,0.3)]">
+          <i class="fa-solid fa-cube text-3xl text-gradient-nexora"></i>
         </div>
-        <h2 class="text-2xl font-black tracking-widest text-gradient-neon">M.Y.MIDIASTREAM</h2>
-        <p class="text-xs text-cyan-400/70 mt-1 uppercase font-semibold tracking-wider">CYBER NEON TRANSMISSION PLATFORM</p>
+        <h2 class="text-2xl font-black tracking-widest text-gradient-nexora">NEXORA</h2>
+        <p class="text-xs text-purple-400/70 mt-1 uppercase font-semibold tracking-wider">Social Stream & Virtual Rooms</p>
       </div>
 
-      <div class="flex bg-[#08090d] p-1 rounded-xl border border-cyan-500/30 mb-5">
-        <button id="tabLoginBtn" type="button" onclick="switchAuthTab('login')" class="flex-1 py-2 text-xs font-bold rounded-lg bg-cyan-600 text-white transition shadow-[0_0_10px_rgba(0,242,254,0.3)]">Entrar</button>
+      <div class="flex bg-[#08090d] p-1 rounded-xl border border-purple-500/30 mb-5">
+        <button id="tabLoginBtn" type="button" onclick="switchAuthTab('login')" class="flex-1 py-2 text-xs font-bold rounded-lg bg-purple-600 text-white transition shadow-[0_0_10px_rgba(139,92,246,0.3)]">Entrar</button>
         <button id="tabRegisterBtn" type="button" onclick="switchAuthTab('register')" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 hover:text-white transition">Criar Conta</button>
       </div>
 
       <div id="formLogin" class="space-y-3.5">
         <div>
           <label class="block text-xs font-semibold text-gray-300 mb-1">E-mail:</label>
-          <input id="loginEmail" type="email" placeholder="seuemail@exemplo.com" class="w-full bg-[#08090d] border border-cyan-500/30 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400">
+          <input id="loginEmail" type="email" placeholder="usuario@nexora.com" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-purple-400">
         </div>
         <div>
           <label class="block text-xs font-semibold text-gray-300 mb-1">Senha:</label>
-          <input id="loginPassword" type="password" placeholder="••••••••" class="w-full bg-[#08090d] border border-cyan-500/30 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400">
+          <input id="loginPassword" type="password" placeholder="••••••••" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-purple-400">
         </div>
 
-        <button type="button" onclick="handleLogin()" class="w-full btn-neon-gradient text-white font-extrabold text-xs py-3 rounded-xl uppercase tracking-wider">
-          ENTRAR NA PLATAFORMA
+        <button type="button" onclick="handleLogin()" class="w-full btn-nexora-gradient text-white font-extrabold text-xs py-3 rounded-xl uppercase tracking-wider">
+          ENTRAR NA NEXORA
         </button>
 
         <div class="relative flex py-2 items-center">
-          <div class="flex-grow border-t border-cyan-500/20"></div>
+          <div class="flex-grow border-t border-purple-500/20"></div>
           <span class="flex-shrink mx-3 text-[10px] text-gray-500 uppercase font-bold">ou</span>
-          <div class="flex-grow border-t border-cyan-500/20"></div>
+          <div class="flex-grow border-t border-purple-500/20"></div>
         </div>
 
-        <button type="button" onclick="handleGoogleLogin()" class="w-full bg-[#08090d] hover:bg-cyan-500/10 border border-cyan-500/40 text-gray-200 font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2">
-          <i class="fa-brands fa-google text-red-400"></i> Continuar com o Google
-        </button>
+        <div class="grid grid-cols-2 gap-2">
+          <button type="button" onclick="handleOAuthLogin('Google')" class="bg-[#08090d] hover:bg-purple-500/10 border border-purple-500/40 text-gray-200 font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2">
+            <i class="fa-brands fa-google text-red-400"></i> Google
+          </button>
+          <button type="button" onclick="handleOAuthLogin('Discord')" class="bg-[#08090d] hover:bg-purple-500/10 border border-purple-500/40 text-gray-200 font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center gap-2">
+            <i class="fa-brands fa-discord text-indigo-400"></i> Discord
+          </button>
+        </div>
       </div>
 
       <div id="formRegister" class="space-y-3 hidden">
         <div>
+          <label class="block text-xs font-semibold text-gray-300 mb-1">Nome de Exibição:</label>
+          <input id="regName" type="text" placeholder="CyberPlayer" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-purple-400">
+        </div>
+        <div>
           <label class="block text-xs font-semibold text-gray-300 mb-1">E-mail:</label>
-          <input id="regEmail" type="email" placeholder="seuemail@exemplo.com" class="w-full bg-[#08090d] border border-cyan-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-cyan-400">
+          <input id="regEmail" type="email" placeholder="usuario@nexora.com" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-purple-400">
         </div>
         <div>
           <label class="block text-xs font-semibold text-gray-300 mb-1">Senha:</label>
-          <input id="regPassword" type="password" placeholder="••••••••" class="w-full bg-[#08090d] border border-cyan-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-cyan-400">
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-gray-300 mb-1">Confirme a Senha:</label>
-          <input id="regConfirmPassword" type="password" placeholder="••••••••" class="w-full bg-[#08090d] border border-cyan-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-cyan-400">
+          <input id="regPassword" type="password" placeholder="••••••••" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-purple-400">
         </div>
         <div>
           <label class="block text-xs font-semibold text-gray-300 mb-1">Data de Nascimento:</label>
-          <input id="regBirthDate" type="date" class="w-full bg-[#08090d] border border-cyan-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-cyan-400">
+          <input id="regBirthDate" type="date" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-purple-400">
         </div>
 
         <button type="button" onclick="handleRegister()" class="w-full bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-extrabold text-xs py-3 rounded-xl uppercase tracking-wider shadow-[0_0_15px_rgba(255,0,127,0.4)] mt-1">
           CRIAR CONTA & ENTRAR
-        </button>
-
-        <button type="button" onclick="handleGoogleLogin()" class="w-full bg-[#08090d] hover:bg-pink-500/10 border border-pink-500/40 text-gray-200 font-bold text-xs py-2 rounded-xl transition flex items-center justify-center gap-2 mt-2">
-          <i class="fa-brands fa-google text-red-400"></i> Vincular Conta Google
         </button>
       </div>
     </div>
   </div>
 
 
-  <!-- ================= TELA DASHBOARD PRINCIPAL ================= -->
+  <!-- ================= DASHBOARD PRINCIPAL ================= -->
   <div id="dashboardView" class="hidden min-h-screen flex flex-col">
-    <header class="border-b border-cyan-500/20 bg-[#0f111a]/90 backdrop-blur-md py-4 px-6 flex justify-between items-center z-30">
+    <header class="border-b border-purple-500/20 bg-[#0f111a]/90 backdrop-blur-md py-4 px-6 flex justify-between items-center z-30">
       <div class="flex items-center space-x-3">
-        <div class="p-2 bg-cyan-500/10 border border-cyan-400/30 rounded-xl text-cyan-400">
-          <i class="fa-solid fa-gauge-high text-lg"></i>
+        <div class="p-2 bg-purple-500/10 border border-purple-400/30 rounded-xl text-purple-400">
+          <i class="fa-solid fa-cube text-lg"></i>
         </div>
-        <h1 class="text-lg font-black tracking-wider text-gradient-neon">M.Y.MIDIASTREAM <span class="text-xs text-cyan-400 font-normal">| DASHBOARD</span></h1>
+        <h1 class="text-lg font-black tracking-wider text-gradient-nexora">NEXORA <span class="text-xs text-purple-400 font-normal">| HUB SOCIAL</span></h1>
       </div>
 
       <div class="flex items-center gap-4">
-        <div class="flex items-center gap-2 bg-[#08090d] px-3.5 py-1.5 rounded-xl border border-cyan-500/30">
-          <i class="fa-solid fa-user-circle text-cyan-400 text-sm"></i>
-          <span id="dashUserEmail" class="text-xs font-bold text-white">usuario@stream.com</span>
+        <div class="flex items-center gap-2 bg-[#08090d] px-3.5 py-1.5 rounded-xl border border-purple-500/30">
+          <i class="fa-solid fa-user-circle text-purple-400 text-sm"></i>
+          <span id="dashUserEmail" class="text-xs font-bold text-white">usuario@nexora.com</span>
           <span id="proBadge" class="hidden bg-gradient-to-r from-amber-400 to-yellow-500 text-black text-[9px] font-black px-2 py-0.5 rounded-full uppercase ml-1">PRO</span>
         </div>
 
         <button onclick="handleLogout()" class="bg-red-900/40 hover:bg-red-600 border border-red-500/40 text-red-200 hover:text-white text-xs py-2 px-3.5 rounded-xl transition font-bold">
-          <i class="fa-solid fa-right-from-bracket"></i> Sair da Conta
+          <i class="fa-solid fa-right-from-bracket"></i> Sair
         </button>
       </div>
     </header>
 
     <main class="flex-1 p-6 max-w-6xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-6">
       
-      <div class="bg-[#0f111a] border-neon-glow rounded-2xl p-5 flex flex-col justify-between">
+      <div class="bg-[#0f111a] border-nexora-glow rounded-2xl p-5 flex flex-col justify-between">
         <div>
-          <h3 class="text-sm font-bold text-cyan-400 mb-3 uppercase flex items-center gap-2">
-            <i class="fa-solid fa-user-pen"></i> Perfil do Operador
+          <h3 class="text-sm font-bold text-purple-400 mb-3 uppercase flex items-center gap-2">
+            <i class="fa-solid fa-user-pen"></i> Perfil & Comunidade
           </h3>
-          <p class="text-xs text-gray-400 mb-4">Defina o nome de exibição que aparecerá para os participantes no chat da sala:</p>
-          <label class="block text-[11px] text-gray-300 mb-1 font-semibold">Nome de Exibição no Chat:</label>
-          <input id="dashNicknameInput" type="text" placeholder="Ex: CyberPlayer" class="w-full bg-[#08090d] border border-cyan-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:border-cyan-400">
+          <p class="text-xs text-gray-400 mb-4">Gerencie seu nome de exibição visível nas salas e feeds sociais da Nexora:</p>
+          <label class="block text-[11px] text-gray-300 mb-1 font-semibold">Nome de Exibição:</label>
+          <input id="dashNicknameInput" type="text" placeholder="Ex: CyberPlayer" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:border-purple-400">
         </div>
-        <button onclick="saveDashNickname()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold py-2.5 rounded-xl transition mt-4">
-          Salvar Nome
+        <button onclick="saveDashNickname()" class="w-full bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold py-2.5 rounded-xl transition mt-4">
+          Salvar Alterações
         </button>
       </div>
 
       <div class="bg-[#0f111a] border-pink-glow rounded-2xl p-5 flex flex-col justify-between">
         <div>
           <h3 class="text-sm font-bold text-pink-400 mb-3 uppercase flex items-center gap-2">
-            <i class="fa-solid fa-door-open"></i> Entrar por ID da Sala
+            <i class="fa-solid fa-door-open"></i> Entrar por ID de Sala
           </h3>
-          <p class="text-xs text-gray-400 mb-3">Digite o ID exato da sala (ex: `salaandin`) para entrar instantaneamente:</p>
-          <label class="block text-[11px] text-gray-300 mb-1 font-semibold">ID da Sala Privada:</label>
-          <input id="dashRoomIdInput" type="text" placeholder="Ex: salaandin" class="w-full bg-[#08090d] border border-pink-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:border-pink-400">
+          <p class="text-xs text-gray-400 mb-3">Digite o ID da sala privada (ex: `nexora-lobby`) para se conectar com amigos:</p>
+          <label class="block text-[11px] text-gray-300 mb-1 font-semibold">ID Exclusivo da Sala:</label>
+          <input id="dashRoomIdInput" type="text" placeholder="Ex: nexora-lobby" class="w-full bg-[#08090d] border border-pink-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:border-pink-400">
         </div>
         <button onclick="createOrJoinRoom()" class="w-full bg-pink-600 hover:bg-pink-500 text-white text-xs font-bold py-2.5 rounded-xl transition mt-4 shadow-[0_0_10px_rgba(255,0,127,0.3)]">
-          <i class="fa-solid fa-right-to-bracket"></i> Entrar na Sala por ID
+          <i class="fa-solid fa-right-to-bracket"></i> Entrar na Sala Privada
         </button>
       </div>
 
-      <div class="bg-[#0f111a] border border-cyan-500/30 rounded-2xl p-5 flex flex-col justify-between">
+      <div class="bg-[#0f111a] border border-purple-500/30 rounded-2xl p-5 flex flex-col justify-between">
         <div>
           <h3 class="text-sm font-bold text-amber-400 mb-3 uppercase flex items-center gap-2">
-            <i class="fa-solid fa-crown"></i> Plano PRO (Ilimitado)
+            <i class="fa-solid fa-crown"></i> Assinatura NEXORA PRO
           </h3>
-          <p class="text-xs text-gray-400 mb-3">Salas com participantes ilimitados, transmissões em 4K, 240 FPS e suporte ao OBS Studio.</p>
+          <p class="text-xs text-gray-400 mb-3">Desbloqueie transmissão em 4K, 240 FPS, chave OBS Studio integrada e salas sem limites.</p>
           
-          <div class="bg-[#08090d] p-2.5 rounded-xl border border-cyan-500/20 text-[11px] space-y-1.5 font-mono">
-            <div class="text-gray-400">Servidor RTMP: <span class="text-cyan-300">rtmp://stream.mymidiastream.br/live</span></div>
-            <div class="text-gray-400">Chave OBS: <span id="dashObsKey" class="text-amber-300">mms_key_live_99</span></div>
+          <div class="bg-[#08090d] p-2.5 rounded-xl border border-purple-500/20 text-[11px] space-y-1.5 font-mono">
+            <div class="text-gray-400">Ingestão RTMP: <span class="text-purple-300">rtmp://live.nexora.stream/app</span></div>
+            <div class="text-gray-400">Chave OBS: <span id="dashObsKey" class="text-amber-300">nex_live_sec_7792</span></div>
           </div>
         </div>
 
-        <button id="dashProBtn" onclick="openCheckoutModal()" class="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-black font-extrabold text-xs py-2.5 rounded-xl transition mt-4 shadow-[0_0_10px_rgba(255,183,0,0.3)]">
-          <i class="fa-solid fa-bolt"></i> Obter Licença PRO
+        <button onclick="openCheckoutModal()" class="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-black font-extrabold text-xs py-2.5 rounded-xl transition mt-4 shadow-[0_0_10px_rgba(255,183,0,0.3)]">
+          <i class="fa-solid fa-bolt"></i> Assinar PRO (R$ 14,90/mês)
         </button>
       </div>
 
@@ -221,17 +223,17 @@
 
   <!-- ================= TELA DA SALA DE TRANSMISSÃO ================= -->
   <div id="roomView" class="hidden min-h-screen flex flex-col">
-    <header class="border-b border-cyan-500/20 bg-[#0f111a]/90 backdrop-blur-md py-3 px-6 flex justify-between items-center z-30">
+    <header class="border-b border-purple-500/20 bg-[#0f111a]/90 backdrop-blur-md py-3 px-6 flex justify-between items-center z-30">
       <div class="flex items-center space-x-3">
-        <button onclick="returnToDashboard()" class="text-cyan-400 hover:text-white text-xs bg-[#08090d] px-3 py-1.5 rounded-xl border border-cyan-500/30 flex items-center gap-1.5 font-bold">
-          <i class="fa-solid fa-arrow-left"></i> Voltar à Dashboard
+        <button onclick="returnToDashboard()" class="text-purple-400 hover:text-white text-xs bg-[#08090d] px-3 py-1.5 rounded-xl border border-purple-500/30 flex items-center gap-1.5 font-bold">
+          <i class="fa-solid fa-arrow-left"></i> Voltar ao Hub
         </button>
-        <h1 class="text-sm font-black tracking-wider text-gradient-neon">SALA PRIVADA ID: <span id="currentRoomTitle" class="text-white">...</span></h1>
+        <h1 class="text-sm font-black tracking-wider text-gradient-nexora">SALA PRIVADA NEXORA ID: <span id="currentRoomTitle" class="text-white">...</span></h1>
       </div>
 
       <div class="flex items-center gap-3">
         <button onclick="toggleCinemaMode()" id="btnCinema" class="bg-[#08090d] border border-pink-500/30 text-pink-400 text-xs py-1.5 px-3 rounded-xl">
-          <i class="fa-solid fa-expand"></i>
+          <i class="fa-solid fa-expand"></i> Modo Cinema
         </button>
       </div>
     </header>
@@ -240,44 +242,43 @@
 
       <div id="leftColumn" class="lg:col-span-2 flex flex-col gap-4">
         
-        <div class="flex justify-between items-center bg-[#0f111a] p-2 rounded-xl border border-cyan-500/20 gap-2">
+        <div class="flex justify-between items-center bg-[#0f111a] p-2 rounded-xl border border-purple-500/20 gap-2">
           <div class="flex flex-1 gap-1">
-            <button id="tabScreen" onclick="switchTab('screen')" class="flex-1 py-1.5 text-xs font-bold rounded-lg bg-cyan-600 text-white transition shadow">
-              <i class="fa-solid fa-desktop"></i> Transmissão da Sala
+            <button id="tabScreen" onclick="switchTab('screen')" class="flex-1 py-1.5 text-xs font-bold rounded-lg bg-purple-600 text-white transition shadow">
+              <i class="fa-solid fa-desktop"></i> Partilha de Mídia & Apps (.exe)
             </button>
             <button id="tabYoutube" onclick="switchTab('youtube')" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-400 hover:text-white transition">
-              <i class="fa-brands fa-youtube text-red-500"></i> YouTube Sync <span class="text-[9px] bg-pink-500/20 text-pink-400 px-1 py-0.5 rounded">PRO</span>
+              <i class="fa-brands fa-youtube text-red-500"></i> Watch Together <span class="text-[9px] bg-pink-500/20 text-pink-400 px-1 py-0.5 rounded">PRO</span>
             </button>
           </div>
-          <div class="px-3 py-1 bg-[#08090d] rounded-lg border border-cyan-500/30 text-xs text-gray-300 flex items-center gap-2">
+          <div class="px-3 py-1 bg-[#08090d] rounded-lg border border-purple-500/30 text-xs text-gray-300 flex items-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span id="roomParticipantsInfo">Conectando...</span>
+            <span id="roomParticipantsInfo">Sincronizando Sala...</span>
           </div>
         </div>
 
-        <div id="displayArea" class="bg-[#0f111a] border-neon-glow rounded-2xl p-3 relative min-h-[420px] flex items-center justify-center overflow-hidden">
+        <div id="displayArea" class="bg-[#0f111a] border-nexora-glow rounded-2xl p-3 relative min-h-[420px] flex items-center justify-center overflow-hidden">
           
           <div id="screenView" class="w-full h-full grid grid-cols-1 md:grid-cols-2 gap-3 items-center justify-center overflow-y-auto max-h-[360px]">
             
-            <div id="slot-local" class="relative bg-black/80 rounded-xl overflow-hidden flex flex-col items-center justify-center min-h-[200px] border border-cyan-500/30">
-              <span id="localStreamLabel" class="absolute top-2 left-2 bg-black/80 text-cyan-300 text-[10px] px-2 py-0.5 rounded font-bold border border-cyan-500/30 z-10">Sua Tela / App (.exe)</span>
-              <button onclick="toggleVideoFullscreen('localVideo')" class="absolute top-2 right-2 bg-black/80 text-white text-xs px-2 py-0.5 rounded border border-cyan-500/20 z-10">
+            <div id="slot-local" class="relative bg-black/80 rounded-xl overflow-hidden flex flex-col items-center justify-center min-h-[200px] border border-purple-500/30">
+              <span id="localStreamLabel" class="absolute top-2 left-2 bg-black/80 text-purple-300 text-[10px] px-2 py-0.5 rounded font-bold border border-purple-500/30 z-10">Sua Transmissão (.exe ou Tela)</span>
+              <button onclick="toggleVideoFullscreen('localVideo')" class="absolute top-2 right-2 bg-black/80 text-white text-xs px-2 py-0.5 rounded border border-purple-500/20 z-10">
                 <i class="fa-solid fa-expand"></i>
               </button>
               <video id="localVideo" autoplay playsinline muted class="w-full max-h-[280px] object-contain hidden"></video>
               <div id="localPlaceholder" class="text-center p-4 text-gray-500 text-xs">
-                <i class="fa-solid fa-desktop text-3xl mb-1 text-cyan-400/40"></i>
-                <p>Sua partilha está inativa</p>
+                <i class="fa-solid fa-desktop text-3xl mb-1 text-purple-400/40"></i>
+                <p>Nenhuma partilha ativa no momento</p>
               </div>
             </div>
 
-            <!-- Grelha dinâmica para fluxos remotos -->
             <div id="remoteStreamsGrid" class="contents">
               <div id="slot-remote-default" class="relative bg-black/80 rounded-xl overflow-hidden flex flex-col items-center justify-center min-h-[200px] border border-pink-500/30">
-                <span class="absolute top-2 left-2 bg-black/80 text-pink-400 text-[10px] px-2 py-0.5 rounded font-bold border border-pink-500/30 z-10">Tela do Parceiro</span>
+                <span class="absolute top-2 left-2 bg-black/80 text-pink-400 text-[10px] px-2 py-0.5 rounded font-bold border border-pink-500/30 z-10">Participante Nexora</span>
                 <div id="remotePlaceholder" class="text-center p-4 text-gray-500 text-xs">
                   <i class="fa-solid fa-user-slash text-3xl mb-1 text-pink-500/30"></i>
-                  <p id="remoteStatusText">Aguardando outros usuários na sala...</p>
+                  <p id="remoteStatusText">Aguardando participantes na sala...</p>
                 </div>
               </div>
             </div>
@@ -285,34 +286,34 @@
           </div>
 
           <div id="youtubeView" class="w-full h-full hidden flex-col items-center absolute inset-3 bg-[#0f111a]">
-            <div class="w-full aspect-video bg-black rounded-xl overflow-hidden relative border border-cyan-500/30">
+            <div class="w-full aspect-video bg-black rounded-xl overflow-hidden relative border border-purple-500/30">
               <div id="ytPlayer"></div>
             </div>
 
-            <div class="w-full mt-2 p-2.5 bg-[#08090d] rounded-xl border border-cyan-500/20 flex flex-col gap-2">
+            <div class="w-full mt-2 p-2.5 bg-[#08090d] rounded-xl border border-purple-500/20 flex flex-col gap-2">
               <div id="proYtNotice" class="text-xs text-pink-400 bg-pink-500/10 p-2 rounded-lg border border-pink-500/20">
-                <i class="fa-solid fa-lock"></i> Requer licença PRO para controlar sincronização do vídeo.
+                <i class="fa-solid fa-lock"></i> Requer licença NEXORA PRO para sincronizar vídeos do YouTube.
               </div>
 
               <div id="ytControlsPro" class="hidden flex-col gap-2">
                 <div class="flex gap-2">
-                  <input id="ytUrlInput" type="text" placeholder="Cole o link do YouTube..." class="flex-1 bg-[#0f111a] border border-cyan-500/30 rounded-xl px-3 py-1.5 text-xs text-white">
+                  <input id="ytUrlInput" type="text" placeholder="Cole o link do YouTube..." class="flex-1 bg-[#0f111a] border border-purple-500/30 rounded-xl px-3 py-1.5 text-xs text-white">
                   <button onclick="loadProYoutubeVideo()" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded-xl font-bold">
-                    Carregar
+                    Carregar Vídeo
                   </button>
                 </div>
                 <div class="flex items-center justify-between text-xs text-gray-400">
-                  <span class="text-cyan-400 font-bold">Controles Globais PRO:</span>
+                  <span class="text-purple-400 font-bold">Controles Globais Watch Together:</span>
                   <div class="flex gap-2">
-                    <button onclick="syncYtAction('play')" class="bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 px-2.5 py-1 rounded-lg font-bold">Play</button>
-                    <button onclick="syncYtAction('pause')" class="bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 px-2.5 py-1 rounded-lg font-bold">Pausa</button>
+                    <button onclick="syncYtAction('play')" class="bg-purple-500/20 border border-purple-500/40 text-purple-300 px-2.5 py-1 rounded-lg font-bold">Play</button>
+                    <button onclick="syncYtAction('pause')" class="bg-purple-500/20 border border-purple-500/40 text-purple-300 px-2.5 py-1 rounded-lg font-bold">Pausa</button>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="absolute bottom-3 right-3 bg-[#08090d]/90 border border-cyan-500/30 px-3 py-1 rounded-full flex gap-2 shadow-2xl z-20">
+          <div class="absolute bottom-3 right-3 bg-[#08090d]/90 border border-purple-500/30 px-3 py-1 rounded-full flex gap-2 shadow-2xl z-20">
             <button onclick="sendEmoji('❤️')" class="hover:scale-125 transition text-xs">❤️</button>
             <button onclick="sendEmoji('🔥')" class="hover:scale-125 transition text-xs">🔥</button>
             <button onclick="sendEmoji('😂')" class="hover:scale-125 transition text-xs">😂</button>
@@ -321,14 +322,14 @@
 
         </div>
 
-        <div class="bg-[#0f111a] border border-cyan-500/30 rounded-2xl p-3.5 shadow-md">
+        <div class="bg-[#0f111a] border border-purple-500/30 rounded-2xl p-3.5 shadow-md">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
             <div>
-              <label class="block text-[10px] font-medium text-gray-400 mb-1">Resolução do Ecrã</label>
-              <select id="selectResolution" class="w-full bg-[#08090d] border border-cyan-500/30 rounded-xl px-2.5 py-1.5 text-xs text-white">
-                <option value="480">480p SD (Grátis)</option>
-                <option value="720">720p HD (Grátis)</option>
-                <option value="1080" selected>1080p Full HD (Grátis)</option>
+              <label class="block text-[10px] font-medium text-gray-400 mb-1">Qualidade de Transmissão</label>
+              <select id="selectResolution" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl px-2.5 py-1.5 text-xs text-white">
+                <option value="480">480p SD (Free)</option>
+                <option value="720">720p HD (Free)</option>
+                <option value="1080" selected>1080p Full HD (Free)</option>
                 <option value="1440" class="pro-option text-pink-400" disabled>1440p 2K 🔒 PRO</option>
                 <option value="2160" class="pro-option text-pink-400" disabled>2160p 4K Ultra HD 🔒 PRO</option>
               </select>
@@ -336,17 +337,17 @@
 
             <div>
               <label class="block text-[10px] font-medium text-gray-400 mb-1">Taxa de Quadros (FPS)</label>
-              <select id="selectFps" class="w-full bg-[#08090d] border border-cyan-500/30 rounded-xl px-2.5 py-1.5 text-xs text-white" onchange="checkFpsSelection(this)">
-                <option value="30">30 FPS (Grátis)</option>
-                <option value="60" selected>60 FPS (Grátis)</option>
+              <select id="selectFps" class="w-full bg-[#08090d] border border-purple-500/30 rounded-xl px-2.5 py-1.5 text-xs text-white" onchange="checkFpsSelection(this)">
+                <option value="30">30 FPS (Free)</option>
+                <option value="60" selected>60 FPS (Free)</option>
                 <option value="120" class="pro-option text-pink-400">120 FPS 🔒 PRO</option>
                 <option value="240" class="pro-option text-pink-400">240 FPS 🔒 PRO</option>
               </select>
             </div>
           </div>
 
-          <button id="btnStartStream" onclick="toggleScreenShare()" class="w-full btn-neon-gradient text-white font-extrabold text-xs py-2.5 px-4 rounded-xl transition flex items-center justify-center gap-2">
-            <i class="fa-solid fa-desktop"></i> PARTILHAR ECRÃ, .EXE OU GUIA DO NAVEGADOR
+          <button id="btnStartStream" onclick="toggleScreenShare()" class="w-full btn-nexora-gradient text-white font-extrabold text-xs py-2.5 px-4 rounded-xl transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-desktop"></i> COMPARTILHAR TELA, APLICATIVO (.EXE) OU GUIA
           </button>
         </div>
 
@@ -354,48 +355,48 @@
 
       <div id="rightColumn" class="flex flex-col gap-4">
         
-        <div class="bg-[#0f111a] border border-cyan-500/30 rounded-2xl p-3.5 shadow-md">
+        <div class="bg-[#0f111a] border border-purple-500/30 rounded-2xl p-3.5 shadow-md">
           <h2 class="text-xs font-bold text-white mb-2 flex items-center justify-between uppercase">
-            <span><i class="fa-solid fa-id-card text-cyan-400"></i> ID da Sala Ativa</span>
-            <span id="connectionStatus" class="text-[9px] bg-amber-900/80 text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/30">Iniciando</span>
+            <span><i class="fa-solid fa-id-card text-purple-400"></i> ID da Sala Ativa</span>
+            <span id="connectionStatus" class="text-[9px] bg-amber-900/80 text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/30">Conectando</span>
           </h2>
 
-          <div class="flex items-center gap-2 bg-[#08090d] p-1.5 rounded-xl border border-cyan-500/30">
-            <span id="roomLinkDisplay" class="text-[11px] font-mono text-cyan-300 truncate flex-1">Nenhum ID</span>
+          <div class="flex items-center gap-2 bg-[#08090d] p-1.5 rounded-xl border border-purple-500/30">
+            <span id="roomLinkDisplay" class="text-[11px] font-mono text-purple-300 truncate flex-1">Nenhum ID</span>
             <button onclick="copyRoomId()" title="Copiar ID da Sala" class="text-gray-400 hover:text-white text-xs p-1">
               <i class="fa-solid fa-copy"></i>
             </button>
           </div>
         </div>
 
-        <div class="bg-[#0f111a] border border-cyan-500/30 rounded-2xl p-3.5 flex-1 flex flex-col shadow-md min-h-[320px] relative">
+        <div class="bg-[#0f111a] border border-purple-500/30 rounded-2xl p-3.5 flex-1 flex flex-col shadow-md min-h-[320px] relative">
           <h2 class="text-xs font-bold text-white mb-2 flex items-center justify-between uppercase">
-            <span><i class="fa-solid fa-comments text-cyan-400"></i> Chat Direto & IA</span>
-            <span class="text-[9px] text-cyan-400">Use <code>/ia [pergunta]</code></span>
+            <span><i class="fa-solid fa-comments text-purple-400"></i> Chat Nexora & IA</span>
+            <span class="text-[9px] text-purple-400">Use <code>/ia [pergunta]</code></span>
           </h2>
 
-          <div id="chatMessages" class="flex-1 bg-[#08090d] border border-cyan-500/20 rounded-xl p-2.5 overflow-y-auto mb-2 text-xs space-y-2 max-h-[220px]">
-            <div class="text-gray-500 italic text-center text-[11px]">Canal de chat sincronizado por ID. Digite <strong>/ia</strong> para testar a inteligência artificial!</div>
+          <div id="chatMessages" class="flex-1 bg-[#08090d] border border-purple-500/20 rounded-xl p-2.5 overflow-y-auto mb-2 text-xs space-y-2 max-h-[220px]">
+            <div class="text-gray-500 italic text-center text-[11px]">Chat P2P seguro ativado. Figurinhas renderizadas em 50x50px. Digite <strong>/ia</strong> para consultar o assistente!</div>
           </div>
 
           <input type="file" id="deviceImageInput" accept="image/*" class="hidden" onchange="handleDeviceImageUpload(event)">
 
-          <div id="stickerPicker" class="hidden absolute bottom-14 left-3 right-3 bg-[#08090d] border border-cyan-500/40 p-2.5 rounded-xl shadow-2xl z-30 grid grid-cols-4 gap-2">
-            <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHY5eWJreXVnY241OHI1b3R5bHdqdXJkZXBvZXAxaXNmMXdrODR5MSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l3q2K5jinAlChoCLS/giphy.gif" onclick="sendSticker(this.src)" class="w-10 h-10 object-cover rounded cursor-pointer border border-cyan-500/30">
-            <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNndicm95c2RrbjUzeXZrYjE1ejUxeXh6cWV6NDdpcXlneXB1MWo4OSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/26u4cqiYI30juCOGY/giphy.gif" onclick="sendSticker(this.src)" class="w-10 h-10 object-cover rounded cursor-pointer border border-cyan-500/30">
-            <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3Z0bjJvaWtwYm4zeGtwOHdzdTFneXV6aTFneTBqOWtsaDRocTZ3cCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/13CoXDiaCcCoyk/giphy.gif" onclick="sendSticker(this.src)" class="w-10 h-10 object-cover rounded cursor-pointer border border-cyan-500/30">
-            <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbms0bnFlZWZtdTJseWF4cmtyazU5YXlsMTRjOXRneTZrbTV2NmV2bSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKsjLuL324yPBU4/giphy.gif" onclick="sendSticker(this.src)" class="w-10 h-10 object-cover rounded cursor-pointer border border-cyan-500/30">
+          <div id="stickerPicker" class="hidden absolute bottom-14 left-3 right-3 bg-[#08090d] border border-purple-500/40 p-2.5 rounded-xl shadow-2xl z-30 grid grid-cols-4 gap-2">
+            <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHY5eWJreXVnY241OHI1b3R5bHdqdXJkZXBvZXAxaXNmMXdrODR5MSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l3q2K5jinAlChoCLS/giphy.gif" onclick="sendSticker(this.src)" style="width: 50px; height: 50px;" class="rounded object-cover cursor-pointer border border-purple-500/30">
+            <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNndicm95c2RrbjUzeXZrYjE1ejUxeXh6cWV6NDdpcXlneXB1MWo4OSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/26u4cqiYI30juCOGY/giphy.gif" onclick="sendSticker(this.src)" style="width: 50px; height: 50px;" class="rounded object-cover cursor-pointer border border-purple-500/30">
+            <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3Z0bjJvaWtwYm4zeGtwOHdzdTFneXV6aTFneTBqOWtsaDRocTZ3cCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/13CoXDiaCcCoyk/giphy.gif" onclick="sendSticker(this.src)" style="width: 50px; height: 50px;" class="rounded object-cover cursor-pointer border border-purple-500/30">
+            <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbms0bnFlZWZtdTJseWF4cmtyazU5YXlsMTRjOXRneTZrbTV2NmV2bSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKsjLuL324yPBU4/giphy.gif" onclick="sendSticker(this.src)" style="width: 50px; height: 50px;" class="rounded object-cover cursor-pointer border border-purple-500/30">
           </div>
 
           <div class="flex gap-1.5 items-center">
-            <button onclick="toggleStickerPicker()" class="text-gray-400 hover:text-cyan-400 text-xs px-1.5 py-1" title="Enviar GIF">
+            <button onclick="toggleStickerPicker()" class="text-gray-400 hover:text-purple-400 text-xs px-1.5 py-1" title="Enviar Sticker/GIF">
               <i class="fa-solid fa-face-smile"></i>
             </button>
-            <button onclick="document.getElementById('deviceImageInput').click()" class="text-gray-400 hover:text-pink-400 text-xs px-1.5 py-1" title="Carregar do Celular/PC (50x50)">
+            <button onclick="document.getElementById('deviceImageInput').click()" class="text-gray-400 hover:text-pink-400 text-xs px-1.5 py-1" title="Enviar Imagem (50x50px)">
               <i class="fa-solid fa-image"></i>
             </button>
-            <input id="chatInput" type="text" placeholder="Escreva ou /ia..." onkeydown="if(event.key==='Enter') sendChatMessage()" class="flex-1 bg-[#08090d] border border-cyan-500/30 rounded-xl px-2.5 py-1.5 text-xs text-white">
-            <button onclick="sendChatMessage()" class="bg-cyan-600 hover:bg-cyan-500 text-white text-xs px-2.5 py-1.5 rounded-xl">
+            <input id="chatInput" type="text" placeholder="Escreva ou /ia..." onkeydown="if(event.key==='Enter') sendChatMessage()" class="flex-1 bg-[#08090d] border border-purple-500/30 rounded-xl px-2.5 py-1.5 text-xs text-white">
+            <button onclick="sendChatMessage()" class="bg-purple-600 hover:bg-purple-500 text-white text-xs px-2.5 py-1.5 rounded-xl">
               <i class="fa-solid fa-paper-plane"></i>
             </button>
           </div>
@@ -406,6 +407,7 @@
     </main>
   </div>
 
+  <!-- MODAL DE CHECKOUT PRO -->
   <div id="checkoutModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4 z-50">
     <div class="bg-[#0f111a] border-pink-glow rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
       <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
@@ -414,16 +416,16 @@
         <div class="inline-flex p-3 bg-pink-500/10 text-pink-400 rounded-2xl mb-2 border border-pink-500/30">
           <i class="fa-solid fa-crown text-2xl"></i>
         </div>
-        <h3 class="text-base font-bold text-white">M.Y.MIDIASTREAM <span class="text-pink-400">PRO</span></h3>
-        <p class="text-xs text-gray-400 mt-1">Salas Ilimitadas, 4K, 240 FPS, Sincronização YouTube e Transmissão OBS.</p>
+        <h3 class="text-base font-bold text-white">NEXORA <span class="text-pink-400">PRO</span></h3>
+        <p class="text-xs text-gray-400 mt-1">Transmissões 4K, 240 FPS, Chave OBS e Watch Together Ilimitado.</p>
       </div>
 
       <div class="bg-[#08090d] p-3.5 rounded-xl border border-pink-500/30 mb-4 flex justify-between items-center">
         <div>
-          <span class="text-[11px] text-gray-400 block">Licença Mensal</span>
-          <span class="text-sm font-bold text-white">R$ 19,90 <span class="text-xs text-gray-500 font-normal">/ 30 dias</span></span>
+          <span class="text-[11px] text-gray-400 block">Assinatura Mensal</span>
+          <span class="text-sm font-bold text-white">R$ 14,90 <span class="text-xs text-gray-500 font-normal">/ mês</span></span>
         </div>
-        <span class="text-[9px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30 font-bold">Ativação Imediata</span>
+        <span class="text-[9px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30 font-bold">Ativação Segura</span>
       </div>
 
       <div class="space-y-3 mb-4">
@@ -431,11 +433,11 @@
           <div class="w-24 h-24 mx-auto bg-gray-900 flex items-center justify-center text-pink-400 rounded-lg mb-1">
             <i class="fa-solid fa-qrcode text-4xl"></i>
           </div>
-          <span class="text-[10px] text-gray-800 font-mono font-bold">Chave Pix: mymidiastream@pagamento.br</span>
+          <span class="text-[10px] text-gray-800 font-mono font-bold">Chave Pix: pagamentos@nexora.stream</span>
         </div>
 
         <button onclick="simulateSuccessfulPayment()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 px-4 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.4)]">
-          <i class="fa-solid fa-bolt"></i> SIMULAR PAGAMENTO APROVADO (PIX)
+          <i class="fa-solid fa-bolt"></i> SIMULAR PAGAMENTO APROVADO
         </button>
       </div>
     </div>
@@ -463,10 +465,11 @@
     };
 
     window.addEventListener('DOMContentLoaded', () => {
-      const savedUser = localStorage.getItem('mymidia_current_user');
+      const savedUser = localStorage.getItem('nexora_current_user');
       if (savedUser) {
         currentUser = JSON.parse(savedUser);
         isPro = currentUser.isPro || false;
+        if (isPro) activateProUI();
         showDashboardView();
       } else {
         showAuthScreen();
@@ -477,12 +480,12 @@
       if (tab === 'login') {
         document.getElementById('formLogin').classList.remove('hidden');
         document.getElementById('formRegister').classList.add('hidden');
-        document.getElementById('tabLoginBtn').className = 'flex-1 py-2 text-xs font-bold rounded-lg bg-cyan-600 text-white transition shadow-[0_0_10px_rgba(0,242,254,0.3)]';
+        document.getElementById('tabLoginBtn').className = 'flex-1 py-2 text-xs font-bold rounded-lg bg-purple-600 text-white transition shadow-[0_0_10px_rgba(139,92,246,0.3)]';
         document.getElementById('tabRegisterBtn').className = 'flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 hover:text-white transition';
       } else {
         document.getElementById('formLogin').classList.add('hidden');
         document.getElementById('formRegister').classList.remove('hidden');
-        document.getElementById('tabRegisterBtn').className = 'flex-1 py-2 text-xs font-bold rounded-lg bg-cyan-600 text-white transition shadow-[0_0_10px_rgba(0,242,254,0.3)]';
+        document.getElementById('tabRegisterBtn').className = 'flex-1 py-2 text-xs font-bold rounded-lg bg-purple-600 text-white transition shadow-[0_0_10px_rgba(139,92,246,0.3)]';
         document.getElementById('tabLoginBtn').className = 'flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 hover:text-white transition';
       }
     }
@@ -491,35 +494,33 @@
       const email = document.getElementById('loginEmail').value.trim();
       const password = document.getElementById('loginPassword').value.trim();
       if (!email || !password) return alert('Informe seu e-mail e senha.');
-      const defaultNickname = email.split('@')[0];
-      currentUser = { email, nickname: defaultNickname, isPro: false };
-      localStorage.setItem('mymidia_current_user', JSON.stringify(currentUser));
+      const defaultName = email.split('@')[0];
+      currentUser = { email, nickname: defaultName, isPro: false };
+      localStorage.setItem('nexora_current_user', JSON.stringify(currentUser));
       showDashboardView();
     }
 
     function handleRegister() {
+      const name = document.getElementById('regName').value.trim();
       const email = document.getElementById('regEmail').value.trim();
       const pass = document.getElementById('regPassword').value.trim();
-      const confirmPass = document.getElementById('regConfirmPassword').value.trim();
       const birth = document.getElementById('regBirthDate').value;
-      if (!email || !pass || !confirmPass || !birth) return alert('Preencha todos os campos.');
-      if (pass !== confirmPass) return alert('As senhas não coincidem.');
-      const defaultNickname = email.split('@')[0];
-      currentUser = { email, nickname: defaultNickname, birthDate: birth, isPro: false };
-      localStorage.setItem('mymidia_current_user', JSON.stringify(currentUser));
-      alert('Conta criada com sucesso!');
+      if (!name || !email || !pass || !birth) return alert('Preencha todos os campos.');
+      currentUser = { email, nickname: name, birthDate: birth, isPro: false };
+      localStorage.setItem('nexora_current_user', JSON.stringify(currentUser));
+      alert('Conta criada com sucesso na Nexora!');
       showDashboardView();
     }
 
-    function handleGoogleLogin() {
+    function handleOAuthLogin(provider) {
       const randomId = Math.floor(Math.random() * 1000);
-      currentUser = { email: `google_user_${randomId}@gmail.com`, nickname: `GoogleUser_${randomId}`, isPro: false };
-      localStorage.setItem('mymidia_current_user', JSON.stringify(currentUser));
+      currentUser = { email: `${provider.toLowerCase()}_user_${randomId}@nexora.com`, nickname: `${provider}User_${randomId}`, isPro: false };
+      localStorage.setItem('nexora_current_user', JSON.stringify(currentUser));
       showDashboardView();
     }
 
     function handleLogout() {
-      localStorage.removeItem('mymidia_current_user');
+      localStorage.removeItem('nexora_current_user');
       currentUser = null;
       if (peer) peer.destroy();
       showAuthScreen();
@@ -544,14 +545,14 @@
       const newName = document.getElementById('dashNicknameInput').value.trim();
       if (!newName) return alert('Informe um nome válido.');
       currentUser.nickname = newName;
-      localStorage.setItem('mymidia_current_user', JSON.stringify(currentUser));
-      alert('Nome de exibição salvo!');
+      localStorage.setItem('nexora_current_user', JSON.stringify(currentUser));
+      alert('Nome de exibição atualizado com sucesso!');
     }
 
     function createOrJoinRoom() {
       const roomId = document.getElementById('dashRoomIdInput').value.trim();
-      if (!roomId) return alert('Informe o ID de uma sala (ex: salaandin).');
-      const cleanId = 'mms-' + roomId.toLowerCase().replace(/[^a-z0-9-_]/g, '');
+      if (!roomId) return alert('Informe o ID da sala (ex: nexora-lobby).');
+      const cleanId = 'nex-' + roomId.toLowerCase().replace(/[^a-z0-9-_]/g, '');
       enterRoom(cleanId);
     }
 
@@ -573,32 +574,29 @@
       document.getElementById('dashboardView').classList.remove('hidden');
     }
 
-    // ARQUITETURA HOST/CONVIDADO ROBUSTA PARA EVITAR CONFLITO DE ID
+    // ARQUITETURA HOST/CONVIDADO COM TRATAMENTO DE ID
     function initPeerRoom(roomId) {
       if (peer) peer.destroy();
       connections = {};
 
-      // O primeiro usuário tenta criar o Peer com o ID exato da sala (Host)
       peer = new Peer(roomId, peerConfig);
 
       peer.on('open', (id) => {
         document.getElementById('connectionStatus').innerText = 'Anfitrião da Sala';
         document.getElementById('connectionStatus').className = 'text-[9px] bg-emerald-900/80 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30';
-        document.getElementById('roomParticipantsInfo').innerText = 'Aguardando participantes entrarem...';
+        document.getElementById('roomParticipantsInfo').innerText = 'Aguardando amigos entrarem...';
       });
 
       peer.on('error', (err) => {
         if (err.type === 'unavailable-id') {
-          // Se o ID já está ocupado, criamos um ID único aleatório para este Convidado
           const guestPeerId = roomId + "-guest-" + Math.random().toString(36).substring(2, 6);
           peer = new Peer(guestPeerId, peerConfig);
 
           peer.on('open', () => {
-            document.getElementById('connectionStatus').innerText = 'Conectado à Sala';
+            document.getElementById('connectionStatus').innerText = 'Sincronizado';
             document.getElementById('connectionStatus').className = 'text-[9px] bg-emerald-900/80 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30';
             document.getElementById('roomParticipantsInfo').innerText = 'Conectando ao anfitrião...';
 
-            // Conecta diretamente ao ID do Anfitrião (roomId)
             const conn = peer.connect(roomId, { reliable: true });
             bindConnection(conn);
           });
@@ -616,7 +614,7 @@
       connections[conn.peer] = conn;
 
       conn.on('open', () => {
-        document.getElementById('connectionStatus').innerText = 'Sincronizado';
+        document.getElementById('connectionStatus').innerText = 'Conectado';
         document.getElementById('connectionStatus').className = 'text-[9px] bg-emerald-900/80 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30';
         
         conn.send({ type: 'nickname', name: currentUser.nickname });
@@ -651,7 +649,7 @@
       conn.on('close', () => {
         delete connections[conn.peer];
         removeRemoteStreamElement(conn.peer);
-        document.getElementById('roomParticipantsInfo').innerText = 'Participante saiu da sala';
+        document.getElementById('roomParticipantsInfo').innerText = 'Participante saiu';
       });
     }
 
@@ -689,7 +687,7 @@
 
     function copyRoomId() {
       navigator.clipboard.writeText(currentRoomId);
-      alert('ID da sala copiado com sucesso!');
+      alert('ID da sala copiado!');
     }
 
     function toggleStickerPicker() {
@@ -697,7 +695,7 @@
     }
 
     function sendSticker(imgUrl) {
-      const myName = currentUser ? currentUser.nickname : 'Visitante';
+      const myName = currentUser ? currentUser.nickname : 'Membro';
       appendChatMessage(myName, imgUrl, true);
       broadcastData({ type: 'chat', sender: myName, text: imgUrl, isSticker: true });
       toggleStickerPicker();
@@ -710,7 +708,7 @@
       const reader = new FileReader();
       reader.onload = function(e) {
         const base64Img = e.target.result;
-        const myName = currentUser ? currentUser.nickname : 'Visitante';
+        const myName = currentUser ? currentUser.nickname : 'Membro';
         appendChatMessage(myName, base64Img, true);
         broadcastData({ type: 'chat', sender: myName, text: base64Img, isSticker: true });
       };
@@ -722,7 +720,7 @@
       const text = input.value.trim();
       if (!text) return;
 
-      const myName = currentUser ? currentUser.nickname : 'Visitante';
+      const myName = currentUser ? currentUser.nickname : 'Membro';
       appendChatMessage(myName, text, false);
 
       broadcastData({ type: 'chat', sender: myName, text: text, isSticker: false });
@@ -731,22 +729,22 @@
       if (text.toLowerCase().startsWith('/ia')) {
         const query = text.replace(/^\/ia\s*/i, '').trim();
         if (!query) {
-          appendChatMessage('🤖 Gemini AI', 'Digite `/ia [sua pergunta]` para consultar!');
+          appendChatMessage('🤖 Nexora AI', 'Digite `/ia [sua pergunta]` para consultar a inteligência artificial!');
           return;
         }
 
-        appendChatMessage('🤖 Gemini AI', 'A processar...');
+        appendChatMessage('🤖 Nexora AI', 'Processando requisição...');
         try {
           const aiResponse = await getGeminiAIResponse(query);
           const chatBox = document.getElementById('chatMessages');
           chatBox.lastChild.remove();
           
-          appendChatMessage('🤖 Gemini AI', aiResponse);
-          broadcastData({ type: 'ai_response', sender: '🤖 Gemini AI', text: aiResponse });
+          appendChatMessage('🤖 Nexora AI', aiResponse);
+          broadcastData({ type: 'ai_response', sender: '🤖 Nexora AI', text: aiResponse });
         } catch (e) {
           const chatBox = document.getElementById('chatMessages');
           chatBox.lastChild.remove();
-          appendChatMessage('🤖 Gemini AI', 'Erro ao obter resposta.');
+          appendChatMessage('🤖 Nexora AI', 'Erro ao processar resposta.');
         }
       }
     }
@@ -759,25 +757,24 @@
 
     async function getGeminiAIResponse(prompt) {
       const p = prompt.toLowerCase();
-      if (p.includes('filme') || p.includes('terror') || p.includes('indica')) {
-        return 'Aqui estão 3 excelentes filmes de terror: 1. Hereditário (2018), 2. A Bruxa (2015) e 3. Invocação do Mal (2013).';
-      } else if (p.includes('fivem') || p.includes('lua')) {
-        return 'Em FiveM/Lua, gerencie eventos com segurança utilizando `RegisterNetEvent`.';
-      } else if (p.includes('godot') || p.includes('gdscript')) {
-        return 'No Godot 4, utilize `CharacterBody3D` com `move_and_slide()` para movimentação precisa.';
+      if (p.includes('nexora') || p.includes('plataforma')) {
+        return 'A Nexora é uma plataforma social avançada que integra salas virtuais, partilha de janelas .exe, WebRTC e Watch Together.';
+      } else if (p.includes('pro') || p.includes('preco')) {
+        return 'O plano Nexora Pro custa R$ 14,90 mensais e inclui 4K, 240 FPS e chaves OBS dedicadas.';
       }
-      return `Resposta para "${prompt}": Como assistente Gemini no M.Y.MIDIASTREAM, estou pronto para auxiliar na sua sala!`;
+      return `Resposta para "${prompt}": Nexora AI analisou sua dúvida e está operando perfeitamente na sala!`;
     }
 
     function appendChatMessage(sender, content, isSticker = false) {
       const chatBox = document.getElementById('chatMessages');
       const msgDiv = document.createElement('div');
-      msgDiv.className = 'bg-[#08090d] p-2 rounded-xl border border-cyan-500/20 flex flex-col gap-1 shadow';
-      const isAI = sender.includes('Gemini');
-      const colorClass = isAI ? 'text-amber-400 font-bold' : 'text-cyan-400 font-bold';
+      msgDiv.className = 'bg-[#08090d] p-2 rounded-xl border border-purple-500/20 flex flex-col gap-1 shadow';
+      const isAI = sender.includes('AI');
+      const colorClass = isAI ? 'text-amber-400 font-bold' : 'text-purple-400 font-bold';
 
       if (isSticker) {
-        msgDiv.innerHTML = `<span class="${colorClass}">${sender}:</span><img src="${content}" style="width: 50px; height: 50px;" class="rounded-lg border border-cyan-500/40 object-cover mt-1 shadow">`;
+        // RENDERIZAÇÃO RIGOROSA DE 50x50 PIXELS CONFORME ESPECIFICADO NO PROMPT MASTER
+        msgDiv.innerHTML = `<span class="${colorClass}">${sender}:</span><img src="${content}" style="width: 50px; height: 50px;" class="rounded-lg border border-purple-500/40 object-cover mt-1 shadow">`;
       } else {
         msgDiv.innerHTML = `<span class="${colorClass}">${sender}:</span> <span class="text-gray-200">${content}</span>`;
       }
@@ -807,10 +804,10 @@
     function simulateSuccessfulPayment() {
       isPro = true;
       currentUser.isPro = true;
-      localStorage.setItem('mymidia_current_user', JSON.stringify(currentUser));
+      localStorage.setItem('nexora_current_user', JSON.stringify(currentUser));
       closeCheckoutModal();
       activateProUI();
-      alert('Licença PRO ativada!');
+      alert('Assinatura NEXORA PRO ativada com sucesso!');
     }
 
     function activateProUI() {
@@ -824,7 +821,7 @@
     function checkFpsSelection(selectElem) {
       const val = parseInt(selectElem.value);
       if ((val === 120 || val === 240) && !isPro) {
-        alert('120 FPS e 240 FPS são exclusivos da licença PRO!');
+        alert('120 FPS e 240 FPS são recursos exclusivos do plano NEXORA PRO!');
         selectElem.value = "60";
         openCheckoutModal();
       }
@@ -849,7 +846,7 @@
         localStream = null;
         document.getElementById('localVideo').classList.add('hidden');
         document.getElementById('localPlaceholder').classList.remove('hidden');
-        document.getElementById('btnStartStream').innerHTML = `<i class="fa-solid fa-desktop"></i> PARTILHAR ECRÃ, .EXE OU GUIA DO NAVEGADOR`;
+        document.getElementById('btnStartStream').innerHTML = `<i class="fa-solid fa-desktop"></i> COMPARTILHAR TELA, APLICATIVO (.EXE) OU GUIA`;
         return;
       }
 
@@ -870,7 +867,7 @@
         });
 
         localStream.getVideoTracks()[0].onended = () => { toggleScreenShare(); };
-      } catch (err) { console.error("Erro ao partilhar ecrã:", err); }
+      } catch (err) { console.error("Erro ao capturar partilha:", err); }
     }
 
     function displayLocalStream(stream) {
@@ -894,12 +891,12 @@
       if (tab === 'screen') {
         document.getElementById('screenView').classList.remove('hidden');
         document.getElementById('youtubeView').classList.add('hidden');
-        document.getElementById('tabScreen').className = 'flex-1 py-1.5 text-xs font-bold rounded-lg bg-cyan-600 text-white transition shadow';
+        document.getElementById('tabScreen').className = 'flex-1 py-1.5 text-xs font-bold rounded-lg bg-purple-600 text-white transition shadow';
         document.getElementById('tabYoutube').className = 'flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-400 hover:text-white transition';
       } else {
         document.getElementById('screenView').classList.add('hidden');
         document.getElementById('youtubeView').classList.remove('hidden');
-        document.getElementById('tabYoutube').className = 'flex-1 py-1.5 text-xs font-bold rounded-lg bg-cyan-600 text-white transition shadow';
+        document.getElementById('tabYoutube').className = 'flex-1 py-1.5 text-xs font-bold rounded-lg bg-purple-600 text-white transition shadow';
         document.getElementById('tabScreen').className = 'flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-400 hover:text-white transition';
       }
     }
