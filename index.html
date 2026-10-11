@@ -20,7 +20,7 @@
     }
     .floating-emoji { animation: floatUp 2.5s ease-out forwards; pointer-events: none; position: absolute; bottom: 20px; z-index: 50; }
 
-    /* Forçar o vídeo a ocupar a tela inteira quando em Fullscreen */
+    /* Ajuste de Fullscreen Real no Vídeo */
     :fullscreen video, :-webkit-full-screen video {
       width: 100vw !important;
       height: 100vh !important;
@@ -54,7 +54,7 @@
         <button id="tabRegisterBtn" onclick="switchAuthTab('register')" class="flex-1 py-2 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition">Criar Conta</button>
       </div>
 
-      <!-- Formulário de Login (Cria automaticamente se não existir) -->
+      <!-- Formulário de Login -->
       <div id="formLogin" class="space-y-3">
         <div>
           <label class="block text-xs font-medium text-gray-400 mb-1">E-mail:</label>
@@ -69,7 +69,7 @@
         </button>
       </div>
 
-      <!-- Formulário de Registo Detalhado -->
+      <!-- Formulário de Registo -->
       <div id="formRegister" class="space-y-3 hidden">
         <div>
           <label class="block text-xs font-medium text-gray-400 mb-1">Apelido / Nome:</label>
@@ -218,7 +218,7 @@
 
       </div>
 
-      <!-- Painel de Configurações de Transmissão (60 FPS Grátis | 120/240 FPS PRO) -->
+      <!-- Painel de Configurações de Transmissão -->
       <div id="screenControlsPanel" class="bg-card-custom border border-custom rounded-xl p-4 shadow-md">
         <h2 class="text-sm font-semibold text-white mb-3 flex items-center gap-2">
           <i class="fa-solid fa-sliders text-indigo-400"></i> Definições de Transmissão de Ecrã
@@ -250,7 +250,7 @@
 
     </div>
 
-    <!-- Coluna Direita: Conexão, ID e Chat com Gemini AI (/ia) -->
+    <!-- Coluna Direita: Conexão, ID e Chat Integrado com Figurinhas (50x50) -->
     <div id="rightColumn" class="flex flex-col gap-4 transition-all duration-300">
       
       <!-- Cartão de Conexão -->
@@ -286,18 +286,29 @@
         </div>
       </div>
 
-      <!-- Chat ao Vivo com Comando /ia (Gemini) -->
-      <div class="bg-card-custom border border-custom rounded-xl p-4 flex-1 flex flex-col shadow-md min-h-[300px]">
+      <!-- Chat ao Vivo com Suporte a Figurinhas (50x50) & Gemini AI (/ia) -->
+      <div class="bg-card-custom border border-custom rounded-xl p-4 flex-1 flex flex-col shadow-md min-h-[320px] relative">
         <h2 class="text-sm font-semibold text-white mb-2 flex items-center justify-between">
           <span><i class="fa-solid fa-comments text-indigo-400"></i> Chat & Gemini AI</span>
           <span class="text-[10px] text-indigo-400">Use <code>/ia</code> para perguntar</span>
         </h2>
 
-        <div id="chatMessages" class="flex-1 bg-dark-custom border border-custom rounded-lg p-2.5 overflow-y-auto mb-3 text-xs space-y-2 max-h-[250px]">
-          <div class="text-gray-500 italic text-center">Digite mensagens ou use <strong>/ia [sua pergunta]</strong> no chat!</div>
+        <div id="chatMessages" class="flex-1 bg-dark-custom border border-custom rounded-lg p-2.5 overflow-y-auto mb-3 text-xs space-y-2 max-h-[220px]">
+          <div class="text-gray-500 italic text-center">Converse ao vivo ou digite <strong>/ia [pergunta]</strong>!</div>
         </div>
 
-        <div class="flex gap-2">
+        <!-- Popover de Seleção de Figurinhas/GIFs -->
+        <div id="stickerPicker" class="hidden absolute bottom-14 left-4 right-4 bg-dark-custom border border-custom p-2.5 rounded-xl shadow-2xl z-30 grid grid-cols-4 gap-2">
+          <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHY5eWJreXVnY241OHI1b3R5bHdqdXJkZXBvZXAxaXNmMXdrODR5MSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l3q2K5jinAlChoCLS/giphy.gif" onclick="sendSticker(this.src)" class="w-12 h-12 object-cover rounded cursor-pointer hover:scale-110 transition border border-custom">
+          <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNndicm95c2RrbjUzeXZrYjE1ejUxeXh6cWV6NDdpcXlneXB1MWo4OSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/26u4cqiYI30juCOGY/giphy.gif" onclick="sendSticker(this.src)" class="w-12 h-12 object-cover rounded cursor-pointer hover:scale-110 transition border border-custom">
+          <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3Z0bjJvaWtwYm4zeGtwOHdzdTFneXV6aTFneTBqOWtsaDRocTZ3cCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/13CoXDiaCcCoyk/giphy.gif" onclick="sendSticker(this.src)" class="w-12 h-12 object-cover rounded cursor-pointer hover:scale-110 transition border border-custom">
+          <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbms0bnFlZWZtdTJseWF4cmtyazU5YXlsMTRjOXRneTZrbTV2NmV2bSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKsjLuL324yPBU4/giphy.gif" onclick="sendSticker(this.src)" class="w-12 h-12 object-cover rounded cursor-pointer hover:scale-110 transition border border-custom">
+        </div>
+
+        <div class="flex gap-2 items-center">
+          <button onclick="toggleStickerPicker()" class="text-gray-400 hover:text-amber-400 text-base px-1.5 py-1 transition" title="Enviar Figurinha / GIF">
+            <i class="fa-solid fa-face-smile"></i>
+          </button>
           <input id="chatInput" type="text" placeholder="Escreva ou digite /ia..." onkeydown="if(event.key==='Enter') sendChatMessage()" class="flex-1 bg-dark-custom border border-custom rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
           <button onclick="sendChatMessage()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded-lg transition">
             <i class="fa-solid fa-paper-plane"></i>
@@ -347,7 +358,7 @@
     </div>
   </div>
 
-  <!-- Script Principal da Aplicação com Correção do Fullscreen -->
+  <!-- Script Principal da Aplicação com Comunicação e Figurinhas 50x50 -->
   <script>
     let currentUser = null;
     let isPro = false;
@@ -482,9 +493,6 @@
       peer.on('connection', (connection) => {
         conn = connection;
         setupConnectionEvents();
-        conn.on('open', () => {
-          if (currentUser) conn.send({ type: 'nickname', name: currentUser.nickname });
-        });
       });
 
       peer.on('call', (call) => {
@@ -502,26 +510,30 @@
       conn = peer.connect(remoteId);
       setupConnectionEvents();
 
-      conn.on('open', () => {
-        if (currentUser) conn.send({ type: 'nickname', name: currentUser.nickname });
-      });
-
       if (localStream) {
         peer.call(remoteId, localStream);
       }
     }
 
     function setupConnectionEvents() {
-      document.getElementById('connectionStatus').innerText = 'Conetado';
-      document.getElementById('connectionStatus').className = 'text-[10px] bg-emerald-900 text-emerald-300 px-2 py-0.5 rounded-full';
-      const myName = currentUser ? currentUser.nickname : 'Você';
-      document.getElementById('roomParticipantsInfo').innerText = `Sala Ativa (${myName} & ${remotePeerNickname})`;
+      conn.on('open', () => {
+        document.getElementById('connectionStatus').innerText = 'Conetado';
+        document.getElementById('connectionStatus').className = 'text-[10px] bg-emerald-900 text-emerald-300 px-2 py-0.5 rounded-full';
+        const myName = currentUser ? currentUser.nickname : 'Você';
+        document.getElementById('roomParticipantsInfo').innerText = `Sala Ativa (${myName} & ${remotePeerNickname})`;
+
+        // Enviar apelido ao ligar
+        if (currentUser) conn.send({ type: 'nickname', name: currentUser.nickname });
+      });
 
       conn.on('data', (data) => {
-        if (data.type === 'chat') appendChatMessage(data.sender, data.text);
+        if (data.type === 'chat') {
+          appendChatMessage(data.sender, data.text, data.isSticker);
+        }
         if (data.type === 'nickname') {
           remotePeerNickname = data.name;
           document.getElementById('remoteStreamLabel').innerText = `Ecrã de ${remotePeerNickname}`;
+          const myName = currentUser ? currentUser.nickname : 'Você';
           document.getElementById('roomParticipantsInfo').innerText = `Sala Ativa (${myName} & ${remotePeerNickname})`;
         }
         if (data.type === 'ytSync') handleRemoteYtSync(data);
@@ -529,7 +541,6 @@
       });
     }
 
-    // Função de Fullscreen Direto no Vídeo (Ecrã Cheia Real)
     function toggleVideoFullscreen(videoId) {
       const videoElem = document.getElementById(videoId);
       if (!document.fullscreenElement) {
@@ -545,14 +556,30 @@
       }
     }
 
+    // Chat com Envio de Mensagens, Figurinhas (50x50) e Gemini AI
+    function toggleStickerPicker() {
+      document.getElementById('stickerPicker').classList.toggle('hidden');
+    }
+
+    function sendSticker(imgUrl) {
+      const myName = currentUser ? currentUser.nickname : 'Visitante';
+      appendChatMessage(myName, imgUrl, true);
+      if (conn && conn.open) {
+        conn.send({ type: 'chat', sender: myName, text: imgUrl, isSticker: true });
+      }
+      toggleStickerPicker();
+    }
+
     async function sendChatMessage() {
       const input = document.getElementById('chatInput');
       const text = input.value.trim();
       if (!text) return;
 
       const myName = currentUser ? currentUser.nickname : 'Visitante';
-      appendChatMessage(myName, text);
-      if (conn && conn.open) conn.send({ type: 'chat', sender: myName, text: text });
+      appendChatMessage(myName, text, false);
+      if (conn && conn.open) {
+        conn.send({ type: 'chat', sender: myName, text: text, isSticker: false });
+      }
       input.value = '';
 
       if (text.toLowerCase().startsWith('/ia')) {
@@ -587,13 +614,19 @@
       return `Compreendi a sua questão sobre "${prompt}". Como assistente Gemini no M.Y.MidiaStream, estou pronto para o ajudar!`;
     }
 
-    function appendChatMessage(sender, text) {
+    function appendChatMessage(sender, content, isSticker = false) {
       const chatBox = document.getElementById('chatMessages');
       const msgDiv = document.createElement('div');
-      msgDiv.className = 'bg-dark-custom p-1.5 rounded border border-custom/50';
+      msgDiv.className = 'bg-dark-custom p-1.5 rounded border border-custom/50 flex flex-col gap-1';
       const isAI = sender.includes('Gemini');
-      const colorClass = isAI ? 'text-amber-400 font-bold' : 'text-indigo-400';
-      msgDiv.innerHTML = `<span class="${colorClass}">${sender}:</span> <span class="text-gray-200">${text}</span>`;
+      const colorClass = isAI ? 'text-amber-400 font-bold' : 'text-indigo-400 font-semibold';
+
+      if (isSticker) {
+        msgDiv.innerHTML = `<span class="${colorClass}">${sender}:</span><img src="${content}" style="width: 50px; height: 50px;" class="rounded border border-custom object-cover mt-1">`;
+      } else {
+        msgDiv.innerHTML = `<span class="${colorClass}">${sender}:</span> <span class="text-gray-200">${content}</span>`;
+      }
+
       chatBox.appendChild(msgDiv);
       chatBox.scrollTop = chatBox.scrollHeight;
     }
