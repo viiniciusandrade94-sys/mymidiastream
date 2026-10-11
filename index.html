@@ -186,14 +186,14 @@
       <div class="bg-[#0f111a] border-pink-glow rounded-2xl p-5 flex flex-col justify-between">
         <div>
           <h3 class="text-sm font-bold text-pink-400 mb-3 uppercase flex items-center gap-2">
-            <i class="fa-solid fa-door-open"></i> Entrar / Criar Sala por ID
+            <i class="fa-solid fa-door-open"></i> Entrar por ID da Sala
           </h3>
-          <p class="text-xs text-gray-400 mb-3">Digite exatamente o mesmo ID da sala do seu amigo para conectar instantaneamente:</p>
+          <p class="text-xs text-gray-400 mb-3">Digite o ID exato da sala (ex: `salaandin`) para entrar instantaneamente:</p>
           <label class="block text-[11px] text-gray-300 mb-1 font-semibold">ID da Sala Privada:</label>
-          <input id="dashRoomIdInput" type="text" placeholder="Ex: sala123" class="w-full bg-[#08090d] border border-pink-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:border-pink-400">
+          <input id="dashRoomIdInput" type="text" placeholder="Ex: salaandin" class="w-full bg-[#08090d] border border-pink-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:border-pink-400">
         </div>
         <button onclick="createOrJoinRoom()" class="w-full bg-pink-600 hover:bg-pink-500 text-white text-xs font-bold py-2.5 rounded-xl transition mt-4 shadow-[0_0_10px_rgba(255,0,127,0.3)]">
-          <i class="fa-solid fa-right-to-bracket"></i> Entrar Direto na Sala por ID
+          <i class="fa-solid fa-right-to-bracket"></i> Entrar na Sala por ID
         </button>
       </div>
 
@@ -251,35 +251,34 @@
           </div>
           <div class="px-3 py-1 bg-[#08090d] rounded-lg border border-cyan-500/30 text-xs text-gray-300 flex items-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span id="roomParticipantsInfo">Conectando à Sala...</span>
+            <span id="roomParticipantsInfo">Aguardando Participantes...</span>
           </div>
         </div>
 
         <div id="displayArea" class="bg-[#0f111a] border-neon-glow rounded-2xl p-3 relative min-h-[420px] flex items-center justify-center overflow-hidden">
           
-          <div id="screenView" class="w-full h-full grid grid-cols-1 md:grid-cols-2 gap-3 items-center justify-center">
+          <div id="screenView" class="w-full h-full grid grid-cols-1 md:grid-cols-2 gap-3 items-center justify-center overflow-y-auto max-h-[360px]">
             
             <div id="slot-local" class="relative bg-black/80 rounded-xl overflow-hidden flex flex-col items-center justify-center min-h-[200px] border border-cyan-500/30">
-              <span id="localStreamLabel" class="absolute top-2 left-2 bg-black/80 text-cyan-300 text-[10px] px-2 py-0.5 rounded font-bold border border-cyan-500/30 z-10">Sua Tela</span>
+              <span id="localStreamLabel" class="absolute top-2 left-2 bg-black/80 text-cyan-300 text-[10px] px-2 py-0.5 rounded font-bold border border-cyan-500/30 z-10">Sua Tela / App (.exe)</span>
               <button onclick="toggleVideoFullscreen('localVideo')" class="absolute top-2 right-2 bg-black/80 text-white text-xs px-2 py-0.5 rounded border border-cyan-500/20 z-10">
                 <i class="fa-solid fa-expand"></i>
               </button>
               <video id="localVideo" autoplay playsinline muted class="w-full max-h-[280px] object-contain hidden"></video>
               <div id="localPlaceholder" class="text-center p-4 text-gray-500 text-xs">
                 <i class="fa-solid fa-desktop text-3xl mb-1 text-cyan-400/40"></i>
-                <p>Sua transmissão está inativa</p>
+                <p>Sua partilha está inativa</p>
               </div>
             </div>
 
-            <div id="slot-remote" class="relative bg-black/80 rounded-xl overflow-hidden flex flex-col items-center justify-center min-h-[200px] border border-pink-500/30">
-              <span id="remoteStreamLabel" class="absolute top-2 left-2 bg-black/80 text-pink-400 text-[10px] px-2 py-0.5 rounded font-bold border border-pink-500/30 z-10">Tela do Parceiro</span>
-              <button onclick="toggleVideoFullscreen('remoteVideo')" class="absolute top-2 right-2 bg-black/80 text-white text-xs px-2 py-0.5 rounded border border-pink-500/20 z-10">
-                <i class="fa-solid fa-expand"></i>
-              </button>
-              <video id="remoteVideo" autoplay playsinline class="w-full max-h-[280px] object-contain hidden"></video>
-              <div id="remotePlaceholder" class="text-center p-4 text-gray-500 text-xs">
-                <i class="fa-solid fa-user-slash text-3xl mb-1 text-pink-500/30"></i>
-                <p id="remoteStatusText">Aguardando seu amigo se conectar...</p>
+            <!-- Grelha Dinâmica para exibir múltiplos ecrãs de todos os participantes da sala -->
+            <div id="remoteStreamsGrid" class="contents">
+              <div id="slot-remote-default" class="relative bg-black/80 rounded-xl overflow-hidden flex flex-col items-center justify-center min-h-[200px] border border-pink-500/30">
+                <span class="absolute top-2 left-2 bg-black/80 text-pink-400 text-[10px] px-2 py-0.5 rounded font-bold border border-pink-500/30 z-10">Tela do Parceiro</span>
+                <div id="remotePlaceholder" class="text-center p-4 text-gray-500 text-xs">
+                  <i class="fa-solid fa-user-slash text-3xl mb-1 text-pink-500/30"></i>
+                  <p id="remoteStatusText">Aguardando outros usuários na sala...</p>
+                </div>
               </div>
             </div>
 
@@ -347,7 +346,7 @@
           </div>
 
           <button id="btnStartStream" onclick="toggleScreenShare()" class="w-full btn-neon-gradient text-white font-extrabold text-xs py-2.5 px-4 rounded-xl transition flex items-center justify-center gap-2">
-            <i class="fa-solid fa-desktop"></i> INICIAR PARTILHA DE ECRÃ COM ÁUDIO
+            <i class="fa-solid fa-desktop"></i> PARTILHAR ECRÃ, .EXE OU GUIA DO NAVEGADOR
           </button>
         </div>
 
@@ -357,13 +356,13 @@
         
         <div class="bg-[#0f111a] border border-cyan-500/30 rounded-2xl p-3.5 shadow-md">
           <h2 class="text-xs font-bold text-white mb-2 flex items-center justify-between uppercase">
-            <span><i class="fa-solid fa-link text-cyan-400"></i> ID Privado da Sala</span>
+            <span><i class="fa-solid id-card text-cyan-400"></i> ID da Sala Ativa</span>
             <span id="connectionStatus" class="text-[9px] bg-amber-900/80 text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/30">Iniciando</span>
           </h2>
 
           <div class="flex items-center gap-2 bg-[#08090d] p-1.5 rounded-xl border border-cyan-500/30">
-            <span id="roomLinkDisplay" class="text-[10px] font-mono text-cyan-300 truncate flex-1">Gerando...</span>
-            <button onclick="copyRoomLink()" title="Copiar Link" class="text-gray-400 hover:text-white text-xs p-1">
+            <span id="roomLinkDisplay" class="text-[11px] font-mono text-cyan-300 truncate flex-1">Nenhum ID</span>
+            <button onclick="copyRoomId()" title="Copiar ID da Sala" class="text-gray-400 hover:text-white text-xs p-1">
               <i class="fa-solid fa-copy"></i>
             </button>
           </div>
@@ -376,7 +375,7 @@
           </h2>
 
           <div id="chatMessages" class="flex-1 bg-[#08090d] border border-cyan-500/20 rounded-xl p-2.5 overflow-y-auto mb-2 text-xs space-y-2 max-h-[220px]">
-            <div class="text-gray-500 italic text-center text-[11px]">Canal de chat P2P sincronizado! Fale com seu amigo ou digite <strong>/ia</strong>!</div>
+            <div class="text-gray-500 italic text-center text-[11px]">Canal de chat sincronizado por ID. Digite <strong>/ia</strong> para testar a inteligência artificial!</div>
           </div>
 
           <input type="file" id="deviceImageInput" accept="image/*" class="hidden" onchange="handleDeviceImageUpload(event)">
@@ -446,21 +445,19 @@
     let currentUser = null;
     let isPro = false;
     let peer = null;
-    let connections = {}; // Mapeia todas as conexões ativas na sala Mesh
+    let connections = {};
     let localStream = null;
     let ytPlayer = null;
     let isYtReady = false;
     let isCinema = false;
     let currentRoomId = null;
 
-    // Servidores STUN e TURN Globais de Alta Disponibilidade
     const peerConfig = {
       config: {
         iceServers: [
           { urls: 'stun:stun.l.google.com:19302' },
           { urls: 'stun:stun1.l.google.com:19302' },
-          { urls: 'stun:stun2.l.google.com:19302' },
-          { urls: 'stun:global.stun.twilio.com:3478' }
+          { urls: 'stun:stun2.l.google.com:19302' }
         ]
       }
     };
@@ -541,10 +538,6 @@
       document.getElementById('dashUserEmail').innerText = currentUser.email;
       document.getElementById('dashNicknameInput').value = currentUser.nickname;
       if (currentUser.isPro) document.getElementById('proBadge').classList.remove('hidden');
-
-      const urlParams = new URLSearchParams(window.location.search);
-      const roomParam = urlParams.get('sala');
-      if (roomParam) enterRoom(roomParam);
     }
 
     function saveDashNickname() {
@@ -557,20 +550,17 @@
 
     function createOrJoinRoom() {
       const roomId = document.getElementById('dashRoomIdInput').value.trim();
-      if (!roomId) return alert('Informe o ID de uma sala.');
+      if (!roomId) return alert('Informe o ID de uma sala (ex: salaandin).');
       const cleanId = 'mms-' + roomId.toLowerCase().replace(/[^a-z0-9-_]/g, '');
       enterRoom(cleanId);
     }
 
     function enterRoom(roomId) {
       currentRoomId = roomId;
-      const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?sala=' + currentRoomId;
-      window.history.replaceState({path: newUrl}, '', newUrl);
-
       document.getElementById('dashboardView').classList.add('hidden');
       document.getElementById('roomView').classList.remove('hidden');
       document.getElementById('currentRoomTitle').innerText = currentRoomId;
-      document.getElementById('roomLinkDisplay').innerText = newUrl;
+      document.getElementById('roomLinkDisplay').innerText = currentRoomId;
 
       initPeerRoom(currentRoomId);
       loadYouTubeAPI();
@@ -579,8 +569,6 @@
     function returnToDashboard() {
       if (peer) peer.destroy();
       connections = {};
-      const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-      window.history.replaceState({path: newUrl}, '', newUrl);
       document.getElementById('roomView').classList.add('hidden');
       document.getElementById('dashboardView').classList.remove('hidden');
     }
@@ -589,16 +577,15 @@
       if (peer) peer.destroy();
       connections = {};
 
-      // ID único dinâmico para evitar conflitos de 'unavailable-id'
-      const myUniquePeerId = roomId + "-" + Math.random().toString(36).substring(2, 7);
-      peer = new Peer(myUniquePeerId, peerConfig);
+      const myPeerId = roomId + "-" + Math.random().toString(36).substring(2, 7);
+      peer = new Peer(myPeerId, peerConfig);
 
       peer.on('open', (id) => {
-        document.getElementById('connectionStatus').innerText = 'Sala Ativa';
+        document.getElementById('connectionStatus').innerText = 'Na Sala por ID';
         document.getElementById('connectionStatus').className = 'text-[9px] bg-emerald-900/80 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30';
-        document.getElementById('roomParticipantsInfo').innerText = 'Procurando Participantes...';
+        document.getElementById('roomParticipantsInfo').innerText = 'Procurando pares na sala...';
 
-        // Tenta conectar ao ID Mestre fixo da Sala
+        // Tenta conectar ao nó mestre da sala com este ID exato
         connectToRoomMaster(roomId);
       });
 
@@ -607,26 +594,18 @@
     }
 
     function connectToRoomMaster(roomId) {
-      // Conecta no Master da sala para registrar presença
       const masterConn = peer.connect(roomId, { reliable: true });
-      
-      masterConn.on('open', () => {
-        bindConnection(masterConn);
-      });
-
+      masterConn.on('open', () => bindConnection(masterConn));
       masterConn.on('error', () => {
-        // Se o Master não existir, registramos este usuário no Master da Sala
         registerAsRoomMaster(roomId);
       });
     }
 
     function registerAsRoomMaster(roomId) {
       const masterPeer = new Peer(roomId, peerConfig);
-
       masterPeer.on('open', () => {
-        document.getElementById('roomParticipantsInfo').innerText = 'Aguardando Amigo Conectar...';
+        document.getElementById('roomParticipantsInfo').innerText = 'Sala Criada (Aguardando Entradas)';
       });
-
       masterPeer.on('connection', (conn) => bindConnection(conn));
       masterPeer.on('call', (call) => answerVideoCall(call));
     }
@@ -635,16 +614,14 @@
       connections[conn.peer] = conn;
 
       conn.on('open', () => {
-        document.getElementById('connectionStatus').innerText = 'Conectado à Sala!';
+        document.getElementById('connectionStatus').innerText = 'Sincronizado';
         document.getElementById('connectionStatus').className = 'text-[9px] bg-emerald-900/80 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30';
         
-        // Troca de nomes entre os dois lados
         conn.send({ type: 'nickname', name: currentUser.nickname });
 
-        // Se você já tiver a partilha de ecrã ligada, envia para a nova conexão de imediato
         if (localStream) {
           const call = peer.call(conn.peer, localStream);
-          call.on('stream', (remoteStream) => handleRemoteStream(remoteStream));
+          call.on('stream', (remoteStream) => handleRemoteStream(remoteStream, conn.peer));
         }
       });
 
@@ -656,18 +633,13 @@
           appendChatMessage(data.sender, data.text, false);
         }
         if (data.type === 'nickname') {
-          document.getElementById('remoteStreamLabel').innerText = `Tela de ${data.name}`;
           document.getElementById('roomParticipantsInfo').innerText = `Conectado com ${data.name}`;
-          document.getElementById('remoteStatusText').innerText = `${data.name} não está a transmitir no momento.`;
-
           conn.send({ type: 'nickname_ack', name: currentUser.nickname });
-
           if (localStream) {
             peer.call(conn.peer, localStream);
           }
         }
         if (data.type === 'nickname_ack') {
-          document.getElementById('remoteStreamLabel').innerText = `Tela de ${data.name}`;
           document.getElementById('roomParticipantsInfo').innerText = `Conectado com ${data.name}`;
         }
         if (data.type === 'ytSync') handleRemoteYtSync(data);
@@ -676,30 +648,46 @@
 
       conn.on('close', () => {
         delete connections[conn.peer];
-        document.getElementById('connectionStatus').innerText = 'Amigo Desconectou';
-        document.getElementById('connectionStatus').className = 'text-[9px] bg-pink-900/80 text-pink-300 px-2 py-0.5 rounded-full border border-pink-500/30';
-        document.getElementById('remoteVideo').classList.add('hidden');
-        document.getElementById('remotePlaceholder').classList.remove('hidden');
+        removeRemoteStreamElement(conn.peer);
+        document.getElementById('roomParticipantsInfo').innerText = 'Participante saiu da sala';
       });
     }
 
     function answerVideoCall(call) {
       call.answer(localStream);
       call.on('stream', (remoteStream) => {
-        handleRemoteStream(remoteStream);
+        handleRemoteStream(remoteStream, call.peer);
       });
     }
 
-    function handleRemoteStream(remoteStream) {
-      const videoElem = document.getElementById('remoteVideo');
-      videoElem.srcObject = remoteStream;
-      videoElem.classList.remove('hidden');
-      document.getElementById('remotePlaceholder').classList.add('hidden');
+    function handleRemoteStream(remoteStream, peerId) {
+      const grid = document.getElementById('remoteStreamsGrid');
+      const defaultPlaceholder = document.getElementById('slot-remote-default');
+      if (defaultPlaceholder) defaultPlaceholder.remove();
+
+      let videoContainer = document.getElementById(`remote-slot-${peerId}`);
+      if (!videoContainer) {
+        videoContainer = document.createElement('div');
+        videoContainer.id = `remote-slot-${peerId}`;
+        videoContainer.className = 'relative bg-black/80 rounded-xl overflow-hidden flex flex-col items-center justify-center min-h-[200px] border border-pink-500/30';
+        videoContainer.innerHTML = `
+          <span class="absolute top-2 left-2 bg-black/80 text-pink-400 text-[10px] px-2 py-0.5 rounded font-bold border border-pink-500/30 z-10">Partilha Ativa</span>
+          <video autoplay playsinline class="w-full max-h-[280px] object-contain"></video>
+        `;
+        grid.appendChild(videoContainer);
+      }
+      const vid = videoContainer.querySelector('video');
+      vid.srcObject = remoteStream;
     }
 
-    function copyRoomLink() {
-      navigator.clipboard.writeText(document.getElementById('roomLinkDisplay').innerText);
-      alert('Link direto da sala copiado!');
+    function removeRemoteStreamElement(peerId) {
+      const el = document.getElementById(`remote-slot-${peerId}`);
+      if (el) el.remove();
+    }
+
+    function copyRoomId() {
+      navigator.clipboard.writeText(currentRoomId);
+      alert('ID da sala copiado com sucesso!');
     }
 
     function toggleStickerPicker() {
@@ -763,9 +751,7 @@
 
     function broadcastData(data) {
       Object.values(connections).forEach(conn => {
-        if (conn && conn.open) {
-          conn.send(data);
-        }
+        if (conn && conn.open) conn.send(data);
       });
     }
 
@@ -774,11 +760,11 @@
       if (p.includes('filme') || p.includes('terror') || p.includes('indica')) {
         return 'Aqui estão 3 excelentes filmes de terror: 1. Hereditário (2018), 2. A Bruxa (2015) e 3. Invocação do Mal (2013).';
       } else if (p.includes('fivem') || p.includes('lua')) {
-        return 'Em FiveM/Lua, gerencie eventos de forma segura com `RegisterNetEvent` e otimize threads com `Citizen.Wait`.';
+        return 'Em FiveM/Lua, gerencie eventos com segurança utilizando `RegisterNetEvent`.';
       } else if (p.includes('godot') || p.includes('gdscript')) {
         return 'No Godot 4, utilize `CharacterBody3D` com `move_and_slide()` para movimentação precisa.';
       }
-      return `Resposta para "${prompt}": Como assistente Gemini no M.Y.MIDIASTREAM, estou a analisar a sua questão para fornecer todo o suporte necessário!`;
+      return `Resposta para "${prompt}": Como assistente Gemini no M.Y.MIDIASTREAM, estou pronto para auxiliar na sua sala!`;
     }
 
     function appendChatMessage(sender, content, isSticker = false) {
@@ -861,13 +847,14 @@
         localStream = null;
         document.getElementById('localVideo').classList.add('hidden');
         document.getElementById('localPlaceholder').classList.remove('hidden');
-        document.getElementById('btnStartStream').innerHTML = `<i class="fa-solid fa-desktop"></i> INICIAR PARTILHA DE ECRÃ COM ÁUDIO`;
+        document.getElementById('btnStartStream').innerHTML = `<i class="fa-solid fa-desktop"></i> PARTILHAR ECRÃ, .EXE OU GUIA DO NAVEGADOR`;
         return;
       }
 
       const fpsVal = parseInt(document.getElementById('selectFps').value);
 
       try {
+        // Nativo do navegador: permite selecionar Tela Inteira, Janela de Aplicativo (.exe) ou Guia do Navegador
         localStream = await navigator.mediaDevices.getDisplayMedia({
           video: { width: { ideal: 1920 }, height: { ideal: 1080 }, frameRate: { ideal: fpsVal } },
           audio: true
@@ -876,10 +863,9 @@
         displayLocalStream(localStream);
         document.getElementById('btnStartStream').innerHTML = `<i class="fa-solid fa-stop"></i> PARAR PARTILHA`;
 
-        // Transmite o vídeo para todas as conexões ativas na sala Mesh
         Object.keys(connections).forEach(peerId => {
           const call = peer.call(peerId, localStream);
-          call.on('stream', (remoteStream) => handleRemoteStream(remoteStream));
+          call.on('stream', (remoteStream) => handleRemoteStream(remoteStream, peerId));
         });
 
         localStream.getVideoTracks()[0].onended = () => { toggleScreenShare(); };
