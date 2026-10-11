@@ -1,305 +1,473 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>M.Y.MidiaStream</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>M.Y.MidiaStream - Pro & Sync</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- PeerJS para conexões P2P WebRTC -->
+  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    body {
-      background-color: #0f172a;
-      color: #f8fafc;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 40px 20px;
-      min-height: 100vh;
-    }
-    .container {
-      max-width: 600px;
-      width: 100%;
-      background: #1e293b;
-      border-radius: 12px;
-      padding: 24px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-    }
-    h1 {
-      font-size: 1.8rem;
-      margin-bottom: 20px;
-      color: #38bdf8;
-      text-align: center;
-    }
-    .card {
-      background: #334155;
-      padding: 16px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-    }
-    .card h2 {
-      font-size: 1.1rem;
-      margin-bottom: 12px;
-      color: #94a3b8;
-    }
-    /* Estilo do Apelido */
-    .profile-section {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .nickname-display {
-      font-size: 1.2rem;
-      font-weight: bold;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 4px 8px;
-      border-radius: 6px;
-      transition: background 0.2s;
-    }
-    .nickname-display:hover {
-      background: #475569;
-    }
-    .nickname-input {
-      font-size: 1.1rem;
-      padding: 4px 8px;
-      background: #0f172a;
-      color: #fff;
-      border: 1px solid #38bdf8;
-      border-radius: 6px;
-      outline: none;
-    }
-    .badge-pro {
-      background: #eab308;
-      color: #000;
-      font-size: 0.75rem;
-      font-weight: bold;
-      padding: 2px 6px;
-      border-radius: 4px;
-      text-transform: uppercase;
-    }
-    .badge-free {
-      background: #64748b;
-      color: #fff;
-      font-size: 0.75rem;
-      padding: 2px 6px;
-      border-radius: 4px;
-    }
-    /* Estilos de Configurações de Transmissão */
-    .setting-group {
-      margin-bottom: 12px;
-    }
-    .setting-group label {
-      display: block;
-      font-size: 0.9rem;
-      margin-bottom: 4px;
-      color: #cbd5e1;
-    }
-    select {
-      width: 100%;
-      padding: 8px;
-      border-radius: 6px;
-      background: #0f172a;
-      color: #fff;
-      border: 1px solid #475569;
-    }
-    select:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    /* Botões de Ação */
-    .btn {
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .btn-pay {
-      background: #22c55e;
-      color: white;
-    }
-    .btn-pay:hover {
-      background: #16a34a;
-    }
-    .status-msg {
-      margin-top: 10px;
-      font-size: 0.85rem;
-      text-align: center;
-      color: #a855f7;
-    }
+    .bg-dark-custom { background-color: #0d1117; }
+    .bg-card-custom { background-color: #161b22; }
+    .border-custom { border-color: #30363d; }
   </style>
 </head>
-<body>
+<body class="bg-dark-custom text-gray-200 min-h-screen flex flex-col font-sans">
 
-  <div class="container">
-    <h1>M.Y.MidiaStream</h1>
-
-    <!-- 1. PERFIL E ALTERAÇÃO DE APELIDO -->
-    <div class="card">
-      <h2>Perfil do Usuário</h2>
-      <div class="profile-section">
-        <span id="nicknameContainer" class="nickname-display" title="Clique para alterar seu apelido">
-          <span id="nicknameText">Carregando...</span>
-          <span id="proBadge" class="badge-free">Básico</span>
-        </span>
-      </div>
-      <p style="font-size: 0.8rem; color: #94a3b8; margin-top: 8px;">
-        * Clique no apelido acima para alterar (Exclusivo Pro).
-      </p>
+  <!-- Header / Navbar -->
+  <header class="border-b border-custom bg-card-custom py-4 px-6 flex flex-wrap justify-between items-center gap-4">
+    <div class="flex items-center space-x-3">
+      <i class="fa-solid fa-play-circle text-indigo-500 text-3xl"></i>
+      <h1 class="text-xl font-bold tracking-wide text-white">M.Y.<span class="text-indigo-400">MidiaStream</span></h1>
     </div>
 
-    <!-- 2. CONFIGURAÇÕES DE COMPARTILHAMENTO DE TELA -->
-    <div class="card">
-      <h2>Configurações de Compartilhamento de Tela</h2>
+    <!-- Usuário & Apelido -->
+    <div class="flex items-center gap-3 bg-dark-custom px-3 py-1.5 rounded-lg border border-custom">
+      <i class="fa-solid fa-user text-gray-400"></i>
+      <input id="nicknameInput" type="text" value="Usuário_Guest" class="bg-transparent text-sm text-white focus:outline-none w-32 border-b border-transparent focus:border-indigo-500" title="Clique para editar o seu apelido">
+      <span id="proBadge" class="hidden bg-gradient-to-r from-amber-500 to-yellow-400 text-black text-xs font-extrabold px-2 py-0.5 rounded-full uppercase">PRO</span>
+    </div>
+
+    <!-- Status & Botão Pro -->
+    <div class="flex items-center gap-3">
+      <button id="btnBuyPro" onclick="simulateProPurchase()" class="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-black font-semibold text-xs py-2 px-4 rounded-lg shadow-md transition flex items-center gap-2">
+        <i class="fa-solid fa-crown"></i> Obter Plano PRO
+      </button>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal -->
+  <main class="flex-1 p-4 md:p-6 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- Coluna Esquerda & Centro: Vídeo / Player YouTube -->
+    <div class="lg:col-span-2 flex flex-col gap-4">
       
-      <div class="setting-group">
-        <label for="resSelect">Resolução:</label>
-        <select id="resSelect" disabled>
-          <option value="720p">720p HD (Padrão)</option>
-          <option value="1080p">1080p Full HD (Pro)</option>
-          <option value="4k">4K Ultra HD (Pro)</option>
-        </select>
+      <!-- Seletor de Modo (Screen Share vs YouTube Sync) -->
+      <div class="flex bg-card-custom p-1 rounded-xl border border-custom gap-1">
+        <button id="tabScreen" onclick="switchTab('screen')" class="flex-1 py-2 text-sm font-medium rounded-lg bg-indigo-600 text-white transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-desktop"></i> Transmissão de Tela
+        </button>
+        <button id="tabYoutube" onclick="switchTab('youtube')" class="flex-1 py-2 text-sm font-medium rounded-lg text-gray-400 hover:text-white transition flex items-center justify-center gap-2">
+          <i class="fa-brands fa-youtube text-red-500"></i> YouTube Sincronizado <span class="text-xs bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded border border-amber-500/30">PRO</span>
+        </button>
       </div>
 
-      <div class="setting-group">
-        <label for="fpsSelect">Taxa de Quadros (FPS):</label>
-        <select id="fpsSelect" disabled>
-          <option value="30">30 FPS (Padrão)</option>
-          <option value="60">60 FPS (Pro)</option>
-        </select>
+      <!-- Área de Exibição Principal -->
+      <div class="bg-card-custom border border-custom rounded-xl p-3 relative min-h-[380px] flex items-center justify-center overflow-hidden shadow-xl">
+        
+        <!-- View 1: Screen Share Video -->
+        <div id="screenView" class="w-full h-full flex items-center justify-center">
+          <video id="localVideo" autoplay playsinline muted class="w-full max-h-[500px] rounded-lg bg-black object-contain hidden"></video>
+          <div id="videoPlaceholder" class="text-center p-8 text-gray-500">
+            <i class="fa-solid fa-tv text-6xl mb-3 text-gray-600"></i>
+            <p class="text-base font-medium">Nenhuma transmissão ativa no momento.</p>
+            <p class="text-xs text-gray-500 mt-1">Inicie a transmissão abaixo ou aguarde uma conexão.</p>
+          </div>
+        </div>
+
+        <!-- View 2: YouTube Player Sincronizado -->
+        <div id="youtubeView" class="w-full h-full hidden flex-col items-center">
+          <div class="w-full aspect-video bg-black rounded-lg overflow-hidden relative">
+            <div id="ytPlayer"></div>
+          </div>
+
+          <!-- Controles de Sincronização do YouTube (Apenas PRO) -->
+          <div class="w-full mt-3 p-3 bg-dark-custom rounded-lg border border-custom flex flex-col gap-2">
+            <div id="proYtNotice" class="text-xs text-amber-400 bg-amber-500/10 p-2 rounded border border-amber-500/20 flex items-center gap-2">
+              <i class="fa-solid fa-lock"></i> Controles de Sincronização de Vídeo bloqueados. Torne-se PRO para carregar e controlar vídeos para a sala.
+            </div>
+
+            <div id="ytControlsPro" class="hidden flex-col gap-2">
+              <div class="flex gap-2">
+                <input id="ytUrlInput" type="text" placeholder="Cole o link do vídeo do YouTube aqui..." class="flex-1 bg-card-custom border border-custom rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+                <button onclick="loadProYoutubeVideo()" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1">
+                  <i class="fa-solid fa-play"></i> Carregar
+                </button>
+              </div>
+              <div class="flex items-center justify-between pt-1 border-t border-custom/50 text-xs text-gray-400">
+                <span>Controles da Sala (PRO):</span>
+                <div class="flex gap-2">
+                  <button onclick="syncYtAction('play')" class="bg-indigo-600/30 border border-indigo-500/50 hover:bg-indigo-600 text-indigo-200 hover:text-white px-2.5 py-1 rounded transition">
+                    <i class="fa-solid fa-play"></i> Play Geral
+                  </button>
+                  <button onclick="syncYtAction('pause')" class="bg-indigo-600/30 border border-indigo-500/50 hover:bg-indigo-600 text-indigo-200 hover:text-white px-2.5 py-1 rounded transition">
+                    <i class="fa-solid fa-pause"></i> Pausar Geral
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
-      <div class="setting-group">
-        <label for="bitrateSelect">Qualidade de Bitrate:</label>
-        <select id="bitrateSelect" disabled>
-          <option value="standard">Padrão</option>
-          <option value="high">Alta Qualidade (Pro)</option>
-        </select>
+      <!-- Painel de Transmissão de Tela (Configurações Pro de Resolução/Bitrate) -->
+      <div id="screenControlsPanel" class="bg-card-custom border border-custom rounded-xl p-4 shadow-md">
+        <h2 class="text-sm font-semibold text-white mb-3 flex items-center gap-2">
+          <i class="fa-solid fa-sliders text-indigo-400"></i> Configurações da Transmissão de Tela
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+          <!-- Resolução -->
+          <div>
+            <label class="block text-xs font-medium text-gray-400 mb-1">Resolução</label>
+            <select id="selectResolution" class="w-full bg-dark-custom border border-custom rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+              <option value="720">720p (Padrão Grátis)</option>
+              <option value="1080" class="pro-option text-amber-400" disabled>1080p Full HD 🔒 PRO</option>
+              <option value="4k" class="pro-option text-amber-400" disabled>4K Ultra HD 🔒 PRO</option>
+            </select>
+          </div>
+
+          <!-- FPS -->
+          <div>
+            <label class="block text-xs font-medium text-gray-400 mb-1">Taxa de Quadros (FPS)</label>
+            <select id="selectFps" class="w-full bg-dark-custom border border-custom rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+              <option value="30">30 FPS (Padrão)</option>
+              <option value="60" class="pro-option text-amber-400" disabled>60 FPS 🔒 PRO</option>
+            </select>
+          </div>
+
+          <!-- Bitrate -->
+          <div>
+            <label class="block text-xs font-medium text-gray-400 mb-1">Qualidade (Bitrate)</label>
+            <select id="selectBitrate" class="w-full bg-dark-custom border border-custom rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+              <option value="2500">2.5 Mbps (Normal)</option>
+              <option value="6000" class="pro-option text-amber-400" disabled>6.0 Mbps 🔒 PRO</option>
+              <option value="12000" class="pro-option text-amber-400" disabled>12.0 Mbps 🔒 PRO</option>
+            </select>
+          </div>
+        </div>
+
+        <button id="btnStartStream" onclick="toggleScreenShare()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm py-2 px-4 rounded-lg transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-play"></i> Iniciar Compartilhamento de Tela
+        </button>
       </div>
+
     </div>
 
-    <!-- 3. ATIVAÇÃO AUTOMÁTICA PRO (SIMULAÇÃO DE PAGAMENTO) -->
-    <div class="card">
-      <h2>Assinatura Pro</h2>
-      <button id="btnSimulatePayment" class="btn btn-pay">Assinar Pro (Simular Pagamento Confirmado)</button>
-      <div id="statusMsg" class="status-msg"></div>
-    </div>
-  </div>
+    <!-- Coluna Direita: Conexão, ID da Sala e Chat -->
+    <div class="flex flex-col gap-4">
+      
+      <!-- Cartão de Conexão PeerJS -->
+      <div class="bg-card-custom border border-custom rounded-xl p-4 shadow-md">
+        <h2 class="text-sm font-semibold text-white mb-2 flex items-center gap-2">
+          <i class="fa-solid fa-network-wired text-indigo-400"></i> Sua Sala de Conexão
+        </h2>
 
+        <div class="mb-3">
+          <span class="text-xs text-gray-400 block mb-1">Seu ID de Conexão:</span>
+          <div class="flex items-center gap-2 bg-dark-custom p-2 rounded-lg border border-custom">
+            <span id="myPeerId" class="text-xs font-mono text-indigo-300 truncate flex-1">Conectando...</span>
+            <button onclick="copyPeerId()" title="Copiar ID" class="text-gray-400 hover:text-white text-xs p-1">
+              <i class="fa-solid fa-copy"></i>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <span class="text-xs text-gray-400 block mb-1">Conectar ao ID do Amigo:</span>
+          <div class="flex gap-2">
+            <input id="remotePeerIdInput" type="text" placeholder="Cole o ID aqui..." class="flex-1 bg-dark-custom border border-custom rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+            <button onclick="connectToRemotePeer()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded-lg transition">
+              Conectar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cartão de Chat da Sala -->
+      <div class="bg-card-custom border border-custom rounded-xl p-4 flex-1 flex flex-col shadow-md min-h-[250px]">
+        <h2 class="text-sm font-semibold text-white mb-2 flex items-center justify-between">
+          <span><i class="fa-solid fa-comments text-indigo-400"></i> Chat da Sala</span>
+          <span id="connectionStatus" class="text-[10px] bg-gray-700 text-gray-300 px-2 py-0.5 rounded-full">Desconectado</span>
+        </h2>
+
+        <!-- Mensagens do Chat -->
+        <div id="chatMessages" class="flex-1 bg-dark-custom border border-custom rounded-lg p-2.5 overflow-y-auto mb-3 text-xs space-y-2 max-h-[220px]">
+          <div class="text-gray-500 italic text-center">Bem-vindo ao chat do M.Y.MidiaStream!</div>
+        </div>
+
+        <!-- Input de Mensagem -->
+        <div class="flex gap-2">
+          <input id="chatInput" type="text" placeholder="Digite uma mensagem..." onkeydown="if(event.key==='Enter') sendChatMessage()" class="flex-1 bg-dark-custom border border-custom rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+          <button onclick="sendChatMessage()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded-lg transition">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Script Principal da Aplicação -->
   <script>
     // Estado do Usuário
-    let userState = {
-      name: "Usuário M.Y.",
-      nickname: "Usuário M.Y.",
-      isPro: false,
-      screenShare: {
-        resolution: "720p",
-        fps: "30",
-        bitrate: "standard"
-      }
-    };
+    let isPro = false;
+    let peer = null;
+    let conn = null;
+    let currentStream = null;
 
-    // Elementos do DOM
-    const nicknameContainer = document.getElementById('nicknameContainer');
-    const nicknameText = document.getElementById('nicknameText');
-    const proBadge = document.getElementById('proBadge');
-    
-    const resSelect = document.getElementById('resSelect');
-    const fpsSelect = document.getElementById('fpsSelect');
-    const bitrateSelect = document.getElementById('bitrateSelect');
-    
-    const btnSimulatePayment = document.getElementById('btnSimulatePayment');
-    const statusMsg = document.getElementById('statusMsg');
+    // Estado do YouTube Sync
+    let ytPlayer = null;
+    let isYtReady = false;
 
-    // Atualiza a Interface de acordo com o Estado
-    function renderUI() {
-      nicknameText.textContent = userState.nickname;
-      
-      if (userState.isPro) {
-        proBadge.textContent = "PRO";
-        proBadge.className = "badge-pro";
-        
-        // Desbloqueia opções Pro
-        resSelect.disabled = false;
-        fpsSelect.disabled = false;
-        bitrateSelect.disabled = false;
-        
-        btnSimulatePayment.style.display = "none";
-        statusMsg.textContent = "Benefício Pro ativo com sucesso!";
-      } else {
-        proBadge.textContent = "Básico";
-        proBadge.className = "badge-free";
-        
-        resSelect.disabled = true;
-        fpsSelect.disabled = true;
-        bitrateSelect.disabled = true;
-      }
+    // Inicialização ao carregar a página
+    window.addEventListener('DOMContentLoaded', () => {
+      initPeerJS();
+      loadYouTubeAPI();
+    });
 
-      resSelect.value = userState.screenShare.resolution;
-      fpsSelect.value = userState.screenShare.fps;
-      bitrateSelect.value = userState.screenShare.bitrate;
+    // 1. Lógica do PeerJS (P2P)
+    function initPeerJS() {
+      peer = new Peer();
+
+      peer.on('open', (id) => {
+        document.getElementById('myPeerId').innerText = id;
+      });
+
+      peer.on('connection', (connection) => {
+        conn = connection;
+        setupConnectionEvents();
+      });
+
+      peer.on('call', (call) => {
+        call.answer();
+        call.on('stream', (remoteStream) => {
+          displayStream(remoteStream);
+        });
+      });
     }
 
-    // Funcionalidade 1: Alterar Apelido no Pro ao Clicar
-    nicknameContainer.addEventListener('click', () => {
-      if (!userState.isPro) {
-        alert("A alteração de apelido é um recurso exclusivo do Benefício Pro!");
+    function connectToRemotePeer() {
+      const remoteId = document.getElementById('remotePeerIdInput').value.trim();
+      if (!remoteId) return alert('Por favor, insira o ID do parceiro.');
+
+      conn = peer.connect(remoteId);
+      setupConnectionEvents();
+    }
+
+    function setupConnectionEvents() {
+      document.getElementById('connectionStatus').innerText = 'Conectado';
+      document.getElementById('connectionStatus').className = 'text-[10px] bg-green-900 text-green-300 px-2 py-0.5 rounded-full';
+
+      conn.on('data', (data) => {
+        // Mensagem de Chat
+        if (data.type === 'chat') {
+          appendChatMessage(data.sender, data.text);
+        }
+        // Eventos de Sincronização de Vídeo YouTube
+        if (data.type === 'ytSync') {
+          handleRemoteYtSync(data);
+        }
+      });
+    }
+
+    // 2. Chat de Mensagens
+    function sendChatMessage() {
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      const nickname = document.getElementById('nicknameInput').value || 'Usuário';
+
+      if (!text) return;
+
+      appendChatMessage(nickname + ' (Você)', text);
+
+      if (conn && conn.open) {
+        conn.send({ type: 'chat', sender: nickname, text: text });
+      }
+
+      input.value = '';
+    }
+
+    function appendChatMessage(sender, text) {
+      const chatBox = document.getElementById('chatMessages');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'bg-card-custom p-1.5 rounded border border-custom/50';
+      msgDiv.innerHTML = `<span class="font-semibold text-indigo-400">${sender}:</span> <span class="text-gray-200">${text}</span>`;
+      chatBox.appendChild(msgDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function copyPeerId() {
+      const idText = document.getElementById('myPeerId').innerText;
+      navigator.clipboard.writeText(idText);
+      alert('ID copiado para a área de transferência!');
+    }
+
+    // 3. Simulação da Compra PRO
+    function simulateProPurchase() {
+      isPro = true;
+
+      // Atualizar UI
+      document.getElementById('proBadge').classList.remove('hidden');
+      document.getElementById('btnBuyPro').innerHTML = `<i class="fa-solid fa-check-circle"></i> Plano PRO Ativo`;
+      document.getElementById('btnBuyPro').className = `bg-emerald-600 text-white font-semibold text-xs py-2 px-4 rounded-lg cursor-default flex items-center gap-2`;
+
+      // Desbloquear Opções de Resolução/FPS/Bitrate
+      const proOptions = document.querySelectorAll('.pro-option');
+      proOptions.forEach(opt => {
+        opt.disabled = false;
+        opt.innerText = opt.innerText.replace('🔒 PRO', '✨ Desbloqueado');
+      });
+
+      // Desbloquear Controles do YouTube Sync
+      document.getElementById('proYtNotice').classList.add('hidden');
+      document.getElementById('ytControlsPro').classList.remove('hidden');
+      document.getElementById('ytControlsPro').classList.add('flex');
+
+      alert('Parabéns! O seu status PRO foi ativado com sucesso. Todas as resoluções e a sincronização do YouTube foram liberadas!');
+    }
+
+    // 4. Transmissão de Tela (Screen Share)
+    async function toggleScreenShare() {
+      if (currentStream) {
+        // Parar Transmissão
+        currentStream.getTracks().forEach(track => track.stop());
+        currentStream = null;
+        document.getElementById('localVideo').classList.add('hidden');
+        document.getElementById('videoPlaceholder').classList.remove('hidden');
+        document.getElementById('btnStartStream').innerHTML = `<i class="fa-solid fa-play"></i> Iniciar Compartilhamento de Tela`;
+        document.getElementById('btnStartStream').className = `w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm py-2 px-4 rounded-lg transition flex items-center justify-center gap-2`;
         return;
       }
 
-      const input = document.createElement('input');
-      input.type = 'text';
-      input.value = userState.nickname;
-      input.className = 'nickname-input';
+      // Parâmetros Selecionados
+      const res = document.getElementById('selectResolution').value;
+      const fps = parseInt(document.getElementById('selectFps').value);
 
-      nicknameContainer.replaceWith(input);
-      input.focus();
+      let width = 1280, height = 720;
+      if (res === '1080') { width = 1920; height = 1080; }
+      if (res === '4k') { width = 3840; height = 2160; }
 
-      const saveNickname = () => {
-        const newNick = input.value.trim();
-        if (newNick) {
-          userState.nickname = newNick;
+      try {
+        currentStream = await navigator.mediaDevices.getDisplayMedia({
+          video: {
+            width: { ideal: width },
+            height: { ideal: height },
+            frameRate: { ideal: fps }
+          },
+          audio: true
+        });
+
+        displayStream(currentStream);
+
+        document.getElementById('btnStartStream').innerHTML = `<i class="fa-solid fa-stop"></i> Parar Compartilhamento`;
+        document.getElementById('btnStartStream').className = `w-full bg-red-600 hover:bg-red-700 text-white font-medium text-sm py-2 px-4 rounded-lg transition flex items-center justify-center gap-2`;
+
+        // Transmitir para parceiro conectado
+        if (conn && conn.peer) {
+          peer.call(conn.peer, currentStream);
         }
-        input.replaceWith(nicknameContainer);
-        renderUI();
-      };
 
-      input.addEventListener('blur', saveNickname);
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') saveNickname();
-      });
-    });
-
-    // Funcionalidade 2: Salvar Configurações de Compartilhamento de Tela
-    [resSelect, fpsSelect, bitrateSelect].forEach(select => {
-      select.addEventListener('change', () => {
-        userState.screenShare.resolution = resSelect.value;
-        userState.screenShare.fps = fpsSelect.value;
-        userState.screenShare.bitrate = bitrateSelect.value;
-      });
-    });
-
-    // Funcionalidade 3: Ativação Automática de Pagamento
-    function activateProAutomatically() {
-      statusMsg.textContent = "Processando confirmação de pagamento...";
-      setTimeout(() => {
-        userState.isPro = true;
-        renderUI();
-      }, 1500);
+      } catch (err) {
+        console.error("Erro ao compartilhar tela:", err);
+      }
     }
 
-    btnSimulatePayment.addEventListener('click', activateProAutomatically);
+    function displayStream(stream) {
+      const videoElem = document.getElementById('localVideo');
+      videoElem.srcObject = stream;
+      videoElem.classList.remove('hidden');
+      document.getElementById('videoPlaceholder').classList.add('hidden');
+    }
 
-    // Inicialização
-    renderUI();
+    // 5. Troca de Abas (Screen Share vs YouTube)
+    function switchTab(tab) {
+      if (tab === 'screen') {
+        document.getElementById('screenView').classList.remove('hidden');
+        document.getElementById('youtubeView').classList.add('hidden');
+        document.getElementById('screenControlsPanel').classList.remove('hidden');
+        document.getElementById('tabScreen').className = 'flex-1 py-2 text-sm font-medium rounded-lg bg-indigo-600 text-white transition flex items-center justify-center gap-2';
+        document.getElementById('tabYoutube').className = 'flex-1 py-2 text-sm font-medium rounded-lg text-gray-400 hover:text-white transition flex items-center justify-center gap-2';
+      } else {
+        document.getElementById('screenView').classList.add('hidden');
+        document.getElementById('youtubeView').classList.remove('hidden');
+        document.getElementById('screenControlsPanel').classList.add('hidden');
+        document.getElementById('tabYoutube').className = 'flex-1 py-2 text-sm font-medium rounded-lg bg-indigo-600 text-white transition flex items-center justify-center gap-2';
+        document.getElementById('tabScreen').className = 'flex-1 py-2 text-sm font-medium rounded-lg text-gray-400 hover:text-white transition flex items-center justify-center gap-2';
+      }
+    }
+
+    // 6. API do Player do YouTube Sincronizado
+    function loadYouTubeAPI() {
+      const tag = document.createElement('script');
+      tag.src = "https://www.youtube.com/iframe_api";
+      const firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    }
+
+    function onYouTubeIframeAPIReady() {
+      ytPlayer = new YT.Player('ytPlayer', {
+        height: '100%',
+        width: '100%',
+        videoId: 'dQw4w9WgXcQ', // Vídeo Padrão
+        playerVars: {
+          'playsinline': 1,
+          'controls': 1
+        },
+        events: {
+          'onReady': () => { isYtReady = true; }
+        }
+      });
+    }
+
+    // Extrai o ID do vídeo a partir de URLs do YouTube
+    function extractYtVideoId(url) {
+      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+      const match = url.match(regExp);
+      return (match && match[2].length === 11) ? match[2] : null;
+    }
+
+    function loadProYoutubeVideo() {
+      if (!isPro) return;
+      const url = document.getElementById('ytUrlInput').value.trim();
+      const videoId = extractYtVideoId(url);
+
+      if (!videoId) return alert('Cole uma URL válida do YouTube!');
+
+      if (isYtReady && ytPlayer) {
+        ytPlayer.loadVideoById(videoId);
+        syncYtAction('load', videoId);
+      }
+    }
+
+    function syncYtAction(action, extraData = null) {
+      if (!isPro || !ytPlayer) return;
+
+      const currentTime = ytPlayer.getCurrentTime();
+
+      if (action === 'play') ytPlayer.playVideo();
+      if (action === 'pause') ytPlayer.pauseVideo();
+
+      // Enviar evento via WebRTC para os outros utilizadores da sala
+      if (conn && conn.open) {
+        conn.send({
+          type: 'ytSync',
+          action: action,
+          time: currentTime,
+          videoId: extraData
+        });
+      }
+    }
+
+    function handleRemoteYtSync(data) {
+      if (!isYtReady || !ytPlayer) return;
+
+      if (data.action === 'load' && data.videoId) {
+        ytPlayer.loadVideoById(data.videoId);
+      } else if (data.action === 'play') {
+        ytPlayer.seekTo(data.time, true);
+        ytPlayer.playVideo();
+      } else if (data.action === 'pause') {
+        ytPlayer.seekTo(data.time, true);
+        ytPlayer.pauseVideo();
+      }
+    }
   </script>
 </body>
 </html>
