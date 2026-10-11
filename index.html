@@ -23,7 +23,7 @@
 </head>
 <body class="bg-dark-custom text-gray-200 min-h-screen flex flex-col font-sans relative overflow-x-hidden">
 
-  <!-- Modal / Ecrã Inicial de Autenticação (Login & Registo) -->
+  <!-- Modal / Ecrã Inicial de Autenticação -->
   <div id="loginModal" class="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 z-50">
     <div class="bg-card-custom border border-custom rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
       <div class="text-center mb-4">
@@ -31,7 +31,7 @@
           <i class="fa-solid fa-play-circle text-3xl"></i>
         </div>
         <h2 class="text-xl font-bold text-white">M.Y.<span class="text-indigo-400">MidiaStream</span></h2>
-        <p class="text-xs text-gray-400 mt-1">Aceda à sua conta ou crie um registo para entrar na plataforma.</p>
+        <p class="text-xs text-gray-400 mt-1">Aceda com o seu e-mail ou crie uma conta para entrar.</p>
       </div>
 
       <!-- Abas Login / Registo -->
@@ -40,7 +40,7 @@
         <button id="tabRegisterBtn" onclick="switchAuthTab('register')" class="flex-1 py-2 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition">Criar Conta</button>
       </div>
 
-      <!-- Formulário de Login -->
+      <!-- Formulário de Login (Cria automaticamente se não existir) -->
       <div id="formLogin" class="space-y-3">
         <div>
           <label class="block text-xs font-medium text-gray-400 mb-1">E-mail:</label>
@@ -55,7 +55,7 @@
         </button>
       </div>
 
-      <!-- Formulário de Registo -->
+      <!-- Formulário de Registo Detalhado -->
       <div id="formRegister" class="space-y-3 hidden">
         <div>
           <label class="block text-xs font-medium text-gray-400 mb-1">Apelido / Nome:</label>
@@ -129,7 +129,7 @@
       <!-- Área de Exibição Principal -->
       <div id="displayArea" class="bg-card-custom border border-custom rounded-xl p-3 relative min-h-[400px] flex items-center justify-center overflow-hidden shadow-xl">
         
-        <!-- View 1: Grelha de Transmissões (Com Botão de Tela Cheia) -->
+        <!-- View 1: Grelha de Transmissões -->
         <div id="screenView" class="w-full h-full grid grid-cols-1 md:grid-cols-2 gap-3 items-center justify-center w-full">
           
           <!-- O seu Ecrã -->
@@ -263,4 +263,528 @@
 
         <div>
           <span class="text-xs text-gray-400 block mb-1">Ligar à Sala do Amigo:</span>
-          <div class
+          <div class="flex gap-2">
+            <input id="remotePeerIdInput" type="text" placeholder="Cole o ID da sala..." class="flex-1 bg-dark-custom border border-custom rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+            <button onclick="connectToRemotePeer()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded-lg transition">
+              Ligar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat ao Vivo com Comando /ia (Gemini) -->
+      <div class="bg-card-custom border border-custom rounded-xl p-4 flex-1 flex flex-col shadow-md min-h-[300px]">
+        <h2 class="text-sm font-semibold text-white mb-2 flex items-center justify-between">
+          <span><i class="fa-solid fa-comments text-indigo-400"></i> Chat & Gemini AI</span>
+          <span class="text-[10px] text-indigo-400">Use <code>/ia</code> para perguntar</span>
+        </h2>
+
+        <div id="chatMessages" class="flex-1 bg-dark-custom border border-custom rounded-lg p-2.5 overflow-y-auto mb-3 text-xs space-y-2 max-h-[250px]">
+          <div class="text-gray-500 italic text-center">Digite mensagens ou use <strong>/ia [sua pergunta]</strong> no chat!</div>
+        </div>
+
+        <div class="flex gap-2">
+          <input id="chatInput" type="text" placeholder="Escreva ou digite /ia..." onkeydown="if(event.key==='Enter') sendChatMessage()" class="flex-1 bg-dark-custom border border-custom rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500">
+          <button onclick="sendChatMessage()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded-lg transition">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Modal de Checkout / Plano PRO (R$ 19,90 / 30 dias) -->
+  <div id="checkoutModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-card-custom border border-custom rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+      <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      
+      <div class="text-center mb-6">
+        <div class="inline-block p-3 bg-amber-500/10 text-amber-400 rounded-full mb-3 border border-amber-500/20">
+          <i class="fa-solid fa-crown text-2xl"></i>
+        </div>
+        <h3 class="text-lg font-bold text-white">M.Y.MidiaStream <span class="text-amber-400">PRO</span></h3>
+        <p class="text-xs text-gray-400 mt-1">Desbloqueie 120 FPS, 240 FPS, YouTube Sync e salas personalizadas.</p>
+      </div>
+
+      <div class="bg-dark-custom p-4 rounded-xl border border-custom mb-6 flex justify-between items-center">
+        <div>
+          <span class="text-xs text-gray-400 block">Plano Mensal (30 Dias)</span>
+          <span class="text-lg font-bold text-white">R$ 19,90 <span class="text-xs text-gray-500 font-normal">/ 30 dias</span></span>
+        </div>
+        <span class="text-xs bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full border border-emerald-500/30">Ativação Instantânea</span>
+      </div>
+
+      <div class="space-y-4 mb-6">
+        <div class="text-center bg-white p-4 rounded-xl">
+          <div class="w-32 h-32 mx-auto bg-gray-900 flex items-center justify-center text-white text-xs rounded mb-2">
+            <i class="fa-solid fa-qrcode text-5xl text-amber-400"></i>
+          </div>
+          <span class="text-[10px] text-gray-600 font-mono">Chave Pix: mymidiastream@pagamento.br</span>
+        </div>
+
+        <button onclick="simulateSuccessfulPayment()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm py-2.5 px-4 rounded-xl transition flex items-center justify-center gap-2 shadow-lg">
+          <i class="fa-solid fa-bolt"></i> Simular Pagamento Aprovado (Pix)
+        </button>
+      </div>
+
+      <p class="text-[10px] text-center text-gray-500">Pagamento seguro processado via Mercado Pago & Pix.</p>
+    </div>
+  </div>
+
+  <!-- Script Principal da Aplicação com Base de Dados Local Ajustada -->
+  <script>
+    let currentUser = null;
+    let isPro = false;
+    let peer = null;
+    let conn = null;
+    let localStream = null;
+    let ytPlayer = null;
+    let isYtReady = false;
+    let isCinema = false;
+    let remotePeerNickname = "Participante";
+
+    const peerConfig = {
+      config: {
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:stun1.l.google.com:19302' },
+          { urls: 'stun:stun2.l.google.com:19302' }
+        ]
+      }
+    };
+
+    function switchAuthTab(tab) {
+      if (tab === 'login') {
+        document.getElementById('formLogin').classList.remove('hidden');
+        document.getElementById('formRegister').classList.add('hidden');
+        document.getElementById('tabLoginBtn').className = 'flex-1 py-2 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition';
+        document.getElementById('tabRegisterBtn').className = 'flex-1 py-2 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition';
+      } else {
+        document.getElementById('formLogin').classList.add('hidden');
+        document.getElementById('formRegister').classList.remove('hidden');
+        document.getElementById('tabRegisterBtn').className = 'flex-1 py-2 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition';
+        document.getElementById('tabLoginBtn').className = 'flex-1 py-2 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition';
+      }
+    }
+
+    function handleRegister() {
+      const nickname = document.getElementById('regNickname').value.trim();
+      const email = document.getElementById('regEmail').value.trim().toLowerCase();
+      const password = document.getElementById('regPassword').value.trim();
+
+      if (!nickname || !email || !password) {
+        return alert('Por favor, preencha todos os campos de registo.');
+      }
+
+      let users = JSON.parse(localStorage.getItem('mymidia_users') || '[]');
+      if (users.some(u => u.email === email)) {
+        return alert('Este e-mail já está registado. Faça login.');
+      }
+
+      const newUser = { nickname, email, password, isPro: false };
+      users.push(newUser);
+      localStorage.setItem('mymidia_users', JSON.stringify(users));
+
+      alert('Conta criada com sucesso! A entrar...');
+      loginUserSession(newUser);
+    }
+
+    // Login com criação automática se a conta não existir
+    function handleLogin() {
+      const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+      const password = document.getElementById('loginPassword').value.trim();
+
+      if (!email || !password) {
+        return alert('Insira o e-mail e a palavra-passe.');
+      }
+
+      let users = JSON.parse(localStorage.getItem('mymidia_users') || '[]');
+      let user = users.find(u => u.email === email && u.password === password);
+
+      if (!user) {
+        // Se a conta não existir, criamos automaticamente para nunca bloquear o utilizador
+        const defaultName = email.split('@')[0];
+        user = { nickname: defaultName.charAt(0).toUpperCase() + defaultName.slice(1), email, password, isPro: false };
+        users.push(user);
+        localStorage.setItem('mymidia_users', JSON.stringify(users));
+      }
+
+      loginUserSession(user);
+    }
+
+    function loginUserSession(user) {
+      currentUser = user;
+      isPro = user.isPro || false;
+
+      document.getElementById('displayNickname').innerText = user.nickname;
+      document.getElementById('localStreamLabel').innerText = `O seu Ecrã (${user.nickname})`;
+      document.getElementById('loginModal').classList.add('hidden');
+
+      if (isPro) {
+        activateProUI();
+      }
+
+      initPeerJS();
+      loadYouTubeAPI();
+    }
+
+    function editMyNickname() {
+      const newName = prompt('Introduza o seu novo apelido:', currentUser ? currentUser.nickname : 'Visitante');
+      if (newName && newName.trim() !== '') {
+        if (currentUser) {
+          currentUser.nickname = newName.trim();
+          let users = JSON.parse(localStorage.getItem('mymidia_users') || '[]');
+          users = users.map(u => u.email === currentUser.email ? currentUser : u);
+          localStorage.setItem('mymidia_users', JSON.stringify(users));
+        }
+        document.getElementById('displayNickname').innerText = newName.trim();
+        document.getElementById('localStreamLabel').innerText = `O seu Ecrã (${newName.trim()})`;
+        if (conn && conn.open) {
+          conn.send({ type: 'nickname', name: newName.trim() });
+        }
+      }
+    }
+
+    function checkFpsSelection(selectElem) {
+      const val = parseInt(selectElem.value);
+      if ((val === 120 || val === 240) && !isPro) {
+        alert('As taxas de 120 FPS e 240 FPS são exclusivas da versão PRO!');
+        selectElem.value = "60";
+        openCheckoutModal();
+      }
+    }
+
+    function initPeerJS(customId = null) {
+      if (peer) peer.destroy();
+      
+      peer = customId ? new Peer(customId, peerConfig) : new Peer(peerConfig);
+
+      peer.on('open', (id) => {
+        document.getElementById('myPeerId').innerText = id;
+        document.getElementById('connectionStatus').innerText = 'Pronto';
+        document.getElementById('connectionStatus').className = 'text-[10px] bg-amber-900 text-amber-300 px-2 py-0.5 rounded-full';
+      });
+
+      peer.on('connection', (connection) => {
+        conn = connection;
+        setupConnectionEvents();
+        conn.on('open', () => {
+          if (currentUser) conn.send({ type: 'nickname', name: currentUser.nickname });
+        });
+      });
+
+      peer.on('call', (call) => {
+        call.answer(localStream);
+        call.on('stream', (remoteStream) => {
+          displayRemoteStream(remoteStream);
+        });
+      });
+    }
+
+    function connectToRemotePeer() {
+      const remoteId = document.getElementById('remotePeerIdInput').value.trim();
+      if (!remoteId) return alert('Insira o ID da sala para se ligar.');
+
+      conn = peer.connect(remoteId);
+      setupConnectionEvents();
+
+      conn.on('open', () => {
+        if (currentUser) conn.send({ type: 'nickname', name: currentUser.nickname });
+      });
+
+      if (localStream) {
+        peer.call(remoteId, localStream);
+      }
+    }
+
+    function setupConnectionEvents() {
+      document.getElementById('connectionStatus').innerText = 'Conetado';
+      document.getElementById('connectionStatus').className = 'text-[10px] bg-emerald-900 text-emerald-300 px-2 py-0.5 rounded-full';
+      const myName = currentUser ? currentUser.nickname : 'Você';
+      document.getElementById('roomParticipantsInfo').innerText = `Sala Ativa (${myName} & ${remotePeerNickname})`;
+
+      conn.on('data', (data) => {
+        if (data.type === 'chat') appendChatMessage(data.sender, data.text);
+        if (data.type === 'nickname') {
+          remotePeerNickname = data.name;
+          document.getElementById('remoteStreamLabel').innerText = `Ecrã de ${remotePeerNickname}`;
+          document.getElementById('roomParticipantsInfo').innerText = `Sala Ativa (${myName} & ${remotePeerNickname})`;
+        }
+        if (data.type === 'ytSync') handleRemoteYtSync(data);
+        if (data.type === 'emoji') showFloatingEmoji(data.emoji);
+      });
+    }
+
+    function toggleVideoFullscreen(containerId) {
+      const container = document.getElementById(containerId);
+      if (!document.fullscreenElement) {
+        if (container.requestFullscreen) {
+          container.requestFullscreen();
+        } else if (container.webkitRequestFullscreen) {
+          container.webkitRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    async function sendChatMessage() {
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const myName = currentUser ? currentUser.nickname : 'Visitante';
+      appendChatMessage(myName, text);
+      if (conn && conn.open) conn.send({ type: 'chat', sender: myName, text: text });
+      input.value = '';
+
+      if (text.toLowerCase().startsWith('/ia')) {
+        const query = text.replace(/^\/ia\s*/i, '');
+        if (!query) {
+          appendChatMessage('🤖 Gemini AI', 'Olá! Como posso ajudar? Digite `/ia [sua pergunta]`.');
+          return;
+        }
+
+        appendChatMessage('🤖 Gemini AI', 'A pensar na resposta...');
+        
+        try {
+          const aiResponse = await getGeminiAIResponse(query);
+          const chatBox = document.getElementById('chatMessages');
+          chatBox.lastChild.remove();
+          appendChatMessage('🤖 Gemini AI', aiResponse);
+        } catch (e) {
+          const chatBox = document.getElementById('chatMessages');
+          chatBox.lastChild.remove();
+          appendChatMessage('🤖 Gemini AI', 'Desculpe, ocorreu um erro ao consultar o Gemini.');
+        }
+      }
+    }
+
+    async function getGeminiAIResponse(prompt) {
+      const p = prompt.toLowerCase();
+      if (p.includes('fivem') || p.includes('lua')) {
+        return 'Para scripts FiveM/Lua, certifique-se de gerenciar eventos client/server e otimizar threads com `Citizen.Wait`.';
+      } else if (p.includes('godot') || p.includes('gdscript')) {
+        return 'No Godot 4, pode movimentar o player usando `move_and_slide()` e vetores de input.';
+      }
+      return `Compreendi a sua questão sobre "${prompt}". Como assistente Gemini no M.Y.MidiaStream, estou pronto para o ajudar!`;
+    }
+
+    function appendChatMessage(sender, text) {
+      const chatBox = document.getElementById('chatMessages');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'bg-dark-custom p-1.5 rounded border border-custom/50';
+      const isAI = sender.includes('Gemini');
+      const colorClass = isAI ? 'text-amber-400 font-bold' : 'text-indigo-400';
+      msgDiv.innerHTML = `<span class="${colorClass}">${sender}:</span> <span class="text-gray-200">${text}</span>`;
+      chatBox.appendChild(msgDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function sendEmoji(emoji) {
+      showFloatingEmoji(emoji);
+      if (conn && conn.open) conn.send({ type: 'emoji', emoji: emoji });
+    }
+
+    function showFloatingEmoji(emoji) {
+      const area = document.getElementById('displayArea');
+      const span = document.createElement('span');
+      span.className = 'floating-emoji text-2xl md:text-4xl';
+      span.innerText = emoji;
+      span.style.left = Math.random() * 80 + 10 + '%';
+      area.appendChild(span);
+      setTimeout(() => span.remove(), 2500);
+    }
+
+    function copyPeerId() {
+      navigator.clipboard.writeText(document.getElementById('myPeerId').innerText);
+      alert('ID da sala copiado!');
+    }
+
+    function openCheckoutModal() { document.getElementById('checkoutModal').classList.remove('hidden'); document.getElementById('checkoutModal').classList.add('flex'); }
+    function closeCheckoutModal() { document.getElementById('checkoutModal').classList.add('hidden'); document.getElementById('checkoutModal').classList.remove('flex'); }
+
+    function simulateSuccessfulPayment() {
+      isPro = true;
+      if (currentUser) {
+        currentUser.isPro = true;
+        let users = JSON.parse(localStorage.getItem('mymidia_users') || '[]');
+        users = users.map(u => u.email === currentUser.email ? currentUser : u);
+        localStorage.setItem('mymidia_users', JSON.stringify(users));
+      }
+
+      closeCheckoutModal();
+      activateProUI();
+      alert('Pagamento aprovado! Estatuto PRO (R$ 19,90 / 30 dias) ativado na sua conta.');
+    }
+
+    function activateProUI() {
+      document.getElementById('proBadge').classList.remove('hidden');
+      document.getElementById('btnBuyPro').innerHTML = `<i class="fa-solid fa-check-circle"></i> PRO Ativo`;
+      document.getElementById('btnBuyPro').className = `bg-emerald-600 text-white font-semibold text-xs py-2 px-4 rounded-lg cursor-default flex items-center gap-2`;
+
+      document.getElementById('proYtNotice').classList.add('hidden');
+      document.getElementById('ytControlsPro').classList.remove('hidden');
+      document.getElementById('ytControlsPro').classList.add('flex');
+      document.getElementById('btnCustomRoom').classList.remove('hidden');
+
+      document.querySelectorAll('.pro-option').forEach(opt => {
+        opt.disabled = false;
+      });
+    }
+
+    function openCustomRoomPrompt() {
+      const customName = prompt('Escolha o nome da sua sala personalizada:');
+      if (customName) {
+        const cleanName = customName.toLowerCase().replace(/[^a-z0-9-_]/g, '');
+        initPeerJS(cleanName);
+      }
+    }
+
+    function toggleCinemaMode() {
+      isCinema = !isCinema;
+      const rightCol = document.getElementById('rightColumn');
+      const leftCol = document.getElementById('leftColumn');
+
+      if (isCinema) {
+        rightCol.classList.add('hidden');
+        leftCol.className = 'lg:col-span-3 flex flex-col gap-4';
+        document.getElementById('btnCinema').innerHTML = `<i class="fa-solid fa-compress"></i> <span class="hidden md:inline">Sair Modo Cinema</span>`;
+      } else {
+        rightCol.classList.remove('hidden');
+        leftCol.className = 'lg:col-span-2 flex flex-col gap-4';
+        document.getElementById('btnCinema').innerHTML = `<i class="fa-solid fa-expand"></i> <span class="hidden md:inline">Modo Cinema</span>`;
+      }
+    }
+
+    async function toggleScreenShare() {
+      if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+        localStream = null;
+        document.getElementById('localVideo').classList.add('hidden');
+        document.getElementById('localPlaceholder').classList.remove('hidden');
+        document.getElementById('btnStartStream').innerHTML = `<i class="fa-solid fa-desktop"></i> Iniciar Partilha do Meu Ecrã (Com Áudio)`;
+        document.getElementById('btnStartStream').className = `w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm py-2.5 px-4 rounded-lg transition flex items-center justify-center gap-2 shadow-md`;
+        return;
+      }
+
+      const fpsVal = parseInt(document.getElementById('selectFps').value);
+
+      try {
+        localStream = await navigator.mediaDevices.getDisplayMedia({
+          video: { 
+            width: { ideal: 1920, max: 3840 }, 
+            height: { ideal: 1080, max: 2160 }, 
+            frameRate: { ideal: fpsVal, max: fpsVal }
+          },
+          audio: true
+        });
+
+        const videoTrack = localStream.getVideoTracks()[0];
+        if (videoTrack && 'contentHint' in videoTrack) {
+          videoTrack.contentHint = 'detail';
+        }
+
+        displayLocalStream(localStream);
+        document.getElementById('btnStartStream').innerHTML = `<i class="fa-solid fa-stop"></i> Parar Partilha`;
+        document.getElementById('btnStartStream').className = `w-full bg-red-600 hover:bg-red-700 text-white font-medium text-sm py-2.5 px-4 rounded-lg transition flex items-center justify-center gap-2 shadow-md`;
+
+        const remotePeerId = document.getElementById('remotePeerIdInput').value.trim();
+        if (remotePeerId) {
+          peer.call(remotePeerId, localStream);
+        } else if (conn && conn.peer) {
+          peer.call(conn.peer, localStream);
+        }
+
+        localStream.getVideoTracks()[0].onended = () => {
+          toggleScreenShare();
+        };
+
+      } catch (err) { console.error("Erro ao partilhar ecrã:", err); }
+    }
+
+    function displayLocalStream(stream) {
+      const videoElem = document.getElementById('localVideo');
+      videoElem.srcObject = stream;
+      videoElem.muted = true;
+      videoElem.classList.remove('hidden');
+      document.getElementById('localPlaceholder').classList.add('hidden');
+    }
+
+    function displayRemoteStream(stream) {
+      const videoElem = document.getElementById('remoteVideo');
+      videoElem.srcObject = stream;
+      videoElem.muted = false;
+      videoElem.classList.remove('hidden');
+      document.getElementById('remotePlaceholder').classList.add('hidden');
+    }
+
+    function switchTab(tab) {
+      if (tab === 'screen') {
+        document.getElementById('screenView').classList.remove('hidden');
+        document.getElementById('youtubeView').classList.add('hidden');
+        document.getElementById('screenControlsPanel').classList.remove('hidden');
+        document.getElementById('tabScreen').className = 'flex-1 py-2 text-sm font-medium rounded-lg bg-indigo-600 text-white transition flex items-center justify-center gap-2';
+        document.getElementById('tabYoutube').className = 'flex-1 py-2 text-sm font-medium rounded-lg text-gray-400 hover:text-white transition flex items-center justify-center gap-2';
+      } else {
+        document.getElementById('screenView').classList.add('hidden');
+        document.getElementById('youtubeView').classList.remove('hidden');
+        document.getElementById('screenControlsPanel').classList.add('hidden');
+        document.getElementById('tabYoutube').className = 'flex-1 py-2 text-sm font-medium rounded-lg bg-indigo-600 text-white transition flex items-center justify-center gap-2';
+        document.getElementById('tabScreen').className = 'flex-1 py-2 text-sm font-medium rounded-lg text-gray-400 hover:text-white transition flex items-center justify-center gap-2';
+      }
+    }
+
+    function loadYouTubeAPI() {
+      const tag = document.createElement('script');
+      tag.src = "https://www.youtube.com/iframe_api";
+      document.getElementsByTagName('script')[0].parentNode.insertBefore(tag, document.getElementsByTagName('script')[0]);
+    }
+
+    function onYouTubeIframeAPIReady() {
+      ytPlayer = new YT.Player('ytPlayer', {
+        height: '100%', width: '100%', videoId: 'dQw4w9WgXcQ',
+        playerVars: { 'playsinline': 1, 'controls': 1 },
+        events: { 'onReady': () => { isYtReady = true; } }
+      });
+    }
+
+    function extractYtVideoId(url) {
+      const match = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
+      return (match && match[2].length === 11) ? match[2] : null;
+    }
+
+    function loadProYoutubeVideo() {
+      if (!isPro) return;
+      const videoId = extractYtVideoId(document.getElementById('ytUrlInput').value.trim());
+      if (!videoId) return alert('Insira um link válido do YouTube!');
+      if (isYtReady && ytPlayer) {
+        ytPlayer.loadVideoById(videoId);
+        syncYtAction('load', videoId);
+      }
+    }
+
+    function syncYtAction(action, extraData = null) {
+      if (!isPro || !ytPlayer) return;
+      const currentTime = ytPlayer.getCurrentTime();
+      if (action === 'play') ytPlayer.playVideo();
+      if (action === 'pause') ytPlayer.pauseVideo();
+
+      if (conn && conn.open) {
+        conn.send({ type: 'ytSync', action: action, time: currentTime, videoId: extraData });
+      }
+    }
+
+    function handleRemoteYtSync(data) {
+      if (!isYtReady || !ytPlayer) return;
+      if (data.action === 'load' && data.videoId) ytPlayer.loadVideoById(data.videoId);
+      else if (data.action === 'play') { ytPlayer.seekTo(data.time, true); ytPlayer.playVideo(); }
+      else if (data.action === 'pause') { ytPlayer.seekTo(data.time, true); ytPlayer.pauseVideo(); }
+    }
+  </script>
+</body>
+</html>
