@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>M.Y.MIDIASTREAM - Direct ID Stream Platform</title>
+  <title>M.Y.MIDIASTREAM - Cyber Neon Platform</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- PeerJS WebRTC -->
@@ -84,13 +84,11 @@
         <p class="text-xs text-cyan-400/70 mt-1 uppercase font-semibold tracking-wider">CYBER NEON TRANSMISSION PLATFORM</p>
       </div>
 
-      <!-- Abas Entrar / Criar Conta -->
       <div class="flex bg-[#08090d] p-1 rounded-xl border border-cyan-500/30 mb-5">
         <button id="tabLoginBtn" type="button" onclick="switchAuthTab('login')" class="flex-1 py-2 text-xs font-bold rounded-lg bg-cyan-600 text-white transition shadow-[0_0_10px_rgba(0,242,254,0.3)]">Entrar</button>
         <button id="tabRegisterBtn" type="button" onclick="switchAuthTab('register')" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 hover:text-white transition">Criar Conta</button>
       </div>
 
-      <!-- Formulário: ENTRAR -->
       <div id="formLogin" class="space-y-3.5">
         <div>
           <label class="block text-xs font-semibold text-gray-300 mb-1">E-mail:</label>
@@ -116,7 +114,6 @@
         </button>
       </div>
 
-      <!-- Formulário: CRIAR CONTA -->
       <div id="formRegister" class="space-y-3 hidden">
         <div>
           <label class="block text-xs font-semibold text-gray-300 mb-1">E-mail:</label>
@@ -149,7 +146,6 @@
 
   <!-- ================= TELA DASHBOARD PRINCIPAL ================= -->
   <div id="dashboardView" class="hidden min-h-screen flex flex-col">
-    <!-- Header Dashboard -->
     <header class="border-b border-cyan-500/20 bg-[#0f111a]/90 backdrop-blur-md py-4 px-6 flex justify-between items-center z-30">
       <div class="flex items-center space-x-3">
         <div class="p-2 bg-cyan-500/10 border border-cyan-400/30 rounded-xl text-cyan-400">
@@ -171,10 +167,8 @@
       </div>
     </header>
 
-    <!-- Conteúdo da Dashboard -->
     <main class="flex-1 p-6 max-w-6xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-6">
       
-      <!-- Card 1: Perfil de Exibição -->
       <div class="bg-[#0f111a] border-neon-glow rounded-2xl p-5 flex flex-col justify-between">
         <div>
           <h3 class="text-sm font-bold text-cyan-400 mb-3 uppercase flex items-center gap-2">
@@ -189,7 +183,6 @@
         </button>
       </div>
 
-      <!-- Card 2: Criar / Entrar em Sala por ID Fixo -->
       <div class="bg-[#0f111a] border-pink-glow rounded-2xl p-5 flex flex-col justify-between">
         <div>
           <h3 class="text-sm font-bold text-pink-400 mb-3 uppercase flex items-center gap-2">
@@ -204,7 +197,6 @@
         </button>
       </div>
 
-      <!-- Card 3: Plano PRO & OBS Studio -->
       <div class="bg-[#0f111a] border border-cyan-500/30 rounded-2xl p-5 flex flex-col justify-between">
         <div>
           <h3 class="text-sm font-bold text-amber-400 mb-3 uppercase flex items-center gap-2">
@@ -229,7 +221,6 @@
 
   <!-- ================= TELA DA SALA DE TRANSMISSÃO ================= -->
   <div id="roomView" class="hidden min-h-screen flex flex-col">
-    <!-- Header Sala -->
     <header class="border-b border-cyan-500/20 bg-[#0f111a]/90 backdrop-blur-md py-3 px-6 flex justify-between items-center z-30">
       <div class="flex items-center space-x-3">
         <button onclick="returnToDashboard()" class="text-cyan-400 hover:text-white text-xs bg-[#08090d] px-3 py-1.5 rounded-xl border border-cyan-500/30 flex items-center gap-1.5 font-bold">
@@ -245,13 +236,10 @@
       </div>
     </header>
 
-    <!-- Conteúdo da Sala -->
     <main class="flex-1 p-4 md:p-6 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-      <!-- Coluna Esquerda: Ecrãs em Direto / YouTube -->
       <div id="leftColumn" class="lg:col-span-2 flex flex-col gap-4">
         
-        <!-- Seletor Modo & Status -->
         <div class="flex justify-between items-center bg-[#0f111a] p-2 rounded-xl border border-cyan-500/20 gap-2">
           <div class="flex flex-1 gap-1">
             <button id="tabScreen" onclick="switchTab('screen')" class="flex-1 py-1.5 text-xs font-bold rounded-lg bg-cyan-600 text-white transition shadow">
@@ -267,12 +255,10 @@
           </div>
         </div>
 
-        <!-- Área dos Vídeos Multi-Stream -->
         <div id="displayArea" class="bg-[#0f111a] border-neon-glow rounded-2xl p-3 relative min-h-[420px] flex items-center justify-center overflow-hidden">
           
           <div id="screenView" class="w-full h-full grid grid-cols-1 md:grid-cols-2 gap-3 items-center justify-center">
             
-            <!-- Meu Vídeo / Transmissão Local -->
             <div id="slot-local" class="relative bg-black/80 rounded-xl overflow-hidden flex flex-col items-center justify-center min-h-[200px] border border-cyan-500/30">
               <span id="localStreamLabel" class="absolute top-2 left-2 bg-black/80 text-cyan-300 text-[10px] px-2 py-0.5 rounded font-bold border border-cyan-500/30 z-10">Sua Tela</span>
               <button onclick="toggleVideoFullscreen('localVideo')" class="absolute top-2 right-2 bg-black/80 text-white text-xs px-2 py-0.5 rounded border border-cyan-500/20 z-10">
@@ -285,7 +271,6 @@
               </div>
             </div>
 
-            <!-- Vídeo do Amigo / Remoto -->
             <div id="slot-remote" class="relative bg-black/80 rounded-xl overflow-hidden flex flex-col items-center justify-center min-h-[200px] border border-pink-500/30">
               <span id="remoteStreamLabel" class="absolute top-2 left-2 bg-black/80 text-pink-400 text-[10px] px-2 py-0.5 rounded font-bold border border-pink-500/30 z-10">Tela do Parceiro</span>
               <button onclick="toggleVideoFullscreen('remoteVideo')" class="absolute top-2 right-2 bg-black/80 text-white text-xs px-2 py-0.5 rounded border border-pink-500/20 z-10">
@@ -300,7 +285,6 @@
 
           </div>
 
-          <!-- YouTube Sync -->
           <div id="youtubeView" class="w-full h-full hidden flex-col items-center absolute inset-3 bg-[#0f111a]">
             <div class="w-full aspect-video bg-black rounded-xl overflow-hidden relative border border-cyan-500/30">
               <div id="ytPlayer"></div>
@@ -329,7 +313,6 @@
             </div>
           </div>
 
-          <!-- Emojis Flutuantes -->
           <div class="absolute bottom-3 right-3 bg-[#08090d]/90 border border-cyan-500/30 px-3 py-1 rounded-full flex gap-2 shadow-2xl z-20">
             <button onclick="sendEmoji('❤️')" class="hover:scale-125 transition text-xs">❤️</button>
             <button onclick="sendEmoji('🔥')" class="hover:scale-125 transition text-xs">🔥</button>
@@ -339,7 +322,6 @@
 
         </div>
 
-        <!-- Definições de Transmissão -->
         <div class="bg-[#0f111a] border border-cyan-500/30 rounded-2xl p-3.5 shadow-md">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
             <div>
@@ -371,10 +353,8 @@
 
       </div>
 
-      <!-- Coluna Direita: Link & Chat com Figurinhas (50x50) -->
       <div id="rightColumn" class="flex flex-col gap-4">
         
-        <!-- Link de Convite da Sala por ID -->
         <div class="bg-[#0f111a] border border-cyan-500/30 rounded-2xl p-3.5 shadow-md">
           <h2 class="text-xs font-bold text-white mb-2 flex items-center justify-between uppercase">
             <span><i class="fa-solid fa-link text-cyan-400"></i> Link Direto da Sala</span>
@@ -389,7 +369,6 @@
           </div>
         </div>
 
-        <!-- Chat ao Vivo com Figurinhas 50x50 & IA -->
         <div class="bg-[#0f111a] border border-cyan-500/30 rounded-2xl p-3.5 flex-1 flex flex-col shadow-md min-h-[320px] relative">
           <h2 class="text-xs font-bold text-white mb-2 flex items-center justify-between uppercase">
             <span><i class="fa-solid fa-comments text-cyan-400"></i> Chat Direto & IA</span>
@@ -400,10 +379,8 @@
             <div class="text-gray-500 italic text-center text-[11px]">Canal de chat estabelecido no ID. Fale com seu amigo ou digite <strong>/ia</strong>!</div>
           </div>
 
-          <!-- File Upload Figurinha -->
           <input type="file" id="deviceImageInput" accept="image/*" class="hidden" onchange="handleDeviceImageUpload(event)">
 
-          <!-- Popover Figurinhas -->
           <div id="stickerPicker" class="hidden absolute bottom-14 left-3 right-3 bg-[#08090d] border border-cyan-500/40 p-2.5 rounded-xl shadow-2xl z-30 grid grid-cols-4 gap-2">
             <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHY5eWJreXVnY241OHI1b3R5bHdqdXJkZXBvZXAxaXNmMXdrODR5MSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l3q2K5jinAlChoCLS/giphy.gif" onclick="sendSticker(this.src)" class="w-10 h-10 object-cover rounded cursor-pointer border border-cyan-500/30">
             <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNndicm95c2RrbjUzeXZrYjE1ejUxeXh6cWV6NDdpcXlneXB1MWo4OSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/26u4cqiYI30juCOGY/giphy.gif" onclick="sendSticker(this.src)" class="w-10 h-10 object-cover rounded cursor-pointer border border-cyan-500/30">
@@ -430,8 +407,6 @@
     </main>
   </div>
 
-
-  <!-- Modal Checkout / Plano PRO -->
   <div id="checkoutModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4 z-50">
     <div class="bg-[#0f111a] border-pink-glow rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
       <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
@@ -467,7 +442,6 @@
     </div>
   </div>
 
-  <!-- Lógica de Conexão Bidirecional Restaurada -->
   <script>
     let currentUser = null;
     let isPro = false;
@@ -517,15 +491,10 @@
     function handleLogin() {
       const email = document.getElementById('loginEmail').value.trim();
       const password = document.getElementById('loginPassword').value.trim();
-
-      if (!email || !password) {
-        return alert('Informe seu e-mail e senha para entrar.');
-      }
-
+      if (!email || !password) return alert('Informe seu e-mail e senha.');
       const defaultNickname = email.split('@')[0];
       currentUser = { email, nickname: defaultNickname, isPro: false };
       localStorage.setItem('mymidia_current_user', JSON.stringify(currentUser));
-
       showDashboardView();
     }
 
@@ -534,19 +503,11 @@
       const pass = document.getElementById('regPassword').value.trim();
       const confirmPass = document.getElementById('regConfirmPassword').value.trim();
       const birth = document.getElementById('regBirthDate').value;
-
-      if (!email || !pass || !confirmPass || !birth) {
-        return alert('Preencha todos os campos para cadastrar.');
-      }
-
-      if (pass !== confirmPass) {
-        return alert('As senhas não coincidem.');
-      }
-
+      if (!email || !pass || !confirmPass || !birth) return alert('Preencha todos os campos.');
+      if (pass !== confirmPass) return alert('As senhas não coincidem.');
       const defaultNickname = email.split('@')[0];
       currentUser = { email, nickname: defaultNickname, birthDate: birth, isPro: false };
       localStorage.setItem('mymidia_current_user', JSON.stringify(currentUser));
-
       alert('Conta criada com sucesso!');
       showDashboardView();
     }
@@ -555,7 +516,6 @@
       const randomId = Math.floor(Math.random() * 1000);
       currentUser = { email: `google_user_${randomId}@gmail.com`, nickname: `GoogleUser_${randomId}`, isPro: false };
       localStorage.setItem('mymidia_current_user', JSON.stringify(currentUser));
-
       showDashboardView();
     }
 
@@ -576,25 +536,18 @@
       document.getElementById('authScreen').classList.add('hidden');
       document.getElementById('dashboardView').classList.remove('hidden');
       document.getElementById('roomView').classList.add('hidden');
-
       document.getElementById('dashUserEmail').innerText = currentUser.email;
       document.getElementById('dashNicknameInput').value = currentUser.nickname;
-
-      if (currentUser.isPro) {
-        document.getElementById('proBadge').classList.remove('hidden');
-      }
+      if (currentUser.isPro) document.getElementById('proBadge').classList.remove('hidden');
 
       const urlParams = new URLSearchParams(window.location.search);
       const roomParam = urlParams.get('sala');
-      if (roomParam) {
-        enterRoom(roomParam);
-      }
+      if (roomParam) enterRoom(roomParam);
     }
 
     function saveDashNickname() {
       const newName = document.getElementById('dashNicknameInput').value.trim();
       if (!newName) return alert('Informe um nome válido.');
-
       currentUser.nickname = newName;
       localStorage.setItem('mymidia_current_user', JSON.stringify(currentUser));
       alert('Nome de exibição salvo!');
@@ -603,7 +556,6 @@
     function createOrJoinRoom() {
       const roomId = document.getElementById('dashRoomIdInput').value.trim();
       if (!roomId) return alert('Informe o ID de uma sala.');
-
       const cleanId = 'mms-' + roomId.toLowerCase().replace(/[^a-z0-9-_]/g, '');
       enterRoom(cleanId);
     }
@@ -627,7 +579,6 @@
       activeConnection = null;
       const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
       window.history.replaceState({path: newUrl}, '', newUrl);
-
       document.getElementById('roomView').classList.add('hidden');
       document.getElementById('dashboardView').classList.remove('hidden');
     }
@@ -674,10 +625,9 @@
         document.getElementById('connectionStatus').innerText = 'Conectado à Sala!';
         document.getElementById('connectionStatus').className = 'text-[9px] bg-emerald-900/80 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30';
         
-        // Handshake do apelido
         conn.send({ type: 'nickname', name: currentUser.nickname });
 
-        // Envia imediatamente a stream local se você já estiver transmitindo
+        // Se você já estiver a partilhar ecrã, reenvia automaticamente ao conectar
         if (localStream) {
           peer.call(conn.peer, localStream);
         }
@@ -687,12 +637,14 @@
         if (data.type === 'chat') {
           appendChatMessage(data.sender, data.text, data.isSticker);
         }
+        if (data.type === 'ai_response') {
+          appendChatMessage(data.sender, data.text, false);
+        }
         if (data.type === 'nickname') {
           document.getElementById('remoteStreamLabel').innerText = `Tela de ${data.name}`;
           document.getElementById('roomParticipantsInfo').innerText = `Conectado com ${data.name}`;
-          document.getElementById('remoteStatusText').innerText = `${data.name} ainda não ligou a transmissão.`;
+          document.getElementById('remoteStatusText').innerText = `${data.name} não está transmitindo no momento.`;
 
-          // Se a conexão veio do amigo, envia de volta o seu apelido para confirmar o canal nos dois lados
           if (activeConnection && activeConnection.open) {
             activeConnection.send({ type: 'nickname_ack', name: currentUser.nickname });
           }
@@ -725,7 +677,7 @@
 
     function copyRoomLink() {
       navigator.clipboard.writeText(document.getElementById('roomLinkDisplay').innerText);
-      alert('Link direto da sala copiado! Envie para o seu amigo.');
+      alert('Link direto da sala copiado!');
     }
 
     function toggleStickerPicker() {
@@ -771,34 +723,42 @@
       input.value = '';
 
       if (text.toLowerCase().startsWith('/ia')) {
-        const query = text.replace(/^\/ia\s*/i, '');
+        const query = text.replace(/^\/ia\s*/i, '').trim();
         if (!query) {
           appendChatMessage('🤖 Gemini AI', 'Digite `/ia [sua pergunta]` para consultar!');
           return;
         }
 
-        appendChatMessage('🤖 Gemini AI', 'Processando resposta...');
+        appendChatMessage('🤖 Gemini AI', 'A processar...');
         try {
           const aiResponse = await getGeminiAIResponse(query);
           const chatBox = document.getElementById('chatMessages');
-          chatBox.lastChild.remove();
+          chatBox.lastChild.remove(); // Remove "A processar..."
+          
           appendChatMessage('🤖 Gemini AI', aiResponse);
+          
+          // Envia a resposta da IA para todos na sala
+          if (activeConnection && activeConnection.open) {
+            activeConnection.send({ type: 'ai_response', sender: '🤖 Gemini AI', text: aiResponse });
+          }
         } catch (e) {
           const chatBox = document.getElementById('chatMessages');
           chatBox.lastChild.remove();
-          appendChatMessage('🤖 Gemini AI', 'Erro ao obter resposta da IA.');
+          appendChatMessage('🤖 Gemini AI', 'Erro ao obter resposta.');
         }
       }
     }
 
     async function getGeminiAIResponse(prompt) {
       const p = prompt.toLowerCase();
-      if (p.includes('fivem') || p.includes('lua')) {
-        return 'Em FiveM/Lua, gerencie eventos de forma segura com `RegisterNetEvent` e otimize laços com `Citizen.Wait`.';
+      if (p.includes('filme') || p.includes('terror') || p.includes('indica')) {
+        return 'Aqui estão 3 excelentes filmes de terror: 1. Hereditário (2018), 2. A Bruxa (2015) e 3. Invocação do Mal (2013).';
+      } else if (p.includes('fivem') || p.includes('lua')) {
+        return 'Em FiveM/Lua, gerencie eventos de forma segura com `RegisterNetEvent` e otimize threads com `Citizen.Wait`.';
       } else if (p.includes('godot') || p.includes('gdscript')) {
-        return 'No Godot 4, utilize `CharacterBody3D` com a função `move_and_slide()` para movimentação fluida.';
+        return 'No Godot 4, utilize `CharacterBody3D` com `move_and_slide()` para movimentação precisa.';
       }
-      return `Resposta gerada para "${prompt}". Como assistente Gemini no M.Y.MIDIASTREAM, estou pronto para ajudar!`;
+      return `Resposta para "${prompt}": Como assistente Gemini no M.Y.MIDIASTREAM, estou a analisar a sua questão para fornecer todo o suporte necessário na transmissão!`;
     }
 
     function appendChatMessage(sender, content, isSticker = false) {
@@ -809,7 +769,7 @@
       const colorClass = isAI ? 'text-amber-400 font-bold' : 'text-cyan-400 font-bold';
 
       if (isSticker) {
-        msgDiv.innerHTML = `<span class="${colorClass}">${sender}:</span><img src="${content}" style="width: 50px; height: 50px;" class="rounded-lg border border-cyan-500/40 object-cover mt-1 shadow-[0_0_8px_rgba(0,242,254,0.3)]">`;
+        msgDiv.innerHTML = `<span class="${colorClass}">${sender}:</span><img src="${content}" style="width: 50px; height: 50px;" class="rounded-lg border border-cyan-500/40 object-cover mt-1 shadow">`;
       } else {
         msgDiv.innerHTML = `<span class="${colorClass}">${sender}:</span> <span class="text-gray-200">${content}</span>`;
       }
@@ -842,7 +802,6 @@
       isPro = true;
       currentUser.isPro = true;
       localStorage.setItem('mymidia_current_user', JSON.stringify(currentUser));
-
       closeCheckoutModal();
       activateProUI();
       alert('Licença PRO ativada!');
@@ -853,14 +812,13 @@
       document.getElementById('proYtNotice').classList.add('hidden');
       document.getElementById('ytControlsPro').classList.remove('hidden');
       document.getElementById('ytControlsPro').classList.add('flex');
-
       document.querySelectorAll('.pro-option').forEach(opt => opt.disabled = false);
     }
 
     function checkFpsSelection(selectElem) {
       const val = parseInt(selectElem.value);
       if ((val === 120 || val === 240) && !isPro) {
-        alert('As taxas de 120 FPS e 240 FPS são exclusivas da licença PRO!');
+        alert('120 FPS e 240 FPS são exclusivos da licença PRO!');
         selectElem.value = "60";
         openCheckoutModal();
       }
@@ -870,7 +828,6 @@
       isCinema = !isCinema;
       const rightCol = document.getElementById('rightColumn');
       const leftCol = document.getElementById('leftColumn');
-
       if (isCinema) {
         rightCol.classList.add('hidden');
         leftCol.className = 'lg:col-span-3 flex flex-col gap-4';
@@ -901,8 +858,15 @@
         displayLocalStream(localStream);
         document.getElementById('btnStartStream').innerHTML = `<i class="fa-solid fa-stop"></i> PARAR PARTILHA`;
 
+        // Garante que a chamada WebRTC seja disparada para o parceiro conectado
         if (activeConnection && activeConnection.peer) {
-          peer.call(activeConnection.peer, localStream);
+          const call = peer.call(activeConnection.peer, localStream);
+          call.on('stream', (remoteStream) => {
+            const videoElem = document.getElementById('remoteVideo');
+            videoElem.srcObject = remoteStream;
+            videoElem.classList.remove('hidden');
+            document.getElementById('remotePlaceholder').classList.add('hidden');
+          });
         }
 
         localStream.getVideoTracks()[0].onended = () => { toggleScreenShare(); };
