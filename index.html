@@ -358,7 +358,7 @@
     </div>
   </div>
 
-  <!-- Script Principal da Aplicação com Comunicação e Figurinhas 50x50 -->
+  <!-- Script Principal da Aplicação -->
   <script>
     let currentUser = null;
     let isPro = false;
@@ -491,8 +491,7 @@
       });
 
       peer.on('connection', (connection) => {
-        conn = connection;
-        setupConnectionEvents();
+        setupConnectionEvents(connection);
       });
 
       peer.on('call', (call) => {
@@ -507,24 +506,29 @@
       const remoteId = document.getElementById('remotePeerIdInput').value.trim();
       if (!remoteId) return alert('Insira o ID da sala para se ligar.');
 
-      conn = peer.connect(remoteId);
-      setupConnectionEvents();
+      const connection = peer.connect(remoteId);
+      setupConnectionEvents(connection);
 
       if (localStream) {
         peer.call(remoteId, localStream);
       }
     }
 
-    function setupConnectionEvents() {
-      conn.on('open', () => {
-        document.getElementById('connectionStatus').innerText = 'Conetado';
-        document.getElementById('connectionStatus').className = 'text-[10px] bg-emerald-900 text-emerald-300 px-2 py-0.5 rounded-full';
-        const myName = currentUser ? currentUser.nickname : 'Você';
-        document.getElementById('roomParticipantsInfo').innerText = `Sala Ativa (${myName} & ${remotePeerNickname})`;
+    function setupConnectionEvents(connection) {
+      conn = connection;
 
-        // Enviar apelido ao ligar
-        if (currentUser) conn.send({ type: 'nickname', name: currentUser.nickname });
-      });
+      document.getElementById('connectionStatus').innerText = 'Conetado';
+      document.getElementById('connectionStatus').className = 'text-[10px] bg-emerald-900 text-emerald-300 px-2 py-0.5 rounded-full';
+      const myName = currentUser ? currentUser.nickname : 'Você';
+      document.getElementById('roomParticipantsInfo').innerText = `Sala Ativa (${myName} & ${remotePeerNickname})`;
+
+      if (currentUser && conn.open) {
+        conn.send({ type: 'nickname', name: currentUser.nickname });
+      } else {
+        conn.on('open', () => {
+          if (currentUser) conn.send({ type: 'nickname', name: currentUser.nickname });
+        });
+      }
 
       conn.on('data', (data) => {
         if (data.type === 'chat') {
@@ -533,8 +537,8 @@
         if (data.type === 'nickname') {
           remotePeerNickname = data.name;
           document.getElementById('remoteStreamLabel').innerText = `Ecrã de ${remotePeerNickname}`;
-          const myName = currentUser ? currentUser.nickname : 'Você';
-          document.getElementById('roomParticipantsInfo').innerText = `Sala Ativa (${myName} & ${remotePeerNickname})`;
+          const currentMyName = currentUser ? currentUser.nickname : 'Você';
+          document.getElementById('roomParticipantsInfo').innerText = `Sala Ativa (${currentMyName} & ${remotePeerNickname})`;
         }
         if (data.type === 'ytSync') handleRemoteYtSync(data);
         if (data.type === 'emoji') showFloatingEmoji(data.emoji);
@@ -556,7 +560,6 @@
       }
     }
 
-    // Chat com Envio de Mensagens, Figurinhas (50x50) e Gemini AI
     function toggleStickerPicker() {
       document.getElementById('stickerPicker').classList.toggle('hidden');
     }
