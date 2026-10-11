@@ -50,8 +50,8 @@
 
       <!-- Abas Login / Registo -->
       <div class="flex bg-dark-custom p-1 rounded-xl border border-custom mb-4">
-        <button id="tabLoginBtn" onclick="switchAuthTab('login')" class="flex-1 py-2 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition">Entrar</button>
-        <button id="tabRegisterBtn" onclick="switchAuthTab('register')" class="flex-1 py-2 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition">Criar Conta</button>
+        <button id="tabLoginBtn" type="button" onclick="switchAuthTab('login')" class="flex-1 py-2 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition">Entrar</button>
+        <button id="tabRegisterBtn" type="button" onclick="switchAuthTab('register')" class="flex-1 py-2 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition">Criar Conta</button>
       </div>
 
       <!-- Formulário de Login -->
@@ -64,7 +64,7 @@
           <label class="block text-xs font-medium text-gray-400 mb-1">Palavra-passe:</label>
           <input id="loginPassword" type="password" placeholder="••••••••" class="w-full bg-dark-custom border border-custom rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
         </div>
-        <button onclick="handleLogin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs py-2.5 rounded-xl transition shadow-lg mt-2">
+        <button type="button" onclick="handleLogin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs py-2.5 rounded-xl transition shadow-lg mt-2">
           Entrar na Conta
         </button>
       </div>
@@ -83,7 +83,7 @@
           <label class="block text-xs font-medium text-gray-400 mb-1">Palavra-passe:</label>
           <input id="regPassword" type="password" placeholder="••••••••" class="w-full bg-dark-custom border border-custom rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
         </div>
-        <button onclick="handleRegister()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs py-2.5 rounded-xl transition shadow-lg mt-2">
+        <button type="button" onclick="handleRegister()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs py-2.5 rounded-xl transition shadow-lg mt-2">
           Registar e Entrar
         </button>
       </div>
@@ -341,7 +341,7 @@
     </div>
   </div>
 
-  <!-- Script Principal da Aplicação com Ligação Automática por Link -->
+  <!-- Script Principal da Aplicação -->
   <script>
     let currentUser = null;
     let isPro = false;
@@ -396,7 +396,6 @@
       users.push(newUser);
       localStorage.setItem('mymidia_users', JSON.stringify(users));
 
-      alert('Conta criada com sucesso! A entrar...');
       loginUserSession(newUser);
     }
 
@@ -405,7 +404,10 @@
       const password = document.getElementById('loginPassword').value.trim();
 
       if (!email || !password) {
-        return alert('Insira o e-mail e a palavra-passe.');
+        // Se estiver vazio, permite entrar diretamente como visitante
+        const visitorName = "Utilizador_" + Math.floor(Math.random() * 1000);
+        loginUserSession({ nickname: visitorName, email: "visitante@mymidia.com", isPro: false });
+        return;
       }
 
       let users = JSON.parse(localStorage.getItem('mymidia_users') || '[]');
@@ -463,23 +465,19 @@
       }
     }
 
-    // Gestão de Salas Automáticas por Link (?sala=XYZ)
     function initSessionRoom() {
       const urlParams = new URLSearchParams(window.location.search);
       const targetRoom = urlParams.get('sala');
 
       if (targetRoom) {
-        // Se abriu através de um link de amigo, nós ligamos para o host da sala
         roomCode = 'mms-' + Math.random().toString(36).substring(2, 8);
         peer = new Peer(roomCode, peerConfig);
 
         peer.on('open', (id) => {
           document.getElementById('roomLinkDisplay').innerText = window.location.href;
-          // Conectar automaticamente ao criador do link recebido
           connectToRoomHost(targetRoom);
         });
       } else {
-        // Se for o criador principal, geramos um ID de sala único e atualizamos a URL com o link
         roomCode = 'mms-' + Math.random().toString(36).substring(2, 8);
         const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?sala=' + roomCode;
         window.history.replaceState({path: newUrl}, '', newUrl);
@@ -509,7 +507,6 @@
       const connection = peer.connect(hostId);
       setupConnectionEvents(connection);
 
-      // Se já estiver a transmitir, envia o stream de vídeo ao entrar na sala
       setTimeout(() => {
         if (localStream) {
           peer.call(hostId, localStream);
@@ -541,7 +538,7 @@
           remotePeerNickname = data.name;
           document.getElementById('remoteStreamLabel').innerText = `Ecrã de ${remotePeerNickname}`;
           const currentMyName = currentUser ? currentUser.nickname : 'Você';
-          document.getElementById('roomParticipantsInfo').innerText = `Sala Partilhada (${currentMyName} &${remotePeerNickname})`;
+          document.getElementById('roomParticipantsInfo').innerText = `Sala Partilhada (${currentMyName} & ${remotePeerNickname})`;
         }
         if (data.type === 'ytSync') handleRemoteYtSync(data);
         if (data.type === 'emoji') showFloatingEmoji(data.emoji);
@@ -623,4 +620,213 @@
       } else if (p.includes('godot') || p.includes('gdscript')) {
         return 'No Godot 4, pode movimentar o player usando `move_and_slide()` e vetores de input.';
       }
-      return `Compreendi a sua questão
+      return `Compreendi a sua questão sobre "${prompt}". Como assistente Gemini no M.Y.MidiaStream, estou pronto para o ajudar!`;
+    }
+
+    function appendChatMessage(sender, content, isSticker = false) {
+      const chatBox = document.getElementById('chatMessages');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'bg-dark-custom p-1.5 rounded border border-custom/50 flex flex-col gap-1';
+      const isAI = sender.includes('Gemini');
+      const colorClass = isAI ? 'text-amber-400 font-bold' : 'text-indigo-400 font-semibold';
+
+      if (isSticker) {
+        msgDiv.innerHTML = `<span class="${colorClass}">${sender}:</span><img src="${content}" style="width: 50px; height: 50px;" class="rounded border border-custom object-cover mt-1">`;
+      } else {
+        msgDiv.innerHTML = `<span class="${colorClass}">${sender}:</span> <span class="text-gray-200">${content}</span>`;
+      }
+
+      chatBox.appendChild(msgDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function sendEmoji(emoji) {
+      showFloatingEmoji(emoji);
+      if (conn && conn.open) conn.send({ type: 'emoji', emoji: emoji });
+    }
+
+    function showFloatingEmoji(emoji) {
+      const area = document.getElementById('displayArea');
+      const span = document.createElement('span');
+      span.className = 'floating-emoji text-2xl md:text-4xl';
+      span.innerText = emoji;
+      span.style.left = Math.random() * 80 + 10 + '%';
+      area.appendChild(span);
+      setTimeout(() => span.remove(), 2500);
+    }
+
+    function openCheckoutModal() { document.getElementById('checkoutModal').classList.remove('hidden'); document.getElementById('checkoutModal').classList.add('flex'); }
+    function closeCheckoutModal() { document.getElementById('checkoutModal').classList.add('hidden'); document.getElementById('checkoutModal').classList.remove('flex'); }
+
+    function simulateSuccessfulPayment() {
+      isPro = true;
+      if (currentUser) {
+        currentUser.isPro = true;
+        let users = JSON.parse(localStorage.getItem('mymidia_users') || '[]');
+        users = users.map(u => u.email === currentUser.email ? currentUser : u);
+        localStorage.setItem('mymidia_users', JSON.stringify(users));
+      }
+
+      closeCheckoutModal();
+      activateProUI();
+      alert('Pagamento aprovado! Estatuto PRO (R$ 19,90 / 30 dias) ativado na sua conta.');
+    }
+
+    function activateProUI() {
+      document.getElementById('proBadge').classList.remove('hidden');
+      document.getElementById('btnBuyPro').innerHTML = `<i class="fa-solid fa-check-circle"></i> PRO Ativo`;
+      document.getElementById('btnBuyPro').className = `bg-emerald-600 text-white font-semibold text-xs py-2 px-4 rounded-lg cursor-default flex items-center gap-2`;
+
+      document.getElementById('proYtNotice').classList.add('hidden');
+      document.getElementById('ytControlsPro').classList.remove('hidden');
+      document.getElementById('ytControlsPro').classList.add('flex');
+
+      document.querySelectorAll('.pro-option').forEach(opt => {
+        opt.disabled = false;
+      });
+    }
+
+    function toggleCinemaMode() {
+      isCinema = !isCinema;
+      const rightCol = document.getElementById('rightColumn');
+      const leftCol = document.getElementById('leftColumn');
+
+      if (isCinema) {
+        rightCol.classList.add('hidden');
+        leftCol.className = 'lg:col-span-3 flex flex-col gap-4';
+        document.getElementById('btnCinema').innerHTML = `<i class="fa-solid fa-compress"></i> <span class="hidden md:inline">Sair Modo Cinema</span>`;
+      } else {
+        rightCol.classList.remove('hidden');
+        leftCol.className = 'lg:col-span-2 flex flex-col gap-4';
+        document.getElementById('btnCinema').innerHTML = `<i class="fa-solid fa-expand"></i> <span class="hidden md:inline">Modo Cinema</span>`;
+      }
+    }
+
+    async function toggleScreenShare() {
+      if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+        localStream = null;
+        document.getElementById('localVideo').classList.add('hidden');
+        document.getElementById('localPlaceholder').classList.remove('hidden');
+        document.getElementById('btnStartStream').innerHTML = `<i class="fa-solid fa-desktop"></i> Iniciar Partilha do Meu Ecrã (Com Áudio)`;
+        document.getElementById('btnStartStream').className = `w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm py-2.5 px-4 rounded-lg transition flex items-center justify-center gap-2 shadow-md`;
+        return;
+      }
+
+      const fpsVal = parseInt(document.getElementById('selectFps').value);
+
+      try {
+        localStream = await navigator.mediaDevices.getDisplayMedia({
+          video: { 
+            width: { ideal: 1920, max: 3840 }, 
+            height: { ideal: 1080, max: 2160 }, 
+            frameRate: { ideal: fpsVal, max: fpsVal }
+          },
+          audio: true
+        });
+
+        const videoTrack = localStream.getVideoTracks()[0];
+        if (videoTrack && 'contentHint' in videoTrack) {
+          videoTrack.contentHint = 'detail';
+        }
+
+        displayLocalStream(localStream);
+        document.getElementById('btnStartStream').innerHTML = `<i class="fa-solid fa-stop"></i> Parar Partilha`;
+        document.getElementById('btnStartStream').className = `w-full bg-red-600 hover:bg-red-700 text-white font-medium text-sm py-2.5 px-4 rounded-lg transition flex items-center justify-center gap-2 shadow-md`;
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetRoom = urlParams.get('sala');
+        if (targetRoom) {
+          peer.call(targetRoom, localStream);
+        } else if (conn && conn.peer) {
+          peer.call(conn.peer, localStream);
+        }
+
+        localStream.getVideoTracks()[0].onended = () => {
+          toggleScreenShare();
+        };
+
+      } catch (err) { console.error("Erro ao partilhar ecrã:", err); }
+    }
+
+    function displayLocalStream(stream) {
+      const videoElem = document.getElementById('localVideo');
+      videoElem.srcObject = stream;
+      videoElem.muted = true;
+      videoElem.classList.remove('hidden');
+      document.getElementById('localPlaceholder').classList.add('hidden');
+    }
+
+    function displayRemoteStream(stream) {
+      const videoElem = document.getElementById('remoteVideo');
+      videoElem.srcObject = stream;
+      videoElem.muted = false;
+      videoElem.classList.remove('hidden');
+      document.getElementById('remotePlaceholder').classList.add('hidden');
+    }
+
+    function switchTab(tab) {
+      if (tab === 'screen') {
+        document.getElementById('screenView').classList.remove('hidden');
+        document.getElementById('youtubeView').classList.add('hidden');
+        document.getElementById('screenControlsPanel').classList.remove('hidden');
+        document.getElementById('tabScreen').className = 'flex-1 py-2 text-sm font-medium rounded-lg bg-indigo-600 text-white transition flex items-center justify-center gap-2';
+        document.getElementById('tabYoutube').className = 'flex-1 py-2 text-sm font-medium rounded-lg text-gray-400 hover:text-white transition flex items-center justify-center gap-2';
+      } else {
+        document.getElementById('screenView').classList.add('hidden');
+        document.getElementById('youtubeView').classList.remove('hidden');
+        document.getElementById('screenControlsPanel').classList.add('hidden');
+        document.getElementById('tabYoutube').className = 'flex-1 py-2 text-sm font-medium rounded-lg bg-indigo-600 text-white transition flex items-center justify-center gap-2';
+        document.getElementById('tabScreen').className = 'flex-1 py-2 text-sm font-medium rounded-lg text-gray-400 hover:text-white transition flex items-center justify-center gap-2';
+      }
+    }
+
+    function loadYouTubeAPI() {
+      const tag = document.createElement('script');
+      tag.src = "https://www.youtube.com/iframe_api";
+      document.getElementsByTagName('script')[0].parentNode.insertBefore(tag, document.getElementsByTagName('script')[0]);
+    }
+
+    function onYouTubeIframeAPIReady() {
+      ytPlayer = new YT.Player('ytPlayer', {
+        height: '100%', width: '100%', videoId: 'dQw4w9WgXcQ',
+        playerVars: { 'playsinline': 1, 'controls': 1 },
+        events: { 'onReady': () => { isYtReady = true; } }
+      });
+    }
+
+    function extractYtVideoId(url) {
+      const match = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
+      return (match && match[2].length === 11) ? match[2] : null;
+    }
+
+    function loadProYoutubeVideo() {
+      if (!isPro) return;
+      const videoId = extractYtVideoId(document.getElementById('ytUrlInput').value.trim());
+      if (!videoId) return alert('Insira um link válido do YouTube!');
+      if (isYtReady && ytPlayer) {
+        ytPlayer.loadVideoById(videoId);
+        syncYtAction('load', videoId);
+      }
+    }
+
+    function syncYtAction(action, extraData = null) {
+      if (!isPro || !ytPlayer) return;
+      const currentTime = ytPlayer.getCurrentTime();
+      if (action === 'play') ytPlayer.playVideo();
+      if (action === 'pause') ytPlayer.pauseVideo();
+
+      if (conn && conn.open) {
+        conn.send({ type: 'ytSync', action: action, time: currentTime, videoId: extraData });
+      }
+    }
+
+    function handleRemoteYtSync(data) {
+      if (!isYtReady || !ytPlayer) return;
+      if (data.action === 'load' && data.videoId) ytPlayer.loadVideoById(data.videoId);
+      else if (data.action === 'play') { ytPlayer.seekTo(data.time, true); ytPlayer.playVideo(); }
+      else if (data.action === 'pause') { ytPlayer.seekTo(data.time, true); ytPlayer.pauseVideo(); }
+    }
+  </script>
+</body>
+</html>
