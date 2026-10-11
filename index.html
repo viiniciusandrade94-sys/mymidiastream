@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>M.Y.MIDIASTREAM - Cyber Neon Platform</title>
+  <title>M.Y.MIDIASTREAM - Multi-Stream Cyber Platform</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- PeerJS para WebRTC P2P -->
+  <!-- PeerJS WebRTC -->
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -17,7 +17,6 @@
       --neon-pink: #ff007f;
       --bg-dark: #08090d;
       --card-dark: #0f111a;
-      --border-neon: rgba(0, 242, 254, 0.3);
     }
 
     body {
@@ -196,7 +195,7 @@
           <h3 class="text-sm font-bold text-pink-400 mb-3 uppercase flex items-center gap-2">
             <i class="fa-solid fa-door-open"></i> Criar ou Entrar em Sala
           </h3>
-          <p class="text-xs text-gray-400 mb-3">Digite um ID exclusivo para criar uma sala privada ou entrar no espaço de um amigo:</p>
+          <p class="text-xs text-gray-400 mb-3">Digite um ID exclusivo para criar uma sala privada (Até 4 Pessoas no Grátis / Ilimitado no PRO):</p>
           <label class="block text-[11px] text-gray-300 mb-1 font-semibold">ID da Sala:</label>
           <input id="dashRoomIdInput" type="text" placeholder="Ex: sala-gamer-1" class="w-full bg-[#08090d] border border-pink-500/30 rounded-xl px-3.5 py-2 text-xs text-white focus:border-pink-400">
         </div>
@@ -209,9 +208,9 @@
       <div class="bg-[#0f111a] border border-cyan-500/30 rounded-2xl p-5 flex flex-col justify-between">
         <div>
           <h3 class="text-sm font-bold text-amber-400 mb-3 uppercase flex items-center gap-2">
-            <i class="fa-solid fa-crown"></i> Plano PRO & OBS Studio
+            <i class="fa-solid fa-crown"></i> Plano PRO (Participantes Ilimitados)
           </h3>
-          <p class="text-xs text-gray-400 mb-3">Desbloqueie transmissões em 4K, 240 FPS e chave dedicada do OBS Studio.</p>
+          <p class="text-xs text-gray-400 mb-3">Desbloqueie salas com participantes ilimitados, transmissões em 4K, 240 FPS e chave OBS Studio.</p>
           
           <div class="bg-[#08090d] p-2.5 rounded-xl border border-cyan-500/20 text-[11px] space-y-1.5 font-mono">
             <div class="text-gray-400">Servidor RTMP: <span class="text-cyan-300">rtmp://stream.mymidiastream.br/live</span></div>
@@ -256,7 +255,7 @@
         <div class="flex justify-between items-center bg-[#0f111a] p-2 rounded-xl border border-cyan-500/20 gap-2">
           <div class="flex flex-1 gap-1">
             <button id="tabScreen" onclick="switchTab('screen')" class="flex-1 py-1.5 text-xs font-bold rounded-lg bg-cyan-600 text-white transition shadow">
-              <i class="fa-solid fa-desktop"></i> Ecrãs em Direto
+              <i class="fa-solid fa-desktop"></i> Ecrãs em Direto (Até 4 Pessoas Grátis)
             </button>
             <button id="tabYoutube" onclick="switchTab('youtube')" class="flex-1 py-1.5 text-xs font-bold rounded-lg text-gray-400 hover:text-white transition">
               <i class="fa-brands fa-youtube text-red-500"></i> YouTube Sync <span class="text-[9px] bg-pink-500/20 text-pink-400 px-1 py-0.5 rounded">PRO</span>
@@ -264,39 +263,65 @@
           </div>
           <div class="px-3 py-1 bg-[#08090d] rounded-lg border border-cyan-500/30 text-xs text-gray-300 flex items-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span id="roomParticipantsInfo">Sala Conectada</span>
+            <span id="roomParticipantsInfo">Conectado (1/4 Participantes)</span>
           </div>
         </div>
 
-        <!-- Área dos Vídeos -->
-        <div id="displayArea" class="bg-[#0f111a] border-neon-glow rounded-2xl p-3 relative min-h-[400px] flex items-center justify-center overflow-hidden">
+        <!-- Área dos Vídeos Multi-Stream -->
+        <div id="displayArea" class="bg-[#0f111a] border-neon-glow rounded-2xl p-3 relative min-h-[420px] flex items-center justify-center overflow-hidden">
           
-          <!-- Grid de Transmissões -->
+          <!-- Grelha Dinâmica para até 4 Participantes -->
           <div id="screenView" class="w-full h-full grid grid-cols-1 md:grid-cols-2 gap-3 items-center justify-center">
             
-            <!-- Local -->
-            <div class="relative bg-black/80 rounded-xl overflow-hidden flex flex-col items-center justify-center min-h-[220px] border border-cyan-500/30">
-              <span id="localStreamLabel" class="absolute top-2 left-2 bg-black/80 text-cyan-300 text-[10px] px-2 py-0.5 rounded font-bold border border-cyan-500/30">Seu Ecrã</span>
-              <button onclick="toggleVideoFullscreen('localVideo')" class="absolute top-2 right-2 bg-black/80 text-white text-xs px-2 py-0.5 rounded border border-cyan-500/20">
+            <!-- Quadro 1 (Seu Ecrã) -->
+            <div id="slot-local" class="relative bg-black/80 rounded-xl overflow-hidden flex flex-col items-center justify-center min-h-[200px] border border-cyan-500/30">
+              <span id="localStreamLabel" class="absolute top-2 left-2 bg-black/80 text-cyan-300 text-[10px] px-2 py-0.5 rounded font-bold border border-cyan-500/30 z-10">O Seu Ecrã</span>
+              <button onclick="toggleVideoFullscreen('localVideo')" class="absolute top-2 right-2 bg-black/80 text-white text-xs px-2 py-0.5 rounded border border-cyan-500/20 z-10">
                 <i class="fa-solid fa-expand"></i>
               </button>
-              <video id="localVideo" autoplay playsinline muted class="w-full max-h-[340px] object-contain hidden"></video>
+              <video id="localVideo" autoplay playsinline muted class="w-full max-h-[280px] object-contain hidden"></video>
               <div id="localPlaceholder" class="text-center p-4 text-gray-500 text-xs">
                 <i class="fa-solid fa-desktop text-3xl mb-1 text-cyan-400/40"></i>
-                <p>Sua transmissão está inativa</p>
+                <p>Sua transmissão está desligada</p>
               </div>
             </div>
 
-            <!-- Remoto -->
-            <div class="relative bg-black/80 rounded-xl overflow-hidden flex flex-col items-center justify-center min-h-[220px] border border-pink-500/30">
-              <span id="remoteStreamLabel" class="absolute top-2 left-2 bg-black/80 text-pink-400 text-[10px] px-2 py-0.5 rounded font-bold border border-pink-500/30">Participante</span>
-              <button onclick="toggleVideoFullscreen('remoteVideo')" class="absolute top-2 right-2 bg-black/80 text-white text-xs px-2 py-0.5 rounded border border-pink-500/20">
+            <!-- Quadro 2 -->
+            <div id="slot-peer-1" class="relative bg-black/80 rounded-xl overflow-hidden flex flex-col items-center justify-center min-h-[200px] border border-pink-500/30">
+              <span class="label-name absolute top-2 left-2 bg-black/80 text-pink-400 text-[10px] px-2 py-0.5 rounded font-bold border border-pink-500/30 z-10">Participante 1</span>
+              <button onclick="toggleVideoFullscreen('remoteVideo1')" class="absolute top-2 right-2 bg-black/80 text-white text-xs px-2 py-0.5 rounded border border-pink-500/20 z-10">
                 <i class="fa-solid fa-expand"></i>
               </button>
-              <video id="remoteVideo" autoplay playsinline class="w-full max-h-[340px] object-contain hidden"></video>
-              <div id="remotePlaceholder" class="text-center p-4 text-gray-500 text-xs">
+              <video id="remoteVideo1" autoplay playsinline class="w-full max-h-[280px] object-contain hidden"></video>
+              <div class="placeholder text-center p-4 text-gray-500 text-xs">
                 <i class="fa-solid fa-user-slash text-3xl mb-1 text-pink-500/30"></i>
-                <p>Nenhum amigo transmitindo</p>
+                <p>Aguardando amigo entrar...</p>
+              </div>
+            </div>
+
+            <!-- Quadro 3 -->
+            <div id="slot-peer-2" class="relative bg-black/80 rounded-xl overflow-hidden flex flex-col items-center justify-center min-h-[200px] border border-cyan-500/30">
+              <span class="label-name absolute top-2 left-2 bg-black/80 text-cyan-300 text-[10px] px-2 py-0.5 rounded font-bold border border-cyan-500/30 z-10">Participante 2</span>
+              <button onclick="toggleVideoFullscreen('remoteVideo2')" class="absolute top-2 right-2 bg-black/80 text-white text-xs px-2 py-0.5 rounded border border-cyan-500/20 z-10">
+                <i class="fa-solid fa-expand"></i>
+              </button>
+              <video id="remoteVideo2" autoplay playsinline class="w-full max-h-[280px] object-contain hidden"></video>
+              <div class="placeholder text-center p-4 text-gray-500 text-xs">
+                <i class="fa-solid fa-user-slash text-3xl mb-1 text-cyan-400/30"></i>
+                <p>Aguardando amigo entrar...</p>
+              </div>
+            </div>
+
+            <!-- Quadro 4 -->
+            <div id="slot-peer-3" class="relative bg-black/80 rounded-xl overflow-hidden flex flex-col items-center justify-center min-h-[200px] border border-pink-500/30">
+              <span class="label-name absolute top-2 left-2 bg-black/80 text-pink-400 text-[10px] px-2 py-0.5 rounded font-bold border border-pink-500/30 z-10">Participante 3</span>
+              <button onclick="toggleVideoFullscreen('remoteVideo3')" class="absolute top-2 right-2 bg-black/80 text-white text-xs px-2 py-0.5 rounded border border-pink-500/20 z-10">
+                <i class="fa-solid fa-expand"></i>
+              </button>
+              <video id="remoteVideo3" autoplay playsinline class="w-full max-h-[280px] object-contain hidden"></video>
+              <div class="placeholder text-center p-4 text-gray-500 text-xs">
+                <i class="fa-solid fa-user-slash text-3xl mb-1 text-pink-500/30"></i>
+                <p>Aguardando amigo entrar...</p>
               </div>
             </div>
 
@@ -310,7 +335,7 @@
 
             <div class="w-full mt-2 p-2.5 bg-[#08090d] rounded-xl border border-cyan-500/20 flex flex-col gap-2">
               <div id="proYtNotice" class="text-xs text-pink-400 bg-pink-500/10 p-2 rounded-lg border border-pink-500/20">
-                <i class="fa-solid fa-lock"></i> Requer licença PRO para controlar sincronização do vídeo.
+                <i class="fa-solid fa-lock"></i> Requer licença PRO para controlar sincronização do vídeo para todos.
               </div>
 
               <div id="ytControlsPro" class="hidden flex-col gap-2">
@@ -380,7 +405,7 @@
         <div class="bg-[#0f111a] border border-cyan-500/30 rounded-2xl p-3.5 shadow-md">
           <h2 class="text-xs font-bold text-white mb-2 flex items-center justify-between uppercase">
             <span><i class="fa-solid fa-link text-cyan-400"></i> Link da Sala Privada</span>
-            <span id="connectionStatus" class="text-[9px] bg-pink-900/80 text-pink-300 px-2 py-0.5 rounded-full border border-pink-500/30">Conectando</span>
+            <span id="connectionStatus" class="text-[9px] bg-emerald-900/80 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30">Sala Ativa</span>
           </h2>
 
           <div class="flex items-center gap-2 bg-[#08090d] p-1.5 rounded-xl border border-cyan-500/30">
@@ -399,10 +424,10 @@
           </h2>
 
           <div id="chatMessages" class="flex-1 bg-[#08090d] border border-cyan-500/20 rounded-xl p-2.5 overflow-y-auto mb-2 text-xs space-y-2 max-h-[220px]">
-            <div class="text-gray-500 italic text-center text-[11px]">Chat da sala privada. Converse com amigos ou digite <strong>/ia</strong>!</div>
+            <div class="text-gray-500 italic text-center text-[11px]">Chat seguro conectado. Fale com o grupo ou digite <strong>/ia</strong>!</div>
           </div>
 
-          <!-- Input arquivo figurinha -->
+          <!-- File Upload Figurinha -->
           <input type="file" id="deviceImageInput" accept="image/*" class="hidden" onchange="handleDeviceImageUpload(event)">
 
           <!-- Popover Figurinhas -->
@@ -443,7 +468,7 @@
           <i class="fa-solid fa-crown text-2xl"></i>
         </div>
         <h3 class="text-base font-bold text-white">M.Y.MIDIASTREAM <span class="text-pink-400">PRO</span></h3>
-        <p class="text-xs text-gray-400 mt-1">Desbloqueie 4K, 240 FPS, Sincronização YouTube e Transmissão OBS.</p>
+        <p class="text-xs text-gray-400 mt-1">Salas Ilimitadas, 4K, 240 FPS, Sincronização YouTube e Transmissão OBS.</p>
       </div>
 
       <div class="bg-[#08090d] p-3.5 rounded-xl border border-pink-500/30 mb-4 flex justify-between items-center">
@@ -469,17 +494,16 @@
     </div>
   </div>
 
-  <!-- Lógica e Estado do Sistema -->
+  <!-- Lógica da Aplicação com Mesh de Conexões de Rede -->
   <script>
     let currentUser = null;
     let isPro = false;
     let peer = null;
-    let conn = null;
+    let connectionsList = []; // Mantém a lista de todas as conexões ativas na sala
     let localStream = null;
     let ytPlayer = null;
     let isYtReady = false;
     let isCinema = false;
-    let remotePeerNickname = "Amigo";
     let currentRoomId = null;
 
     const peerConfig = {
@@ -540,11 +564,11 @@
       const birth = document.getElementById('regBirthDate').value;
 
       if (!email || !pass || !confirmPass || !birth) {
-        return alert('Preencha todos os campos obrigatórios para criar sua conta.');
+        return alert('Preencha todos os campos para cadastrar.');
       }
 
       if (pass !== confirmPass) {
-        return alert('A confirmação da senha não coincide com a senha informada.');
+        return alert('As senhas não coincidem.');
       }
 
       const defaultNickname = email.split('@')[0];
@@ -588,7 +612,6 @@
         document.getElementById('proBadge').classList.remove('hidden');
       }
 
-      // Se entrou por um link direto (?sala=XYZ), redireciona direto pra sala
       const urlParams = new URLSearchParams(window.location.search);
       const roomParam = urlParams.get('sala');
       if (roomParam) {
@@ -602,12 +625,12 @@
 
       currentUser.nickname = newName;
       localStorage.setItem('mymidia_current_user', JSON.stringify(currentUser));
-      alert('Nome de exibição salvo com sucesso!');
+      alert('Nome de exibição salvo!');
     }
 
     function createOrJoinRoom() {
       const roomId = document.getElementById('dashRoomIdInput').value.trim();
-      if (!roomId) return alert('Informe um ID de sala.');
+      if (!roomId) return alert('Informe o ID de uma sala.');
 
       const cleanId = 'mms-' + roomId.toLowerCase().replace(/[^a-z0-9-_]/g, '');
       enterRoom(cleanId);
@@ -629,6 +652,7 @@
 
     function returnToDashboard() {
       if (peer) peer.destroy();
+      connectionsList = [];
       const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
       window.history.replaceState({path: newUrl}, '', newUrl);
 
@@ -638,70 +662,118 @@
 
     function initPeerRoom(roomId) {
       if (peer) peer.destroy();
+      connectionsList = [];
 
       const urlParams = new URLSearchParams(window.location.search);
-      const isHost = !urlParams.get('sala') || urlParams.get('sala') === roomId;
-
-      const myPeerId = isHost ? roomId : roomId + "-guest-" + Math.random().toString(36).substring(2, 6);
+      const myPeerId = roomId + "-peer-" + Math.random().toString(36).substring(2, 6);
       peer = new Peer(myPeerId, peerConfig);
 
-      peer.on('open', () => {
-        document.getElementById('connectionStatus').innerText = 'Conectado à Sala';
-        document.getElementById('connectionStatus').className = 'text-[9px] bg-emerald-900/80 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30';
+      peer.on('open', (id) => {
+        document.getElementById('connectionStatus').innerText = 'Sala Pronta';
 
-        if (!isHost) {
-          connectToPeerHost(roomId);
+        // Tenta se conectar diretamente ao host principal (se não for o host)
+        if (myPeerId !== roomId) {
+          connectToPeer(roomId);
         }
       });
 
       peer.on('connection', (connection) => {
-        setupConnectionEvents(connection);
+        registerConnection(connection);
       });
 
       peer.on('call', (call) => {
         call.answer(localStream);
         call.on('stream', (remoteStream) => {
-          displayRemoteStream(remoteStream);
+          attachRemoteStream(call.peer, remoteStream);
         });
       });
     }
 
-    function connectToPeerHost(hostId) {
-      const connection = peer.connect(hostId);
-      setupConnectionEvents(connection);
-
-      setTimeout(() => {
-        if (localStream) peer.call(hostId, localStream);
-      }, 1200);
+    function connectToPeer(targetPeerId) {
+      if (connectionsList.some(c => c.peer === targetPeerId)) return;
+      const connection = peer.connect(targetPeerId);
+      registerConnection(connection);
     }
 
-    function setupConnectionEvents(connection) {
-      conn = connection;
+    function registerConnection(connection) {
+      connection.on('open', () => {
+        if (!connectionsList.some(c => c.peer === connection.peer)) {
+          
+          // Trava para limite de 4 participantes no Plano Grátis
+          if (connectionsList.length >= 3 && !isPro) {
+            alert('A sala gratuita suporta no máximo 4 pessoas em simultâneo. Faça o upgrade para o Plano PRO para ter espaço ilimitado!');
+            connection.close();
+            return;
+          }
 
-      const handleOpen = () => {
-        document.getElementById('connectionStatus').innerText = 'Conectado com Amigo';
-        const myName = currentUser ? currentUser.nickname : 'Visitante';
-        conn.send({ type: 'nickname', name: myName });
-      };
+          connectionsList.push(connection);
+          updateParticipantsUI();
 
-      if (conn.open) handleOpen();
-      else conn.on('open', handleOpen);
+          // Envia o nickname para o novo participante
+          connection.send({ type: 'nickname', name: currentUser.nickname });
 
-      conn.on('data', (data) => {
-        if (data.type === 'chat') appendChatMessage(data.sender, data.text, data.isSticker);
+          // Se você estiver compartilhando tela, disca chamada de vídeo para ele
+          if (localStream) {
+            peer.call(connection.peer, localStream);
+          }
+        }
+      });
+
+      connection.on('data', (data) => {
+        if (data.type === 'chat') {
+          appendChatMessage(data.sender, data.text, data.isSticker);
+          broadcastData(data, connection.peer); // Repassa para os outros amigos na sala
+        }
         if (data.type === 'nickname') {
-          remotePeerNickname = data.name;
-          document.getElementById('remoteStreamLabel').innerText = `Ecrã de ${remotePeerNickname}`;
-          document.getElementById('roomParticipantsInfo').innerText = `Sala (${currentUser.nickname} & ${remotePeerNickname})`;
+          connection.nickname = data.name;
+          updateParticipantsUI();
         }
         if (data.type === 'ytSync') handleRemoteYtSync(data);
         if (data.type === 'emoji') showFloatingEmoji(data.emoji);
       });
+
+      connection.on('close', () => {
+        connectionsList = connectionsList.filter(c => c.peer !== connection.peer);
+        updateParticipantsUI();
+      });
+    }
+
+    function broadcastData(data, senderPeerId) {
+      connectionsList.forEach(conn => {
+        if (conn.peer !== senderPeerId && conn.open) {
+          conn.send(data);
+        }
+      });
+    }
+
+    function updateParticipantsUI() {
+      const totalCount = connectionsList.length + 1;
+      const maxText = isPro ? 'Ilimitado' : '4';
+      document.getElementById('roomParticipantsInfo').innerText = `Conectado (${totalCount}/${maxText} Participantes)`;
+    }
+
+    function attachRemoteStream(peerId, stream) {
+      // Encontra o primeiro slot livre de vídeo do participante
+      const slots = ['remoteVideo1', 'remoteVideo2', 'remoteVideo3'];
+      for (let id of slots) {
+        const videoElem = document.getElementById(id);
+        if (videoElem.classList.contains('hidden') || videoElem.dataset.peerId === peerId) {
+          videoElem.srcObject = stream;
+          videoElem.dataset.peerId = peerId;
+          videoElem.classList.remove('hidden');
+          
+          const parent = videoElem.parentElement;
+          if (parent.querySelector('.placeholder')) {
+            parent.querySelector('.placeholder').classList.add('hidden');
+          }
+          break;
+        }
+      }
     }
 
     function copyRoomLink() {
       navigator.clipboard.writeText(document.getElementById('roomLinkDisplay').innerText);
-      alert('Link da sala copiado!');
+      alert('Link da sala copiado! Envie para até 3 amigos entrarem na sua transmissão.');
     }
 
     function toggleStickerPicker() {
@@ -711,9 +783,7 @@
     function sendSticker(imgUrl) {
       const myName = currentUser ? currentUser.nickname : 'Visitante';
       appendChatMessage(myName, imgUrl, true);
-      if (conn && conn.open) {
-        conn.send({ type: 'chat', sender: myName, text: imgUrl, isSticker: true });
-      }
+      broadcastDataToAll({ type: 'chat', sender: myName, text: imgUrl, isSticker: true });
       toggleStickerPicker();
     }
 
@@ -726,9 +796,7 @@
         const base64Img = e.target.result;
         const myName = currentUser ? currentUser.nickname : 'Visitante';
         appendChatMessage(myName, base64Img, true);
-        if (conn && conn.open) {
-          conn.send({ type: 'chat', sender: myName, text: base64Img, isSticker: true });
-        }
+        broadcastDataToAll({ type: 'chat', sender: myName, text: base64Img, isSticker: true });
       };
       reader.readAsDataURL(file);
     }
@@ -740,19 +808,17 @@
 
       const myName = currentUser ? currentUser.nickname : 'Visitante';
       appendChatMessage(myName, text, false);
-      if (conn && conn.open) {
-        conn.send({ type: 'chat', sender: myName, text: text, isSticker: false });
-      }
+      broadcastDataToAll({ type: 'chat', sender: myName, text: text, isSticker: false });
       input.value = '';
 
       if (text.toLowerCase().startsWith('/ia')) {
         const query = text.replace(/^\/ia\s*/i, '');
         if (!query) {
-          appendChatMessage('🤖 Gemini AI', 'Digite `/ia [pergunta]` para consultar!');
+          appendChatMessage('🤖 Gemini AI', 'Digite `/ia [sua pergunta]` para consultar!');
           return;
         }
 
-        appendChatMessage('🤖 Gemini AI', 'A processar consulta...');
+        appendChatMessage('🤖 Gemini AI', 'A processar consulta neural...');
         try {
           const aiResponse = await getGeminiAIResponse(query);
           const chatBox = document.getElementById('chatMessages');
@@ -766,6 +832,12 @@
       }
     }
 
+    function broadcastDataToAll(data) {
+      connectionsList.forEach(conn => {
+        if (conn.open) conn.send(data);
+      });
+    }
+
     async function getGeminiAIResponse(prompt) {
       const p = prompt.toLowerCase();
       if (p.includes('fivem') || p.includes('lua')) {
@@ -773,7 +845,7 @@
       } else if (p.includes('godot') || p.includes('gdscript')) {
         return 'No Godot 4, utilize `CharacterBody3D` com a função `move_and_slide()` para movimentação fluida.';
       }
-      return `Entendi sua dúvida sobre "${prompt}". Como assistente Gemini no M.Y.MIDIASTREAM, estou pronto para ajudar!`;
+      return `Análise concluída para "${prompt}". Como assistente Gemini no M.Y.MIDIASTREAM, estou pronto para ajudar!`;
     }
 
     function appendChatMessage(sender, content, isSticker = false) {
@@ -795,7 +867,7 @@
 
     function sendEmoji(emoji) {
       showFloatingEmoji(emoji);
-      if (conn && conn.open) conn.send({ type: 'emoji', emoji: emoji });
+      broadcastDataToAll({ type: 'emoji', emoji: emoji });
     }
 
     function showFloatingEmoji(emoji) {
@@ -818,7 +890,7 @@
 
       closeCheckoutModal();
       activateProUI();
-      alert('Licença PRO ativada!');
+      alert('Licença PRO ativada! Limite de participantes removido.');
     }
 
     function activateProUI() {
@@ -828,6 +900,7 @@
       document.getElementById('ytControlsPro').classList.add('flex');
 
       document.querySelectorAll('.pro-option').forEach(opt => opt.disabled = false);
+      updateParticipantsUI();
     }
 
     function checkFpsSelection(selectElem) {
@@ -874,8 +947,10 @@
         displayLocalStream(localStream);
         document.getElementById('btnStartStream').innerHTML = `<i class="fa-solid fa-stop"></i> PARAR PARTILHA`;
 
-        if (currentRoomId) peer.call(currentRoomId, localStream);
-        if (conn && conn.peer) peer.call(conn.peer, localStream);
+        // Disca e transmite a tela para TODOS os participantes na sala em simultâneo
+        connectionsList.forEach(conn => {
+          if (conn.open) peer.call(conn.peer, localStream);
+        });
 
         localStream.getVideoTracks()[0].onended = () => { toggleScreenShare(); };
       } catch (err) { console.error("Erro ao partilhar ecrã:", err); }
@@ -887,14 +962,6 @@
       videoElem.muted = true;
       videoElem.classList.remove('hidden');
       document.getElementById('localPlaceholder').classList.add('hidden');
-    }
-
-    function displayRemoteStream(stream) {
-      const videoElem = document.getElementById('remoteVideo');
-      videoElem.srcObject = stream;
-      videoElem.muted = false;
-      videoElem.classList.remove('hidden');
-      document.getElementById('remotePlaceholder').classList.add('hidden');
     }
 
     function toggleVideoFullscreen(videoId) {
@@ -956,9 +1023,7 @@
       if (action === 'play') ytPlayer.playVideo();
       if (action === 'pause') ytPlayer.pauseVideo();
 
-      if (conn && conn.open) {
-        conn.send({ type: 'ytSync', action: action, time: currentTime, videoId: extraData });
-      }
+      broadcastDataToAll({ type: 'ytSync', action: action, time: currentTime, videoId: extraData });
     }
 
     function handleRemoteYtSync(data) {
