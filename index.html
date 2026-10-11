@@ -251,7 +251,7 @@
           </div>
           <div class="px-3 py-1 bg-[#08090d] rounded-lg border border-cyan-500/30 text-xs text-gray-300 flex items-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span id="roomParticipantsInfo">Aguardando Participantes...</span>
+            <span id="roomParticipantsInfo">Conectando...</span>
           </div>
         </div>
 
@@ -271,7 +271,7 @@
               </div>
             </div>
 
-            <!-- Grelha Dinâmica para exibir múltiplos ecrãs de todos os participantes da sala -->
+            <!-- Grelha dinâmica para fluxos remotos -->
             <div id="remoteStreamsGrid" class="contents">
               <div id="slot-remote-default" class="relative bg-black/80 rounded-xl overflow-hidden flex flex-col items-center justify-center min-h-[200px] border border-pink-500/30">
                 <span class="absolute top-2 left-2 bg-black/80 text-pink-400 text-[10px] px-2 py-0.5 rounded font-bold border border-pink-500/30 z-10">Tela do Parceiro</span>
@@ -356,7 +356,7 @@
         
         <div class="bg-[#0f111a] border border-cyan-500/30 rounded-2xl p-3.5 shadow-md">
           <h2 class="text-xs font-bold text-white mb-2 flex items-center justify-between uppercase">
-            <span><i class="fa-solid id-card text-cyan-400"></i> ID da Sala Ativa</span>
+            <span><i class="fa-solid fa-id-card text-cyan-400"></i> ID da Sala Ativa</span>
             <span id="connectionStatus" class="text-[9px] bg-amber-900/80 text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/30">Iniciando</span>
           </h2>
 
@@ -573,41 +573,43 @@
       document.getElementById('dashboardView').classList.remove('hidden');
     }
 
+    // ARQUITETURA HOST/CONVIDADO ROBUSTA PARA EVITAR CONFLITO DE ID
     function initPeerRoom(roomId) {
       if (peer) peer.destroy();
       connections = {};
 
-      const myPeerId = roomId + "-" + Math.random().toString(36).substring(2, 7);
-      peer = new Peer(myPeerId, peerConfig);
+      // O primeiro usuário tenta criar o Peer com o ID exato da sala (Host)
+      peer = new Peer(roomId, peerConfig);
 
       peer.on('open', (id) => {
-        document.getElementById('connectionStatus').innerText = 'Na Sala por ID';
+        document.getElementById('connectionStatus').innerText = 'Anfitrião da Sala';
         document.getElementById('connectionStatus').className = 'text-[9px] bg-emerald-900/80 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30';
-        document.getElementById('roomParticipantsInfo').innerText = 'Procurando pares na sala...';
+        document.getElementById('roomParticipantsInfo').innerText = 'Aguardando participantes entrarem...';
+      });
 
-        // Tenta conectar ao nó mestre da sala com este ID exato
-        connectToRoomMaster(roomId);
+      peer.on('error', (err) => {
+        if (err.type === 'unavailable-id') {
+          // Se o ID já está ocupado, criamos um ID único aleatório para este Convidado
+          const guestPeerId = roomId + "-guest-" + Math.random().toString(36).substring(2, 6);
+          peer = new Peer(guestPeerId, peerConfig);
+
+          peer.on('open', () => {
+            document.getElementById('connectionStatus').innerText = 'Conectado à Sala';
+            document.getElementById('connectionStatus').className = 'text-[9px] bg-emerald-900/80 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30';
+            document.getElementById('roomParticipantsInfo').innerText = 'Conectando ao anfitrião...';
+
+            // Conecta diretamente ao ID do Anfitrião (roomId)
+            const conn = peer.connect(roomId, { reliable: true });
+            bindConnection(conn);
+          });
+
+          peer.on('connection', (conn) => bindConnection(conn));
+          peer.on('call', (call) => answerVideoCall(call));
+        }
       });
 
       peer.on('connection', (conn) => bindConnection(conn));
       peer.on('call', (call) => answerVideoCall(call));
-    }
-
-    function connectToRoomMaster(roomId) {
-      const masterConn = peer.connect(roomId, { reliable: true });
-      masterConn.on('open', () => bindConnection(masterConn));
-      masterConn.on('error', () => {
-        registerAsRoomMaster(roomId);
-      });
-    }
-
-    function registerAsRoomMaster(roomId) {
-      const masterPeer = new Peer(roomId, peerConfig);
-      masterPeer.on('open', () => {
-        document.getElementById('roomParticipantsInfo').innerText = 'Sala Criada (Aguardando Entradas)';
-      });
-      masterPeer.on('connection', (conn) => bindConnection(conn));
-      masterPeer.on('call', (call) => answerVideoCall(call));
     }
 
     function bindConnection(conn) {
@@ -854,7 +856,6 @@
       const fpsVal = parseInt(document.getElementById('selectFps').value);
 
       try {
-        // Nativo do navegador: permite selecionar Tela Inteira, Janela de Aplicativo (.exe) ou Guia do Navegador
         localStream = await navigator.mediaDevices.getDisplayMedia({
           video: { width: { ideal: 1920 }, height: { ideal: 1080 }, frameRate: { ideal: fpsVal } },
           audio: true
