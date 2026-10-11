@@ -1,184 +1,188 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>M.Y.MidiaStream - Cyber Steampunk Edition</title>
-  <!-- Tailwind CSS CDN -->
+  <title>M.Y.MIDIASTREAM - Neon Cyber Edition</title>
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- PeerJS para conexões P2P WebRTC -->
+  <!-- PeerJS -->
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
   <style>
+    /* Estilo Neon Cyber baseado na Logo */
     :root {
-      --neon-cyan: #00f3ff;
-      --neon-magenta: #ff007f;
-      --neon-amber: #ffb700;
-      --bg-cyber: #080b11;
-      --card-cyber: #0e1420;
-      --border-cyber: #1e293b;
+      --neon-cyan: #00f2fe;
+      --neon-pink: #ff007f;
+      --neon-magenta: #d946ef;
+      --bg-dark: #08090d;
+      --card-dark: #0f111a;
+      --border-neon: #1e2640;
     }
-    body { background-color: var(--bg-cyber); color: #e2e8f0; font-family: 'Segoe UI', Roboto, sans-serif; }
-    .bg-cyber-dark { background-color: var(--bg-cyber); }
-    .bg-cyber-card { background-color: var(--card-cyber); }
-    .border-cyber { border-color: var(--border-cyber); }
-    
-    .neon-glow-cyan { box-shadow: 0 0 15px rgba(0, 243, 255, 0.25); border-color: rgba(0, 243, 255, 0.4); }
-    .neon-glow-magenta { box-shadow: 0 0 15px rgba(255, 0, 127, 0.25); border-color: rgba(255, 0, 127, 0.4); }
-    .neon-glow-amber { box-shadow: 0 0 15px rgba(255, 183, 0, 0.25); border-color: rgba(255, 183, 0, 0.4); }
-    
-    .text-neon-cyan { color: var(--neon-cyan); }
-    .text-neon-magenta { color: var(--neon-magenta); }
-    .text-neon-amber { color: var(--neon-amber); }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(0, 242, 254, 0.12) 0%, transparent 60%),
+        radial-gradient(circle at 100% 100%, rgba(255, 0, 127, 0.1) 0%, transparent 50%),
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 24px 24px, 24px 24px;
+      color: #f1f5f9;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    .border-neon-glow {
+      border: 1px solid rgba(0, 242, 254, 0.4);
+      box-shadow: 0 0 15px rgba(0, 242, 254, 0.2), inset 0 0 10px rgba(0, 242, 254, 0.1);
+    }
+
+    .border-pink-glow {
+      border: 1px solid rgba(255, 0, 127, 0.4);
+      box-shadow: 0 0 15px rgba(255, 0, 127, 0.2), inset 0 0 10px rgba(255, 0, 127, 0.1);
+    }
+
+    .text-gradient-neon {
+      background: linear-gradient(135deg, #00f2fe 0%, #4facfe 40%, #ff007f 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 0 8px rgba(0, 242, 254, 0.4));
+    }
+
+    .btn-neon-gradient {
+      background: linear-gradient(90deg, #00f2fe 0%, #0099ff 50%, #ff007f 100%);
+      background-size: 200% auto;
+      transition: 0.4s ease;
+      box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+    }
+    .btn-neon-gradient:hover {
+      background-position: right center;
+      box-shadow: 0 0 25px rgba(255, 0, 127, 0.5);
+    }
 
     @keyframes floatUp {
       0% { transform: translateY(0px) scale(0.8); opacity: 1; }
-      100% { transform: translateY(-350px) scale(1.4); opacity: 0; }
+      100% { transform: translateY(-300px) scale(1.3); opacity: 0; }
     }
-    .floating-emoji { animation: floatUp 2.5s ease-out forwards; pointer-events: none; position: absolute; bottom: 20px; z-index: 50; }
+    .floating-emoji { animation: floatUp 2.2s ease-out forwards; pointer-events: none; position: absolute; bottom: 20px; z-index: 50; }
 
-    /* Fullscreen Real */
     :fullscreen video, :-webkit-full-screen video {
       width: 100vw !important; height: 100vh !important; object-fit: contain !important;
     }
-    :fullscreen, :-webkit-full-screen { background-color: black !important; display: flex !important; align-items: center !important; justify-content: center !important; }
+    :fullscreen, :-webkit-full-screen { background-color: #000 !important; display: flex !important; align-items: center !important; justify-content: center !important; }
   </style>
 </head>
 <body class="min-h-screen flex flex-col relative overflow-x-hidden">
 
-  <!-- Ecrã / Modal de Autenticação -->
-  <div id="loginModal" class="fixed inset-0 bg-black/95 backdrop-blur-lg flex items-center justify-center p-4 z-50">
-    <div class="bg-cyber-card border border-cyber rounded-2xl max-w-md w-full p-6 shadow-2xl neon-glow-cyan relative">
+  <!-- Modal / Ecrã Inicial de Autenticação -->
+  <div id="loginModal" class="fixed inset-0 bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 z-50">
+    <div class="bg-[#0f111a] border-neon-glow rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
       <div class="text-center mb-6">
-        <div class="inline-block p-3.5 bg-cyan-500/10 text-cyan-400 rounded-full mb-3 border border-cyan-500/30 shadow-[0_0_20px_rgba(0,243,255,0.3)]">
-          <i class="fa-solid fa-microchip text-3xl"></i>
+        <div class="inline-flex p-3 bg-cyan-500/10 border border-cyan-400/40 rounded-2xl mb-3 shadow-[0_0_20px_rgba(0,242,254,0.3)]">
+          <i class="fa-solid fa-desktop text-3xl text-gradient-neon"></i>
         </div>
-        <h2 class="text-2xl font-black tracking-wider text-white">M.Y.<span class="text-neon-cyan">MIDIASTREAM</span></h2>
-        <p class="text-xs text-gray-400 mt-1 uppercase tracking-widest">Steampunk Cyber Edition</p>
+        <h2 class="text-2xl font-black tracking-widest text-gradient-neon">M.Y.MIDIASTREAM</h2>
+        <p class="text-xs text-cyan-400/70 mt-1 uppercase font-semibold tracking-wider">Cyber Neon Transmission Platform</p>
       </div>
 
-      <div class="flex bg-cyber-dark p-1 rounded-xl border border-cyber mb-5">
-        <button id="tabLoginBtn" type="button" onclick="switchAuthTab('login')" class="flex-1 py-2 text-xs font-bold rounded-lg bg-cyan-600 text-white transition shadow">Entrar</button>
-        <button id="tabRegisterBtn" type="button" onclick="switchAuthTab('register')" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 hover:text-white transition">Registar</button>
-      </div>
-
-      <div id="formLogin" class="space-y-3.5">
+      <!-- Formulário Simplificado de Entrada -->
+      <div class="space-y-4">
         <div>
-          <label class="block text-xs font-medium text-gray-400 mb-1">E-mail de Acesso:</label>
-          <input id="loginEmail" type="email" placeholder="cyber@stream.com" class="w-full bg-cyber-dark border border-cyber rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400">
+          <label class="block text-xs font-semibold text-gray-300 mb-1">Seu Nome / Apelido de Exibição:</label>
+          <input id="loginNickname" type="text" placeholder="Ex: CyberPlayer" class="w-full bg-[#08090d] border border-cyan-500/30 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400 focus:shadow-[0_0_10px_rgba(0,242,254,0.3)]">
         </div>
         <div>
-          <label class="block text-xs font-medium text-gray-400 mb-1">Palavra-passe:</label>
-          <input id="loginPassword" type="password" placeholder="••••••••" class="w-full bg-cyber-dark border border-cyber rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400">
+          <label class="block text-xs font-semibold text-gray-300 mb-1">E-mail de Acesso (Opcional):</label>
+          <input id="loginEmail" type="email" placeholder="usuario@stream.com" class="w-full bg-[#08090d] border border-cyan-500/30 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400">
         </div>
-        <button type="button" onclick="handleLogin()" class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs py-3 rounded-xl transition shadow-[0_0_15px_rgba(0,243,255,0.4)] mt-2">
-          INICIALIZAR SISTEMA
-        </button>
-      </div>
-
-      <div id="formRegister" class="space-y-3.5 hidden">
-        <div>
-          <label class="block text-xs font-medium text-gray-400 mb-1">Nome / Apelido no Chat:</label>
-          <input id="regNickname" type="text" placeholder="Ex: CyberVini" class="w-full bg-cyber-dark border border-cyber rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400">
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-gray-400 mb-1">E-mail:</label>
-          <input id="regEmail" type="email" placeholder="cyber@stream.com" class="w-full bg-cyber-dark border border-cyber rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400">
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-gray-400 mb-1">Palavra-passe:</label>
-          <input id="regPassword" type="password" placeholder="••••••••" class="w-full bg-cyber-dark border border-cyber rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-400">
-        </div>
-        <button type="button" onclick="handleRegister()" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs py-3 rounded-xl transition shadow-[0_0_15px_rgba(16,185,129,0.4)] mt-2">
-          CRIAR CONTA & ENTRAR
+        <button type="button" onclick="handleLogin()" class="w-full btn-neon-gradient text-white font-extrabold text-xs py-3 rounded-xl uppercase tracking-wider">
+          Entrar na Sala Neon
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Navbar / Header Steampunk Neon -->
-  <header class="border-b border-cyber bg-cyber-card py-3.5 px-6 flex flex-wrap justify-between items-center gap-4 z-30 shadow-lg">
+  <!-- Header Estilo Neon Cyber -->
+  <header class="border-b border-cyan-500/20 bg-[#0f111a]/80 backdrop-blur-md py-3.5 px-6 flex flex-wrap justify-between items-center gap-4 z-30 shadow-lg">
     <div class="flex items-center space-x-3">
-      <div class="p-2 bg-cyan-500/10 border border-cyan-500/30 rounded-lg text-cyan-400">
-        <i class="fa-solid fa-bolt-lightning text-xl"></i>
+      <div class="p-2 bg-cyan-500/10 border border-cyan-400/30 rounded-xl text-cyan-400 shadow-[0_0_10px_rgba(0,242,254,0.2)]">
+        <i class="fa-solid fa-wave-square text-lg"></i>
       </div>
-      <h1 class="text-lg font-black tracking-wider text-white">M.Y.<span class="text-neon-cyan">MIDIASTREAM</span></h1>
+      <h1 class="text-lg font-black tracking-wider text-gradient-neon">M.Y.MIDIASTREAM</h1>
     </div>
 
-    <!-- Perfil & Apelido Rápido -->
-    <div class="flex items-center gap-3 bg-cyber-dark px-3.5 py-1.5 rounded-xl border border-cyber">
-      <i class="fa-solid fa-user-gear text-cyan-400"></i>
-      <span id="displayNickname" class="text-xs font-bold text-white">Utilizador</span>
-      <button onclick="editMyNickname()" title="Alterar Apelido" class="text-gray-400 hover:text-cyan-400 text-xs ml-1 transition">
+    <!-- Perfil & Apelido Editável -->
+    <div class="flex items-center gap-3 bg-[#08090d] px-3.5 py-1.5 rounded-xl border border-cyan-500/30 shadow-[0_0_10px_rgba(0,242,254,0.1)]">
+      <i class="fa-solid fa-user-tag text-cyan-400 text-xs"></i>
+      <span id="displayNickname" class="text-xs font-bold text-white">Visitante</span>
+      <button onclick="toggleDashboardModal()" title="Alterar Apelido" class="text-gray-400 hover:text-cyan-400 text-xs ml-1 transition">
         <i class="fa-solid fa-pen-to-square"></i>
       </button>
-      <span id="proBadge" class="hidden bg-gradient-to-r from-amber-500 to-yellow-400 text-black text-[10px] font-black px-2 py-0.5 rounded-full uppercase shadow-lg ml-2">PRO</span>
+      <span id="proBadge" class="hidden bg-gradient-to-r from-amber-400 to-yellow-500 text-black text-[9px] font-black px-2 py-0.5 rounded-full uppercase shadow ml-1">PRO</span>
     </div>
 
     <div class="flex items-center gap-3">
-      <button onclick="toggleDashboardModal()" class="bg-cyber-dark border border-cyber hover:border-cyan-500 text-cyan-400 text-xs py-2 px-3.5 rounded-xl transition flex items-center gap-2 shadow">
-        <i class="fa-solid fa-gauge-high"><span>Dashboard</span></i>
+      <button onclick="toggleDashboardModal()" class="bg-[#08090d] border border-cyan-500/30 hover:border-cyan-400 text-cyan-400 text-xs py-2 px-3.5 rounded-xl transition flex items-center gap-2 shadow-[0_0_10px_rgba(0,242,254,0.15)]">
+        <i class="fa-solid fa-gauge-high"></i> <span class="hidden md:inline">Dashboard</span>
       </button>
-      <button onclick="toggleCinemaMode()" id="btnCinema" class="bg-cyber-dark border border-cyber hover:border-magenta-500 text-gray-300 hover:text-white text-xs py-2 px-3 rounded-xl transition flex items-center gap-1.5">
+      <button onclick="toggleCinemaMode()" id="btnCinema" class="bg-[#08090d] border border-pink-500/30 hover:border-pink-500 text-pink-400 text-xs py-2 px-3 rounded-xl transition flex items-center gap-1.5">
         <i class="fa-solid fa-expand"></i>
       </button>
-      <button id="btnBuyPro" onclick="openCheckoutModal()" class="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-black font-extrabold text-xs py-2 px-4 rounded-xl shadow-[0_0_15px_rgba(255,183,0,0.3)] transition flex items-center gap-2">
-        <i class="fa-solid fa-crown"></i> ATIVAR PRO
+      <button id="btnBuyPro" onclick="openCheckoutModal()" class="bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-extrabold text-xs py-2 px-4 rounded-xl shadow-[0_0_15px_rgba(255,0,127,0.4)] transition flex items-center gap-2">
+        <i class="fa-solid fa-crown"></i> OBTER PLANO PRO
       </button>
     </div>
   </header>
 
-  <!-- Dashboard Modal (Painel de Controlo) -->
-  <div id="dashboardModal" class="fixed inset-0 bg-black/9org backdrop-blur-md hidden items-center justify-center p-4 z-50">
-    <div class="bg-cyber-card border border-cyan-500/50 rounded-2xl max-w-2xl w-full p-6 shadow-2xl neon-glow-cyan relative max-h-[90vh] overflow-y-auto">
+  <!-- Painel Dashboard Modal -->
+  <div id="dashboardModal" class="fixed inset-0 bg-black/85 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+    <div class="bg-[#0f111a] border-neon-glow rounded-2xl max-w-2xl w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
       <button onclick="toggleDashboardModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white text-base"><i class="fa-solid fa-xmark"></i></button>
       
-      <h3 class="text-base font-bold text-white mb-4 flex items-center gap-2">
-        <i class="fa-solid fa-terminal text-neon-cyan"></i> Painel de Controlo & Configurações da Sala
+      <h3 class="text-base font-bold text-gradient-neon mb-4 flex items-center gap-2">
+        <i class="fa-solid fa-sliders"></i> Painel de Controlo da Sala & Perfil
       </h3>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
-        <div class="bg-cyber-dark p-4 rounded-xl border border-cyber">
-          <h4 class="text-xs font-bold text-cyan-400 mb-2 uppercase"><i class="fa-solid fa-id-badge"></i> Perfil do Operador</h4>
-          <label class="block text-[11px] text-gray-400 mb-1">Nome no Chat:</label>
+        <div class="bg-[#08090d] p-4 rounded-xl border border-cyan-500/30">
+          <h4 class="text-xs font-bold text-cyan-400 mb-2 uppercase"><i class="fa-solid fa-user-pen"></i> Alterar Apelido no Chat</h4>
           <div class="flex gap-2">
-            <input id="dashNicknameInput" type="text" class="flex-1 bg-cyber-card border border-cyber rounded-lg px-3 py-1.5 text-xs text-white focus:border-cyan-400">
+            <input id="dashNicknameInput" type="text" class="flex-1 bg-[#0f111a] border border-cyan-500/30 rounded-lg px-3 py-1.5 text-xs text-white focus:border-cyan-400">
             <button onclick="saveDashNickname()" class="bg-cyan-600 hover:bg-cyan-500 text-white text-xs px-3 py-1.5 rounded-lg font-bold">Salvar</button>
           </div>
         </div>
 
-        <div class="bg-cyber-dark p-4 rounded-xl border border-cyber">
-          <h4 class="text-xs font-bold text-magenta-500 mb-2 uppercase text-neon-magenta"><i class="fa-solid fa-link"></i> Gestão de Salas Privadas</h4>
-          <p class="text-[11px] text-gray-400 mb-2">Crie ou mude o ID da sala e partilhe com a sua equipa:</p>
+        <div class="bg-[#08090d] p-4 rounded-xl border border-pink-500/30">
+          <h4 class="text-xs font-bold text-pink-400 mb-2 uppercase"><i class="fa-solid fa-[#00F2FE]"></i> Criar / Trocar de Sala por ID</h4>
           <div class="flex gap-2">
-            <input id="dashCustomRoomInput" type="text" placeholder="Ex: minha-sala-gamer" class="flex-1 bg-cyber-card border border-cyber rounded-lg px-3 py-1.5 text-xs text-white focus:border-magenta-500">
-            <button onclick="joinCustomRoom()" class="bg-pink-600 hover:bg-pink-500 text-white text-xs px-3 py-1.5 rounded-lg font-bold">Entrar</button>
+            <input id="dashCustomRoomInput" type="text" placeholder="Ex: sala-gamer-1" class="flex-1 bg-[#0f111a] border border-pink-500/30 rounded-lg px-3 py-1.5 text-xs text-white focus:border-pink-500">
+            <button onclick="joinCustomRoom()" class="bg-pink-600 hover:bg-pink-500 text-white text-xs px-3 py-1.5 rounded-lg font-bold">Criar / Entrar</button>
           </div>
         </div>
       </div>
 
-      <!-- OBS Streaming Integration (Twitch style) -->
-      <div class="bg-cyber-dark p-4 rounded-xl border border-cyber mb-5">
-        <h4 class="text-xs font-bold text-neon-amber mb-2 uppercase"><i class="fa-solid fa-video"></i> Transmissão via OBS Studio (Stream Key)</h4>
-        <p class="text-[11px] text-gray-400 mb-3">Conecte o seu OBS para transmitir direto para a sala com baixa latência.</p>
+      <!-- OBS Integration -->
+      <div class="bg-[#08090d] p-4 rounded-xl border border-cyan-500/30 mb-5">
+        <h4 class="text-xs font-bold text-amber-400 mb-2 uppercase"><i class="fa-solid fa-video"></i> Transmissão via OBS Studio (Stream Key)</h4>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
           <div>
             <label class="block text-[10px] text-gray-400 mb-1">Servidor RTMP:</label>
-            <input type="text" readonly value="rtmp://stream.mymidiastream.br/live" class="w-full bg-cyber-card border border-cyber rounded-lg px-2.5 py-1.5 text-cyan-300 font-mono text-[11px]">
+            <input type="text" readonly value="rtmp://stream.mymidiastream.br/live" class="w-full bg-[#0f111a] border border-cyan-500/20 rounded-lg px-2.5 py-1.5 text-cyan-300 font-mono text-[11px]">
           </div>
           <div>
-            <label class="block text-[10px] text-gray-400 mb-1">Chave de Stream (Stream Key):</label>
+            <label class="block text-[10px] text-gray-400 mb-1">Chave de Stream (Key):</label>
             <div class="flex gap-1.5">
-              <input id="obsStreamKey" type="text" readonly value="mms_live_9x8q7w6e5r4t" class="flex-1 bg-cyber-card border border-cyber rounded-lg px-2.5 py-1.5 text-amber-300 font-mono text-[11px]">
-              <button onclick="copyStreamKey()" class="bg-amber-600/30 border border-amber-500 hover:bg-amber-600 text-amber-300 hover:text-black px-2.5 py-1.5 rounded-lg transition"><i class="fa-solid fa-copy"></i></button>
+              <input id="obsStreamKey" type="text" readonly value="mms_neon_key_99x2" class="flex-1 bg-[#0f111a] border border-cyan-500/20 rounded-lg px-2.5 py-1.5 text-amber-300 font-mono text-[11px]">
+              <button onclick="copyStreamKey()" class="bg-amber-500/20 border border-amber-500 hover:bg-amber-500 hover:text-black text-amber-300 px-2.5 py-1.5 rounded-lg transition"><i class="fa-solid fa-copy"></i></button>
             </div>
           </div>
         </div>
       </div>
 
-      <button onclick="toggleDashboardModal()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold py-2.5 rounded-xl transition">
-        Fechar Painel & Retornar à Sala
+      <button onclick="toggleDashboardModal()" class="w-full btn-neon-gradient text-white text-xs font-bold py-2.5 rounded-xl uppercase">
+        Voltar à Transmissão
       </button>
     </div>
   </div>
@@ -186,85 +190,85 @@
   <!-- Conteúdo Principal -->
   <main id="mainContainer" class="flex-1 p-4 md:p-6 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-3 gap-6 transition-all duration-300">
 
-    <!-- Coluna Esquerda & Centro: Ecrãs & YouTube Sync -->
+    <!-- Coluna Esquerda & Centro: Vídeo / YouTube -->
     <div id="leftColumn" class="lg:col-span-2 flex flex-col gap-4 transition-all duration-300">
       
-      <!-- Seletor de Modo & Info da Sala -->
-      <div class="flex flex-wrap justify-between items-center bg-cyber-card p-2 rounded-xl border border-cyber gap-2 shadow-md">
+      <!-- Seletor de Modo & Status -->
+      <div class="flex flex-wrap justify-between items-center bg-[#0f111a] p-2 rounded-xl border border-cyan-500/20 gap-2 shadow-md">
         <div class="flex flex-1 gap-1 min-w-[200px]">
-          <button id="tabScreen" onclick="switchTab('screen')" class="flex-1 py-2 text-xs font-bold rounded-lg bg-cyan-600 text-white transition flex items-center justify-center gap-2 shadow">
-            <i class="fa-solid fa-desktop"></i> Grelha de Ecrãs
+          <button id="tabScreen" onclick="switchTab('screen')" class="flex-1 py-2 text-xs font-bold rounded-lg bg-cyan-600 text-white transition shadow-[0_0_10px_rgba(0,242,254,0.3)] flex items-center justify-center gap-2">
+            <i class="fa-solid fa-desktop"></i> Ecrãs em Direto
           </button>
           <button id="tabYoutube" onclick="switchTab('youtube')" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 hover:text-white transition flex items-center justify-center gap-2">
-            <i class="fa-brands fa-youtube text-red-500"></i> YouTube & Stream Sync <span class="text-[9px] bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded border border-amber-500/30">PRO</span>
+            <i class="fa-brands fa-youtube text-red-500"></i> YouTube Sync <span class="text-[9px] bg-pink-500/20 text-pink-400 px-1.5 py-0.5 rounded border border-pink-500/30">PRO</span>
           </button>
         </div>
-        <div class="px-3 py-1 bg-cyber-dark rounded-lg border border-cyber text-xs text-gray-300 flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_#10b981]"></span>
+        <div class="px-3 py-1 bg-[#08090d] rounded-lg border border-cyan-500/30 text-xs text-gray-300 flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]"></span>
           <span id="roomParticipantsInfo">Sala Privada Ativa</span>
         </div>
       </div>
 
-      <!-- Área de Visualização Principal -->
-      <div id="displayArea" class="bg-cyber-card border border-cyber rounded-2xl p-3 relative min-h-[420px] flex items-center justify-center overflow-hidden shadow-xl neon-glow-cyan">
+      <!-- Exibição de Vídeo Principal -->
+      <div id="displayArea" class="bg-[#0f111a] border-neon-glow rounded-2xl p-3 relative min-h-[420px] flex items-center justify-center overflow-hidden shadow-xl">
         
-        <!-- View 1: Grelha de Ecrãs -->
+        <!-- View 1: Transmissões em Grelha -->
         <div id="screenView" class="w-full h-full grid grid-cols-1 md:grid-cols-2 gap-3 items-center justify-center w-full">
           
-          <!-- O seu Ecrã -->
-          <div id="localVideoContainer" class="relative bg-black rounded-xl overflow-hidden flex flex-col items-center justify-center min-h-[240px] border border-cyber">
+          <!-- Ecrã Local -->
+          <div id="localVideoContainer" class="relative bg-black/80 rounded-xl overflow-hidden flex flex-col items-center justify-center min-h-[240px] border border-cyan-500/30">
             <span id="localStreamLabel" class="absolute top-2.5 left-2.5 bg-black/80 text-cyan-300 text-[11px] px-2.5 py-1 rounded-md backdrop-blur z-10 font-bold border border-cyan-500/30">O seu Ecrã (Você)</span>
-            <button onclick="toggleVideoFullscreen('localVideo')" class="absolute top-2.5 right-2.5 bg-black/80 hover:bg-black text-white text-xs px-2.5 py-1 rounded-md backdrop-blur z-10 border border-cyber">
+            <button onclick="toggleVideoFullscreen('localVideo')" class="absolute top-2.5 right-2.5 bg-black/80 hover:bg-black text-white text-xs px-2.5 py-1 rounded-md backdrop-blur z-10 border border-cyan-500/20">
               <i class="fa-solid fa-expand"></i>
             </button>
             <video id="localVideo" autoplay playsinline muted class="w-full max-h-[360px] object-contain hidden"></video>
             <div id="localPlaceholder" class="text-center p-6 text-gray-500 text-xs">
-              <i class="fa-solid fa-tower-broadcast text-4xl mb-2 text-cyan-500/50"></i>
-              <p>A sua transmissão está inativa</p>
+              <i class="fa-solid fa-desktop text-4xl mb-2 text-cyan-400/40"></i>
+              <p>A sua transmissão está desligada</p>
             </div>
           </div>
 
-          <!-- Ecrã do Participante -->
-          <div id="remoteVideoContainer" class="relative bg-black rounded-xl overflow-hidden flex flex-col items-center justify-center min-h-[240px] border border-cyber">
-            <span id="remoteStreamLabel" class="absolute top-2.5 left-2.5 bg-black/80 text-emerald-300 text-[11px] px-2.5 py-1 rounded-md backdrop-blur z-10 font-bold border border-emerald-500/30">Participante (Aguardando...)</span>
-            <button onclick="toggleVideoFullscreen('remoteVideo')" class="absolute top-2.5 right-2.5 bg-black/80 hover:bg-black text-white text-xs px-2.5 py-1 rounded-md backdrop-blur z-10 border border-cyber">
+          <!-- Ecrã Remoto -->
+          <div id="remoteVideoContainer" class="relative bg-black/80 rounded-xl overflow-hidden flex flex-col items-center justify-center min-h-[240px] border border-pink-500/30">
+            <span id="remoteStreamLabel" class="absolute top-2.5 left-2.5 bg-black/80 text-pink-400 text-[11px] px-2.5 py-1 rounded-md backdrop-blur z-10 font-bold border border-pink-500/30">Participante (Aguardando...)</span>
+            <button onclick="toggleVideoFullscreen('remoteVideo')" class="absolute top-2.5 right-2.5 bg-black/80 hover:bg-black text-white text-xs px-2.5 py-1 rounded-md backdrop-blur z-10 border border-pink-500/20">
               <i class="fa-solid fa-expand"></i>
             </button>
             <video id="remoteVideo" autoplay playsinline class="w-full max-h-[360px] object-contain hidden"></video>
             <div id="remotePlaceholder" class="text-center p-6 text-gray-500 text-xs">
-              <i class="fa-solid fa-user-slash text-4xl mb-2 text-gray-600"></i>
-              <p>Nenhum operador na sala</p>
+              <i class="fa-solid fa-user-slash text-4xl mb-2 text-pink-500/30"></i>
+              <p>Nenhum amigo na sala</p>
             </div>
           </div>
 
         </div>
 
-        <!-- View 2: YouTube / Stream Sync -->
-        <div id="youtubeView" class="w-full h-full hidden flex-col items-center absolute inset-3 bg-cyber-card">
-          <div class="w-full aspect-video bg-black rounded-xl overflow-hidden relative border border-cyber">
+        <!-- View 2: YouTube Sync -->
+        <div id="youtubeView" class="w-full h-full hidden flex-col items-center absolute inset-3 bg-[#0f111a]">
+          <div class="w-full aspect-video bg-black rounded-xl overflow-hidden relative border border-cyan-500/30">
             <div id="ytPlayer"></div>
           </div>
 
-          <div class="w-full mt-3 p-3 bg-cyber-dark rounded-xl border border-cyber flex flex-col gap-2.5">
-            <div id="proYtNotice" class="text-xs text-amber-400 bg-amber-500/10 p-2.5 rounded-lg border border-amber-500/20 flex items-center gap-2">
-              <i class="fa-solid fa-lock"></i> Controles de Sincronização Globais bloqueados. Adira ao Plano PRO para controlar o player para todos na sala.
+          <div class="w-full mt-3 p-3 bg-[#08090d] rounded-xl border border-cyan-500/20 flex flex-col gap-2.5">
+            <div id="proYtNotice" class="text-xs text-pink-400 bg-pink-500/10 p-2.5 rounded-lg border border-pink-500/20 flex items-center gap-2">
+              <i class="fa-solid fa-lock"></i> Controles de Sincronização bloqueados. Adira ao Plano PRO para controlar o vídeo para toda a sala.
             </div>
 
             <div id="ytControlsPro" class="hidden flex-col gap-2.5">
               <div class="flex gap-2">
-                <input id="ytUrlInput" type="text" placeholder="Cole o link do YouTube aqui..." class="flex-1 bg-cyber-card border border-cyber rounded-xl px-3 py-2 text-xs text-white focus:border-amber-400">
-                <button onclick="loadProYoutubeVideo()" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3.5 py-2 rounded-xl font-bold transition flex items-center gap-1.5 shadow">
+                <input id="ytUrlInput" type="text" placeholder="Cole o link do YouTube aqui..." class="flex-1 bg-[#0f111a] border border-cyan-500/30 rounded-xl px-3 py-2 text-xs text-white focus:border-cyan-400">
+                <button onclick="loadProYoutubeVideo()" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3.5 py-2 rounded-xl font-bold transition">
                   <i class="fa-solid fa-play"></i> Carregar
                 </button>
               </div>
-              <div class="flex items-center justify-between pt-1.5 border-t border-cyber text-xs text-gray-400">
-                <span class="text-amber-400 font-bold">Controles Globais PRO:</span>
+              <div class="flex items-center justify-between pt-1.5 border-t border-cyan-500/20 text-xs text-gray-400">
+                <span class="text-cyan-400 font-bold">Controles Globais PRO:</span>
                 <div class="flex gap-2">
-                  <button onclick="syncYtAction('play')" class="bg-amber-500/20 border border-amber-500/40 hover:bg-amber-500 hover:text-black text-amber-300 px-3 py-1 rounded-lg transition font-bold">
-                    <i class="fa-solid fa-play"></i> Play Geral
+                  <button onclick="syncYtAction('play')" class="bg-cyan-500/20 border border-cyan-500/40 hover:bg-cyan-500 hover:text-black text-cyan-300 px-3 py-1 rounded-lg transition font-bold">
+                    <i class="fa-solid fa-play"></i> Play
                   </button>
-                  <button onclick="syncYtAction('pause')" class="bg-amber-500/20 border border-amber-500/40 hover:bg-amber-500 hover:text-black text-amber-300 px-3 py-1 rounded-lg transition font-bold">
-                    <i class="fa-solid fa-pause"></i> Pausa Geral
+                  <button onclick="syncYtAction('pause')" class="bg-cyan-500/20 border border-cyan-500/40 hover:bg-cyan-500 hover:text-black text-cyan-300 px-3 py-1 rounded-lg transition font-bold">
+                    <i class="fa-solid fa-pause"></i> Pausa
                   </button>
                 </div>
               </div>
@@ -273,7 +277,7 @@
         </div>
 
         <!-- Emojis Flutuantes -->
-        <div class="absolute bottom-4 right-4 bg-cyber-dark/90 backdrop-blur-md border border-cyber px-3.5 py-1.5 rounded-full flex gap-2.5 shadow-2xl z-20">
+        <div class="absolute bottom-4 right-4 bg-[#08090d]/90 backdrop-blur-md border border-cyan-500/30 px-3.5 py-1.5 rounded-full flex gap-2.5 shadow-2xl z-20">
           <button onclick="sendEmoji('❤️')" class="hover:scale-125 transition text-sm">❤️</button>
           <button onclick="sendEmoji('🔥')" class="hover:scale-125 transition text-sm">🔥</button>
           <button onclick="sendEmoji('😂')" class="hover:scale-125 transition text-sm">😂</button>
@@ -283,91 +287,91 @@
 
       </div>
 
-      <!-- Definições de Transmissão (Resoluções & FPS Gratuitos / PRO) -->
-      <div class="bg-cyber-card border border-cyber rounded-2xl p-4 shadow-md">
-        <h2 class="text-xs font-bold text-white mb-3 flex items-center gap-2 uppercase tracking-wide">
-          <i class="fa-solid fa-sliders text-neon-cyan"></i> Definições de Resolução & Taxa de Quadros
+      <!-- Definições de Transmissão (Resoluções & FPS) -->
+      <div class="bg-[#0f111a] border border-cyan-500/30 rounded-2xl p-4 shadow-md">
+        <h2 class="text-xs font-bold text-gradient-neon mb-3 uppercase tracking-wide flex items-center gap-2">
+          <i class="fa-solid fa-sliders"></i> Resolução & Taxa de Quadros da Transmissão
         </h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
           <div>
             <label class="block text-[11px] font-medium text-gray-400 mb-1">Resolução do Ecrã</label>
-            <select id="selectResolution" class="w-full bg-cyber-dark border border-cyber rounded-xl px-3 py-2 text-xs text-white focus:border-cyan-400">
+            <select id="selectResolution" class="w-full bg-[#08090d] border border-cyan-500/30 rounded-xl px-3 py-2 text-xs text-white focus:border-cyan-400">
               <option value="480">480p SD (Grátis)</option>
               <option value="720">720p HD (Grátis)</option>
               <option value="1080" selected>1080p Full HD (Grátis)</option>
-              <option value="1440" class="pro-option text-amber-400" disabled>1440p 2K 🔒 PRO</option>
-              <option value="2160" class="pro-option text-amber-400" disabled>2160p 4K Ultra HD 🔒 PRO</option>
+              <option value="1440" class="pro-option text-pink-400" disabled>1440p 2K 🔒 PRO</option>
+              <option value="2160" class="pro-option text-pink-400" disabled>2160p 4K Ultra HD 🔒 PRO</option>
             </select>
           </div>
 
           <div>
             <label class="block text-[11px] font-medium text-gray-400 mb-1">Taxa de Quadros (FPS)</label>
-            <select id="selectFps" class="w-full bg-cyber-dark border border-cyber rounded-xl px-3 py-2 text-xs text-white focus:border-cyan-400" onchange="checkFpsSelection(this)">
+            <select id="selectFps" class="w-full bg-[#08090d] border border-cyan-500/30 rounded-xl px-3 py-2 text-xs text-white focus:border-cyan-400" onchange="checkFpsSelection(this)">
               <option value="30">30 FPS (Grátis)</option>
-              <option value="60" selected>60 FPS Alta Fluidez (Grátis)</option>
-              <option value="120" class="pro-option text-amber-400">120 FPS 🔒 PRO</option>
-              <option value="240" class="pro-option text-amber-400">240 FPS 🔒 PRO (Modo Competitivo)</option>
+              <option value="60" selected>60 FPS (Grátis)</option>
+              <option value="120" class="pro-option text-pink-400">120 FPS 🔒 PRO</option>
+              <option value="240" class="pro-option text-pink-400">240 FPS 🔒 PRO (Máximo Desempenho)</option>
             </select>
           </div>
         </div>
 
-        <button id="btnStartStream" onclick="toggleScreenShare()" class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs py-3 px-4 rounded-xl transition flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,243,255,0.3)]">
+        <button id="btnStartStream" onclick="toggleScreenShare()" class="w-full btn-neon-gradient text-white font-extrabold text-xs py-3 px-4 rounded-xl transition flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,242,254,0.3)]">
           <i class="fa-solid fa-desktop"></i> INICIAR PARTILHA DE ECRÃ COM ÁUDIO
         </button>
       </div>
 
     </div>
 
-    <!-- Coluna Direita: Link da Sala & Chat com Figurinhas 50x50 e IA -->
+    <!-- Coluna Direita: Link da Sala & Chat com Figurinhas (50x50) -->
     <div id="rightColumn" class="flex flex-col gap-4 transition-all duration-300">
       
-      <!-- Cartão de Sala Privada -->
-      <div class="bg-cyber-card border border-cyber rounded-2xl p-4 shadow-md">
+      <!-- Convite de Sala Privada por Link -->
+      <div class="bg-[#0f111a] border border-cyan-500/30 rounded-2xl p-4 shadow-md">
         <h2 class="text-xs font-bold text-white mb-2 flex items-center justify-between uppercase tracking-wide">
-          <span><i class="fa-solid fa-link text-neon-cyan"></i> Link de Acesso à Sala</span>
-          <span id="connectionStatus" class="text-[10px] bg-red-900/80 text-red-300 px-2.5 py-0.5 rounded-full border border-red-500/30">A ligar...</span>
+          <span><i class="fa-solid fa-link text-cyan-400"></i> Link da Sua Sala Privada</span>
+          <span id="connectionStatus" class="text-[10px] bg-pink-900/80 text-pink-300 px-2.5 py-0.5 rounded-full border border-pink-500/30">A conectar...</span>
         </h2>
 
-        <p class="text-[11px] text-gray-400 mb-2">Partilhe este link com a sua equipa:</p>
-        <div class="flex items-center gap-2 bg-cyber-dark p-2 rounded-xl border border-cyber">
-          <span id="roomLinkDisplay" class="text-[11px] font-mono text-cyan-300 truncate flex-1">A gerar link...</span>
+        <p class="text-[11px] text-gray-400 mb-2">Envie este link para seu amigo entrar exatamente na mesma sala:</p>
+        <div class="flex items-center gap-2 bg-[#08090d] p-2 rounded-xl border border-cyan-500/30">
+          <span id="roomLinkDisplay" class="text-[11px] font-mono text-cyan-300 truncate flex-1">Gerando link da sala...</span>
           <button onclick="copyRoomLink()" title="Copiar Link" class="text-gray-400 hover:text-white text-xs p-1.5 transition">
             <i class="fa-solid fa-copy"></i>
           </button>
         </div>
       </div>
 
-      <!-- Chat ao Vivo com Figurinhas 50x50, Imagem do Dispositivo & Gemini AI -->
-      <div class="bg-cyber-card border border-cyber rounded-2xl p-4 flex-1 flex flex-col shadow-md min-h-[340px] relative">
+      <!-- Chat ao Vivo com Figurinhas 50x50 & IA -->
+      <div class="bg-[#0f111a] border border-cyan-500/30 rounded-2xl p-4 flex-1 flex flex-col shadow-md min-h-[340px] relative">
         <h2 class="text-xs font-bold text-white mb-2 flex items-center justify-between uppercase tracking-wide">
-          <span><i class="fa-solid fa-comments text-neon-cyan"></i> Chat Global & IA</span>
+          <span><i class="fa-solid fa-comments text-cyan-400"></i> Chat do Grupo & IA</span>
           <span class="text-[10px] text-cyan-400">Use <code>/ia [pergunta]</code></span>
         </h2>
 
-        <div id="chatMessages" class="flex-1 bg-cyber-dark border border-cyber rounded-xl p-3 overflow-y-auto mb-3 text-xs space-y-2.5 max-h-[230px]">
-          <div class="text-gray-500 italic text-center">Conectado ao chat seguro da sala. Envie mensagens ou digite <strong>/ia</strong>!</div>
+        <div id="chatMessages" class="flex-1 bg-[#08090d] border border-cyan-500/20 rounded-xl p-3 overflow-y-auto mb-3 text-xs space-y-2.5 max-h-[230px]">
+          <div class="text-gray-500 italic text-center">Conectado ao chat da sala. Converse com seus amigos ou use <strong>/ia</strong>!</div>
         </div>
 
-        <!-- Input oculto para carregar imagem/GIF do dispositivo -->
+        <!-- Input para carregar figurinha do dispositivo -->
         <input type="file" id="deviceImageInput" accept="image/*" class="hidden" onchange="handleDeviceImageUpload(event)">
 
-        <!-- Popover de Figurinhas / GIFs Pré-definidos -->
-        <div id="stickerPicker" class="hidden absolute bottom-16 left-4 right-4 bg-cyber-dark border border-cyan-500/40 p-3 rounded-2xl shadow-2xl z-30 grid grid-cols-4 gap-2 backdrop-blur-md">
-          <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHY5eWJreXVnY241OHI1b3R5bHdqdXJkZXBvZXAxaXNmMXdrODR5MSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l3q2K5jinAlChoCLS/giphy.gif" onclick="sendSticker(this.src)" class="w-12 h-12 object-cover rounded-lg cursor-pointer hover:scale-110 transition border border-cyber">
-          <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNndicm95c2RrbjUzeXZrYjE1ejUxeXh6cWV6NDdpcXlneXB1MWo4OSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/26u4cqiYI30juCOGY/giphy.gif" onclick="sendSticker(this.src)" class="w-12 h-12 object-cover rounded-lg cursor-pointer hover:scale-110 transition border border-cyber">
-          <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3Z0bjJvaWtwYm4zeGtwOHdzdTFneXV6aTFneTBqOWtsaDRocTZ3cCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/13CoXDiaCcCoyk/giphy.gif" onclick="sendSticker(this.src)" class="w-12 h-12 object-cover rounded-lg cursor-pointer hover:scale-110 transition border border-cyber">
-          <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbms0bnFlZWZtdTJseWF4cmtyazU5YXlsMTRjOXRneTZrbTV2NmV2bSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKsjLuL324yPBU4/giphy.gif" onclick="sendSticker(this.src)" class="w-12 h-12 object-cover rounded-lg cursor-pointer hover:scale-110 transition border border-cyber">
+        <!-- Popover de Figurinhas Pré-definidas -->
+        <div id="stickerPicker" class="hidden absolute bottom-16 left-4 right-4 bg-[#08090d] border border-cyan-500/40 p-3 rounded-2xl shadow-2xl z-30 grid grid-cols-4 gap-2 backdrop-blur-md">
+          <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHY5eWJreXVnY241OHI1b3R5bHdqdXJkZXBvZXAxaXNmMXdrODR5MSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l3q2K5jinAlChoCLS/giphy.gif" onclick="sendSticker(this.src)" class="w-12 h-12 object-cover rounded-lg cursor-pointer hover:scale-110 transition border border-cyan-500/30">
+          <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNndicm95c2RrbjUzeXZrYjE1ejUxeXh6cWV6NDdpcXlneXB1MWo4OSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/26u4cqiYI30juCOGY/giphy.gif" onclick="sendSticker(this.src)" class="w-12 h-12 object-cover rounded-lg cursor-pointer hover:scale-110 transition border border-cyan-500/30">
+          <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3Z0bjJvaWtwYm4zeGtwOHdzdTFneXV6aTFneTBqOWtsaDRocTZ3cCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/13CoXDiaCcCoyk/giphy.gif" onclick="sendSticker(this.src)" class="w-12 h-12 object-cover rounded-lg cursor-pointer hover:scale-110 transition border border-cyan-500/30">
+          <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbms0bnFlZWZtdTJseWF4cmtyazU5YXlsMTRjOXRneTZrbTV2NmV2bSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKsjLuL324yPBU4/giphy.gif" onclick="sendSticker(this.src)" class="w-12 h-12 object-cover rounded-lg cursor-pointer hover:scale-110 transition border border-cyan-500/30">
         </div>
 
         <div class="flex gap-2 items-center">
-          <button onclick="toggleStickerPicker()" class="text-gray-400 hover:text-amber-400 text-sm px-2 py-1 transition" title="Enviar GIF / Figurinha">
+          <button onclick="toggleStickerPicker()" class="text-gray-400 hover:text-cyan-400 text-sm px-2 py-1 transition" title="Enviar GIF / Figurinha">
             <i class="fa-solid fa-face-smile"></i>
           </button>
-          <button onclick="document.getElementById('deviceImageInput').click()" class="text-gray-400 hover:text-cyan-400 text-sm px-2 py-1 transition" title="Carregar Imagem/GIF do Dispositivo">
+          <button onclick="document.getElementById('deviceImageInput').click()" class="text-gray-400 hover:text-pink-400 text-sm px-2 py-1 transition" title="Enviar do Celular/PC (50x50)">
             <i class="fa-solid fa-image"></i>
           </button>
-          <input id="chatInput" type="text" placeholder="Escreva a mensagem ou /ia..." onkeydown="if(event.key==='Enter') sendChatMessage()" class="flex-1 bg-cyber-dark border border-cyber rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400">
+          <input id="chatInput" type="text" placeholder="Escreva no chat ou /ia..." onkeydown="if(event.key==='Enter') sendChatMessage()" class="flex-1 bg-[#08090d] border border-cyan-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400">
           <button onclick="sendChatMessage()" class="bg-cyan-600 hover:bg-cyan-500 text-white text-xs px-3 py-2 rounded-xl transition shadow">
             <i class="fa-solid fa-paper-plane"></i>
           </button>
@@ -379,32 +383,32 @@
   </main>
 
   <!-- Modal Checkout / Plano PRO -->
-  <div id="checkoutModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-    <div class="bg-cyber-card border border-amber-500/50 rounded-2xl max-w-md w-full p-6 shadow-2xl neon-glow-amber relative">
+  <div id="checkoutModal" class="fixed inset-0 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+    <div class="bg-[#0f111a] border-pink-glow rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
       <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
       
       <div class="text-center mb-5">
-        <div class="inline-block p-3 bg-amber-500/10 text-amber-400 rounded-full mb-2.5 border border-amber-500/30">
+        <div class="inline-flex p-3 bg-pink-500/10 text-pink-400 rounded-2xl mb-2.5 border border-pink-500/30">
           <i class="fa-solid fa-crown text-2xl"></i>
         </div>
-        <h3 class="text-base font-bold text-white">M.Y.MidiaStream <span class="text-amber-400">PRO</span></h3>
-        <p class="text-xs text-gray-400 mt-1">Desbloqueie 4K, 240 FPS, Sincronização YouTube e Streams OBS.</p>
+        <h3 class="text-base font-bold text-white">M.Y.MIDIASTREAM <span class="text-pink-400">PRO</span></h3>
+        <p class="text-xs text-gray-400 mt-1">Desbloqueie 4K, 240 FPS, YouTube Sync e Transmissão via OBS.</p>
       </div>
 
-      <div class="bg-cyber-dark p-4 rounded-xl border border-cyber mb-5 flex justify-between items-center">
+      <div class="bg-[#08090d] p-4 rounded-xl border border-pink-500/30 mb-5 flex justify-between items-center">
         <div>
-          <span class="text-[11px] text-gray-400 block">Licença Mensal (30 Dias)</span>
-          <span class="text-base font-bold text-white">R$ 19,90 <span class="text-xs text-gray-500 font-normal">/ mês</span></span>
+          <span class="text-[11px] text-gray-400 block">Licença Mensal</span>
+          <span class="text-base font-bold text-white">R$ 19,90 <span class="text-xs text-gray-500 font-normal">/ 30 dias</span></span>
         </div>
         <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full border border-emerald-500/30 font-bold">Ativação Imediata</span>
       </div>
 
       <div class="space-y-3.5 mb-5">
         <div class="text-center bg-white p-4 rounded-xl">
-          <div class="w-28 h-28 mx-auto bg-gray-900 flex items-center justify-center text-amber-400 rounded-lg mb-2">
+          <div class="w-28 h-28 mx-auto bg-gray-900 flex items-center justify-center text-pink-400 rounded-lg mb-2">
             <i class="fa-solid fa-qrcode text-5xl"></i>
           </div>
-          <span class="text-[10px] text-gray-700 font-mono font-bold">Chave Pix: mymidiastream@pagamento.br</span>
+          <span class="text-[10px] text-gray-800 font-mono font-bold">Chave Pix: mymidiastream@pagamento.br</span>
         </div>
 
         <button onclick="simulateSuccessfulPayment()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-3 px-4 rounded-xl transition flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.4)]">
@@ -412,11 +416,11 @@
         </button>
       </div>
 
-      <p class="text-[10px] text-center text-gray-500">Pagamento processado em ambiente seguro SSL & Pix.</p>
+      <p class="text-[10px] text-center text-gray-500">Pagamento processado via Pix com ativação automática na sala.</p>
     </div>
   </div>
 
-  <!-- Script Principal da Aplicação -->
+  <!-- Lógica da Aplicação -->
   <script>
     let currentUser = null;
     let isPro = false;
@@ -426,8 +430,8 @@
     let ytPlayer = null;
     let isYtReady = false;
     let isCinema = false;
-    let remotePeerNickname = "Participante";
-    let roomCode = null;
+    let remotePeerNickname = "Amigo";
+    let currentRoomId = null;
 
     const peerConfig = {
       config: {
@@ -439,154 +443,43 @@
       }
     };
 
-    function switchAuthTab(tab) {
-      if (tab === 'login') {
-        document.getElementById('formLogin').classList.remove('hidden');
-        document.getElementById('formRegister').classList.add('hidden');
-        document.getElementById('tabLoginBtn').className = 'flex-1 py-2 text-xs font-bold rounded-lg bg-cyan-600 text-white transition shadow';
-        document.getElementById('tabRegisterBtn').className = 'flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 hover:text-white transition';
-      } else {
-        document.getElementById('formLogin').classList.add('hidden');
-        document.getElementById('formRegister').classList.remove('hidden');
-        document.getElementById('tabRegisterBtn').className = 'flex-1 py-2 text-xs font-bold rounded-lg bg-cyan-600 text-white transition shadow';
-        document.getElementById('tabLoginBtn').className = 'flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 hover:text-white transition';
-      }
-    }
-
-    function handleRegister() {
-      const nickname = document.getElementById('regNickname').value.trim();
-      const email = document.getElementById('regEmail').value.trim().toLowerCase();
-      const password = document.getElementById('regPassword').value.trim();
-
-      if (!nickname || !email || !password) {
-        return alert('Por favor, preencha todos os campos de registo.');
-      }
-
-      let users = JSON.parse(localStorage.getItem('mymidia_users') || '[]');
-      if (users.some(u => u.email === email)) {
-        return alert('Este e-mail já está registado.');
-      }
-
-      const newUser = { nickname, email, password, isPro: false };
-      users.push(newUser);
-      localStorage.setItem('mymidia_users', JSON.stringify(users));
-
-      loginUserSession(newUser);
-    }
-
     function handleLogin() {
-      const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-      const password = document.getElementById('loginPassword').value.trim();
+      const nickname = document.getElementById('loginNickname').value.trim() || "User_" + Math.floor(Math.random() * 1000);
+      const email = document.getElementById('loginEmail').value.trim() || "user@stream.com";
 
-      if (!email || !password) {
-        const visitorName = "Operador_" + Math.floor(Math.random() * 1000);
-        loginUserSession({ nickname: visitorName, email: "operador@cyber.com", isPro: false });
-        return;
-      }
-
-      let users = JSON.parse(localStorage.getItem('mymidia_users') || '[]');
-      let user = users.find(u => u.email === email && u.password === password);
-
-      if (!user) {
-        const defaultName = email.split('@')[0];
-        user = { nickname: defaultName.charAt(0).toUpperCase() + defaultName.slice(1), email, password, isPro: false };
-        users.push(user);
-        localStorage.setItem('mymidia_users', JSON.stringify(users));
-      }
-
-      loginUserSession(user);
-    }
-
-    function loginUserSession(user) {
-      currentUser = user;
-      isPro = user.isPro || false;
-
-      document.getElementById('displayNickname').innerText = user.nickname;
-      document.getElementById('dashNicknameInput').value = user.nickname;
-      document.getElementById('localStreamLabel').innerText = `O seu Ecrã (${user.nickname})`;
+      currentUser = { nickname, email, isPro: false };
+      document.getElementById('displayNickname').innerText = nickname;
+      document.getElementById('dashNicknameInput').value = nickname;
+      document.getElementById('localStreamLabel').innerText = `O seu Ecrã (${nickname})`;
       document.getElementById('loginModal').classList.add('hidden');
-
-      if (isPro) {
-        activateProUI();
-      }
 
       initSessionRoom();
       loadYouTubeAPI();
     }
 
-    function editMyNickname() {
-      toggleDashboardModal();
-    }
-
-    function saveDashNickname() {
-      const newName = document.getElementById('dashNicknameInput').value.trim();
-      if (!newName) return alert('Insira um nome válido.');
-
-      currentUser.nickname = newName;
-      document.getElementById('displayNickname').innerText = newName;
-      document.getElementById('localStreamLabel').innerText = `O seu Ecrã (${newName})`;
-
-      let users = JSON.parse(localStorage.getItem('mymidia_users') || '[]');
-      users = users.map(u => u.email === currentUser.email ? currentUser : u);
-      localStorage.setItem('mymidia_users', JSON.stringify(users));
-
-      if (conn && conn.open) {
-        conn.send({ type: 'nickname', name: newName });
-      }
-      alert('Apelido atualizado com sucesso!');
-      toggleDashboardModal();
-    }
-
-    function toggleDashboardModal() {
-      const modal = document.getElementById('dashboardModal');
-      modal.classList.toggle('hidden');
-      modal.classList.toggle('flex');
-    }
-
-    function joinCustomRoom() {
-      const customId = document.getElementById('dashCustomRoomInput').value.trim();
-      if (!customId) return alert('Insira um ID de sala válido.');
-      const cleanId = 'mms-' + customId.toLowerCase().replace(/[^a-z0-9-_]/g, '');
-      const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?sala=' + cleanId;
-      window.location.href = newUrl;
-    }
-
-    function copyStreamKey() {
-      navigator.clipboard.writeText(document.getElementById('obsStreamKey').value);
-      alert('Chave de transmissão copiada com sucesso!');
-    }
-
-    function checkFpsSelection(selectElem) {
-      const val = parseInt(selectElem.value);
-      if ((val === 120 || val === 240) && !isPro) {
-        alert('As taxas de 120 FPS e 240 FPS são exclusivas da versão PRO!');
-        selectElem.value = "60";
-        openCheckoutModal();
-      }
-    }
-
     function initSessionRoom() {
       const urlParams = new URLSearchParams(window.location.search);
-      const targetRoom = urlParams.get('sala');
+      const roomParam = urlParams.get('sala');
 
-      if (targetRoom) {
-        roomCode = targetRoom;
-        peer = new Peer(roomCode, peerConfig);
+      if (roomParam) {
+        currentRoomId = roomParam;
+        const myPeerId = currentRoomId + "-guest-" + Math.random().toString(36).substring(2, 6);
+        peer = new Peer(myPeerId, peerConfig);
 
-        peer.on('open', (id) => {
+        peer.on('open', () => {
           document.getElementById('roomLinkDisplay').innerText = window.location.href;
-          connectToRoomHost(targetRoom);
+          connectToPeerHost(currentRoomId);
         });
       } else {
-        roomCode = 'mms-' + Math.random().toString(36).substring(2, 8);
-        const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?sala=' + roomCode;
+        currentRoomId = "mms-neon-" + Math.random().toString(36).substring(2, 8);
+        const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?sala=' + currentRoomId;
         window.history.replaceState({path: newUrl}, '', newUrl);
 
-        peer = new Peer(roomCode, peerConfig);
+        peer = new Peer(currentRoomId, peerConfig);
 
-        peer.on('open', (id) => {
+        peer.on('open', () => {
           document.getElementById('roomLinkDisplay').innerText = newUrl;
-          document.getElementById('connectionStatus').innerText = 'Pronto (Aguardando)';
+          document.getElementById('connectionStatus').innerText = 'Pronto (Aguardando Amigos)';
           document.getElementById('connectionStatus').className = 'text-[10px] bg-amber-900/80 text-amber-300 px-2.5 py-0.5 rounded-full border border-amber-500/30';
         });
       }
@@ -603,7 +496,7 @@
       });
     }
 
-    function connectToRoomHost(hostId) {
+    function connectToPeerHost(hostId) {
       const connection = peer.connect(hostId);
       setupConnectionEvents(connection);
 
@@ -611,7 +504,7 @@
         if (localStream) {
           peer.call(hostId, localStream);
         }
-      }, 1000);
+      }, 1200);
     }
 
     function setupConnectionEvents(connection) {
@@ -620,7 +513,7 @@
       const handleOpen = () => {
         document.getElementById('connectionStatus').innerText = 'Conectado à Sala';
         document.getElementById('connectionStatus').className = 'text-[10px] bg-emerald-900/80 text-emerald-300 px-2.5 py-0.5 rounded-full border border-emerald-500/30';
-        const myName = currentUser ? currentUser.nickname : 'Operador';
+        const myName = currentUser ? currentUser.nickname : 'Visitante';
         conn.send({ type: 'nickname', name: myName });
       };
 
@@ -637,7 +530,7 @@
         if (data.type === 'nickname') {
           remotePeerNickname = data.name;
           document.getElementById('remoteStreamLabel').innerText = `Ecrã de ${remotePeerNickname}`;
-          const currentMyName = currentUser ? currentUser.nickname : 'Operador';
+          const currentMyName = currentUser ? currentUser.nickname : 'Visitante';
           document.getElementById('roomParticipantsInfo').innerText = `Sala (${currentMyName} & ${remotePeerNickname})`;
         }
         if (data.type === 'ytSync') handleRemoteYtSync(data);
@@ -646,22 +539,47 @@
 
       conn.on('close', () => {
         document.getElementById('connectionStatus').innerText = 'Desconectado';
-        document.getElementById('connectionStatus').className = 'text-[10px] bg-red-900/80 text-red-300 px-2.5 py-0.5 rounded-full border border-red-500/30';
+        document.getElementById('connectionStatus').className = 'text-[10px] bg-pink-900/80 text-pink-300 px-2.5 py-0.5 rounded-full border border-pink-500/30';
       });
     }
 
     function copyRoomLink() {
       navigator.clipboard.writeText(document.getElementById('roomLinkDisplay').innerText);
-      alert('Link da sala copiado com sucesso!');
+      alert('Link da sala copiado! Envie para o seu amigo para entrarem na mesma sala.');
     }
 
-    function toggleVideoFullscreen(videoId) {
-      const videoElem = document.getElementById(videoId);
-      if (!document.fullscreenElement) {
-        if (videoElem.requestFullscreen) videoElem.requestFullscreen();
-      } else {
-        if (document.exitFullscreen) document.exitFullscreen();
+    function toggleDashboardModal() {
+      const modal = document.getElementById('dashboardModal');
+      modal.classList.toggle('hidden');
+      modal.classList.toggle('flex');
+    }
+
+    function saveDashNickname() {
+      const newName = document.getElementById('dashNicknameInput').value.trim();
+      if (!newName) return alert('Insira um nome válido.');
+
+      currentUser.nickname = newName;
+      document.getElementById('displayNickname').innerText = newName;
+      document.getElementById('localStreamLabel').innerText = `O seu Ecrã (${newName})`;
+
+      if (conn && conn.open) {
+        conn.send({ type: 'nickname', name: newName });
       }
+      alert('Apelido atualizado!');
+      toggleDashboardModal();
+    }
+
+    function joinCustomRoom() {
+      const customId = document.getElementById('dashCustomRoomInput').value.trim();
+      if (!customId) return alert('Insira o ID de uma sala.');
+      const cleanId = 'mms-neon-' + customId.toLowerCase().replace(/[^a-z0-9-_]/g, '');
+      const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?sala=' + cleanId;
+      window.location.href = newUrl;
+    }
+
+    function copyStreamKey() {
+      navigator.clipboard.writeText(document.getElementById('obsStreamKey').value);
+      alert('Chave OBS copiada!');
     }
 
     function toggleStickerPicker() {
@@ -669,7 +587,7 @@
     }
 
     function sendSticker(imgUrl) {
-      const myName = currentUser ? currentUser.nickname : 'Operador';
+      const myName = currentUser ? currentUser.nickname : 'Visitante';
       appendChatMessage(myName, imgUrl, true);
       if (conn && conn.open) {
         conn.send({ type: 'chat', sender: myName, text: imgUrl, isSticker: true });
@@ -684,7 +602,7 @@
       const reader = new FileReader();
       reader.onload = function(e) {
         const base64Img = e.target.result;
-        const myName = currentUser ? currentUser.nickname : 'Operador';
+        const myName = currentUser ? currentUser.nickname : 'Visitante';
         appendChatMessage(myName, base64Img, true);
         if (conn && conn.open) {
           conn.send({ type: 'chat', sender: myName, text: base64Img, isSticker: true });
@@ -698,7 +616,7 @@
       const text = input.value.trim();
       if (!text) return;
 
-      const myName = currentUser ? currentUser.nickname : 'Operador';
+      const myName = currentUser ? currentUser.nickname : 'Visitante';
       appendChatMessage(myName, text, false);
       if (conn && conn.open) {
         conn.send({ type: 'chat', sender: myName, text: text, isSticker: false });
@@ -708,11 +626,11 @@
       if (text.toLowerCase().startsWith('/ia')) {
         const query = text.replace(/^\/ia\s*/i, '');
         if (!query) {
-          appendChatMessage('🤖 Gemini AI', 'Olá! Como posso ajudar? Digite `/ia [sua pergunta]`.');
+          appendChatMessage('🤖 Gemini AI', 'Digite `/ia [sua pergunta]` para perguntar algo!');
           return;
         }
 
-        appendChatMessage('🤖 Gemini AI', 'A processar consulta neural...');
+        appendChatMessage('🤖 Gemini AI', 'Processando resposta...');
         
         try {
           const aiResponse = await getGeminiAIResponse(query);
@@ -722,7 +640,7 @@
         } catch (e) {
           const chatBox = document.getElementById('chatMessages');
           chatBox.lastChild.remove();
-          appendChatMessage('🤖 Gemini AI', 'Erro ao processar resposta da IA.');
+          appendChatMessage('🤖 Gemini AI', 'Erro ao obter resposta da IA.');
         }
       }
     }
@@ -730,22 +648,22 @@
     async function getGeminiAIResponse(prompt) {
       const p = prompt.toLowerCase();
       if (p.includes('fivem') || p.includes('lua')) {
-        return 'Para scripts FiveM/Lua, otimize threads com `Citizen.Wait` e utilize eventos seguros `RegisterNetEvent`.';
+        return 'Em FiveM/Lua, sincronize dados usando `TriggerServerEvent` e otimize o consumo com `Citizen.Wait()`.';
       } else if (p.includes('godot') || p.includes('gdscript')) {
-        return 'No Godot 4, utilize `move_and_slide()` no CharacterBody3D para movimentação fluida.';
+        return 'No Godot 4, use `CharacterBody3D` com `move_and_slide()` para movimentação precisa de jogadores.';
       }
-      return `Análise concluída para "${prompt}". Como assistente Gemini no M.Y.MidiaStream, estou pronto para auxiliar na transmissão!`;
+      return `Compreendi a pergunta sobre "${prompt}". Como assistente Gemini no M.Y.MIDIASTREAM, estou pronto para ajudar!`;
     }
 
     function appendChatMessage(sender, content, isSticker = false) {
       const chatBox = document.getElementById('chatMessages');
       const msgDiv = document.createElement('div');
-      msgDiv.className = 'bg-cyber-dark p-2 rounded-xl border border-cyber flex flex-col gap-1';
+      msgDiv.className = 'bg-[#08090d] p-2 rounded-xl border border-cyan-500/20 flex flex-col gap-1 shadow';
       const isAI = sender.includes('Gemini');
       const colorClass = isAI ? 'text-amber-400 font-bold' : 'text-cyan-400 font-bold';
 
       if (isSticker) {
-        msgDiv.innerHTML = `<span class="${colorClass}">${sender}:</span><img src="${content}" style="width: 50px; height: 50px;" class="rounded-lg border border-cyan-500/40 object-cover mt-1 shadow">`;
+        msgDiv.innerHTML = `<span class="${colorClass}">${sender}:</span><img src="${content}" style="width: 50px; height: 50px;" class="rounded-lg border border-cyan-500/40 object-cover mt-1 shadow-[0_0_8px_rgba(0,242,254,0.3)]">`;
       } else {
         msgDiv.innerHTML = `<span class="${colorClass}">${sender}:</span> <span class="text-gray-200">${content}</span>`;
       }
@@ -766,7 +684,7 @@
       span.innerText = emoji;
       span.style.left = Math.random() * 80 + 10 + '%';
       area.appendChild(span);
-      setTimeout(() => span.remove(), 2500);
+      setTimeout(() => span.remove(), 2200);
     }
 
     function openCheckoutModal() { document.getElementById('checkoutModal').classList.remove('hidden'); document.getElementById('checkoutModal').classList.add('flex'); }
@@ -774,16 +692,11 @@
 
     function simulateSuccessfulPayment() {
       isPro = true;
-      if (currentUser) {
-        currentUser.isPro = true;
-        let users = JSON.parse(localStorage.getItem('mymidia_users') || '[]');
-        users = users.map(u => u.email === currentUser.email ? currentUser : u);
-        localStorage.setItem('mymidia_users', JSON.stringify(users));
-      }
+      if (currentUser) currentUser.isPro = true;
 
       closeCheckoutModal();
       activateProUI();
-      alert('Plano PRO ativado com sucesso em sua conta!');
+      alert('Plano PRO ativado com sucesso!');
     }
 
     function activateProUI() {
@@ -798,6 +711,15 @@
       document.querySelectorAll('.pro-option').forEach(opt => {
         opt.disabled = false;
       });
+    }
+
+    function checkFpsSelection(selectElem) {
+      const val = parseInt(selectElem.value);
+      if ((val === 120 || val === 240) && !isPro) {
+        alert('As taxas de 120 FPS e 240 FPS são exclusivas do Plano PRO!');
+        selectElem.value = "60";
+        openCheckoutModal();
+      }
     }
 
     function toggleCinemaMode() {
@@ -837,9 +759,7 @@
         displayLocalStream(localStream);
         document.getElementById('btnStartStream').innerHTML = `<i class="fa-solid fa-stop"></i> PARAR PARTILHA`;
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const targetRoom = urlParams.get('sala');
-        if (targetRoom) peer.call(targetRoom, localStream);
+        if (currentRoomId) peer.call(currentRoomId, localStream);
         if (conn && conn.peer) peer.call(conn.peer, localStream);
 
         localStream.getVideoTracks()[0].onended = () => { toggleScreenShare(); };
@@ -862,17 +782,26 @@
       document.getElementById('remotePlaceholder').classList.add('hidden');
     }
 
+    function toggleVideoFullscreen(videoId) {
+      const videoElem = document.getElementById(videoId);
+      if (!document.fullscreenElement) {
+        if (videoElem.requestFullscreen) videoElem.requestFullscreen();
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    }
+
     function switchTab(tab) {
       if (tab === 'screen') {
         document.getElementById('screenView').classList.remove('hidden');
         document.getElementById('youtubeView').classList.add('hidden');
-        document.getElementById('tabScreen').className = 'flex-1 py-2 text-xs font-bold rounded-lg bg-cyan-600 text-white transition shadow';
-        document.getElementById('tabYoutube').className = 'flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 hover:text-white transition';
+        document.getElementById('tabScreen').className = 'flex-1 py-2 text-xs font-bold rounded-lg bg-cyan-600 text-white transition shadow-[0_0_10px_rgba(0,242,254,0.3)] flex items-center justify-center gap-2';
+        document.getElementById('tabYoutube').className = 'flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 hover:text-white transition flex items-center justify-center gap-2';
       } else {
         document.getElementById('screenView').classList.add('hidden');
         document.getElementById('youtubeView').classList.remove('hidden');
-        document.getElementById('tabYoutube').className = 'flex-1 py-2 text-xs font-bold rounded-lg bg-cyan-600 text-white transition shadow';
-        document.getElementById('tabScreen').className = 'flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 hover:text-white transition';
+        document.getElementById('tabYoutube').className = 'flex-1 py-2 text-xs font-bold rounded-lg bg-cyan-600 text-white transition shadow-[0_0_10px_rgba(0,242,254,0.3)] flex items-center justify-center gap-2';
+        document.getElementById('tabScreen').className = 'flex-1 py-2 text-xs font-bold rounded-lg text-gray-400 hover:text-white transition flex items-center justify-center gap-2';
       }
     }
 
