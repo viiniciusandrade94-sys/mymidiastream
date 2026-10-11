@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>M.Y.MidiaStream - Transmissão Privada & IA Chat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #07090e;
+      --panel-bg: rgba(15, 20, 32, 0.85);
+      --neon-cyan: #00f3ff;
+      --neon-pink: #ff007f;
+      --neon-purple: #9d00ff;
+      --text-main: #f0f4f8;
+      --text-muted: #8a99ad;
+      --border-color: rgba(0, 243, 255, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(157, 0, 255, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(0, 243, 255, 0.08) 0%, transparent 40%);
+    }
+
+    /* HEADER / NAVBAR */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background: rgba(7, 9, 14, 0.9);
+      border-bottom: 1px solid var(--border-color);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+    }
+
+    .brand {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+    }
+
+    .brand span {
+      color: var(--neon-cyan);
+    }
+
+    .user-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .badge-pro {
+      background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+      color: #fff;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 0 0 10px rgba(255, 0, 127, 0.4);
+    }
+
+    .btn {
+      background: transparent;
+      border: 1px solid var(--neon-cyan);
+      color: var(--neon-cyan);
+      padding: 0.5rem 1.2rem;
+      border-radius: 6px;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn:hover {
+      background: rgba(0, 243, 255, 0.15);
+      box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .btn-pink {
+      border-color: var(--neon-pink);
+      color: var(--neon-pink);
+    }
+
+    .btn-pink:hover {
+      background: rgba(255, 0, 127, 0.15);
+      box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
+    }
+
+    /* MAIN CONTAINER */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* DASHBOARD / AUTH SECTIONS */
+    .dashboard-panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    }
+
+    .auth-container {
+      max-width: 450px;
+      margin: 3rem auto;
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 1.2rem;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.4rem;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      background: rgba(7, 9, 14, 0.8);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 1rem;
+      outline: none;
+      transition: border 0.3s;
+    }
+
+    .form-control:focus {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 8px rgba(0, 243, 255, 0.3);
+    }
+
+    /* STREAMING ROOM LAYOUT */
+    .room-container {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 1.5rem;
+      height: calc(100vh - 140px);
+    }
+
+    @media (max-width: 992px) {
+      .room-container {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+    }
+
+    /* STREAM PLAYER CONTAINER */
+    .stream-viewport {
+      background: #000;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+    }
+
+    .stream-placeholder {
+      text-align: center;
+      color: var(--text-muted);
+      padding: 2rem;
+    }
+
+    .stream-placeholder h2 {
+      color: var(--text-main);
+      font-family: 'Orbitron', sans-serif;
+      margin-bottom: 1rem;
+    }
+
+    .player-controls {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .stream-viewport:hover .player-controls {
+      opacity: 1;
+    }
+
+    /* CHAT PANEL */
+    .chat-panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+    }
+
+    .chat-header {
+      padding: 1rem;
+      background: rgba(7, 9, 14, 0.6);
+      border-bottom: 1px solid var(--border-color);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 1rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .chat-msg {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 0.6rem 0.8rem;
+      border-radius: 6px;
+      border-left: 3px solid var(--neon-cyan);
+      font-size: 0.95rem;
+      word-break: break-word;
+    }
+
+    .chat-msg.ai-msg {
+      border-left-color: var(--neon-pink);
+      background: rgba(255, 0, 127, 0.05);
+    }
+
+    .chat-msg .sender {
+      font-weight: 700;
+      color: var(--neon-cyan);
+      margin-bottom: 0.2rem;
+      font-size: 0.85rem;
+      display: block;
+    }
+
+    .chat-msg.ai-msg .sender {
+      color: var(--neon-pink);
+    }
+
+    .chat-input-area {
+      padding: 0.8rem;
+      background: rgba(7, 9, 14, 0.8);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .chat-input-box {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .chat-hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      backdrop-filter: blur(5px);
+    }
+
+    .modal-card {
+      background: var(--bg-dark);
+      border: 1px solid var(--neon-pink);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 500px;
+      padding: 2rem;
+      box-shadow: 0 0 30px rgba(255, 0, 127, 0.3);
+      text-align: center;
+      position: relative;
+    }
+
+    .modal-card h2 {
+      font-family: 'Orbitron', sans-serif;
+      color: #fff;
+      margin-bottom: 1rem;
+    }
+
+    .modal-card ul {
+      text-align: left;
+      margin: 1.5rem 0;
+      list-style: none;
+    }
+
+    .modal-card ul li {
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .modal-card ul li::before {
+      content: "✓";
+      color: var(--neon-cyan);
+      font-weight: bold;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="brand">M.Y.<span>MidiaStream</span></div>
+    <div class="user-actions">
+      <span id="proBadge" class="badge-pro hidden">Pro Ativo</span>
+      <button id="btnOpenProModal" class="btn btn-pink">Seja Pro</button>
+      <button id="btnLogout" class="btn hidden">Sair</button>
+    </div>
+  </header>
+
+  <!-- MAIN AREA -->
+  <main>
+    <!-- LOGIN / REGISTER VIEW -->
+    <section id="authSection" class="dashboard-panel auth-container">
+      <h2 style="font-family:'Orbitron'; margin-bottom: 1.5rem;" id="authTitle">Acessar Plataforma</h2>
+      <form id="authForm">
+        <div class="form-group">
+          <label for="inputUsername">Usuário</label>
+          <input type="text" id="inputUsername" class="form-control" placeholder="Seu apelido ou e-mail" required>
+        </div>
+        <div class="form-group">
+          <label for="inputPassword">Senha</label>
+          <input type="password" id="inputPassword" class="form-control" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn" style="width: 100%; margin-top: 1rem;">Entrar / Cadastrar</button>
+      </form>
+    </section>
+
+    <!-- USER DASHBOARD VIEW -->
+    <section id="dashboardSection" class="dashboard-panel hidden">
+      <h2 style="font-family:'Orbitron'; margin-bottom: 1rem;">Bem-vindo ao Painel</h2>
+      <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Crie uma nova sala privada de transmissão ou continue em uma sessão salva.</p>
+
+      <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+        <button id="btnCreateRoom" class="btn">🚀 Criar Nova Sala Privada</button>
+      </div>
+
+      <h3 style="font-family:'Orbitron'; font-size: 1.1rem; margin-bottom: 1rem;">Suas Salas Salvas</h3>
+      <div id="roomHistoryList" style="display: flex; flex-direction: column; gap: 0.8rem;">
+        <p style="color: var(--text-muted);">Nenhuma sala criada até o momento.</p>
+      </div>
+    </section>
+
+    <!-- STREAM ROOM VIEW -->
+    <section id="roomSection" class="room-container hidden">
+      <!-- VIDEO STREAMING AREA -->
+      <div class="stream-viewport" id="streamViewport">
+        <video id="remoteVideo" autoplay playsinline></video>
+        
+        <div id="streamPlaceholder" class="stream-placeholder">
+          <h2>Sala Privada Pronta</h2>
+          <p>Envie o link para os seus ouvintes ou inicie a sua transmissão de tela abaixo.</p>
+          <div style="margin-top: 1.5rem;">
+            <button id="btnStartStream" class="btn">Compartilhar Tela e Áudio</button>
+          </div>
+        </div>
+
+        <!-- PLAYER CONTROLS OVERLAY -->
+        <div class="player-controls">
+          <span style="font-size: 0.9rem; color: var(--text-muted);" id="roomStatusText">Sessão Ativa</span>
+          <div style="display: flex; gap: 0.5rem;">
+            <button id="btnToggleFullscreen" class="btn" style="padding: 0.3rem 0.8rem; font-size: 0.85rem;">⛶ Tela Cheia</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHAT & AI PANEL -->
+      <div class="chat-panel">
+        <div class="chat-header">
+          <span>Chat da Sala</span>
+          <span style="font-size: 0.75rem; color: var(--neon-cyan);">Ao Vivo</span>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+          <div class="chat-msg ai-msg">
+            <span class="sender">M.Y. AI Bot</span>
+            Bem-vindo ao chat! Digite <strong>/ia [sua pergunta]</strong> para usar a inteligência artificial Gemini durante a transmissão.
+          </div>
+        </div>
+
+        <div class="chat-input-area">
+          <div class="chat-input-box">
+            <input type="text" id="chatInput" class="form-control" placeholder="Digite uma mensagem ou /ia..." />
+            <button id="btnSendMsg" class="btn">Enviar</button>
+          </div>
+          <span class="chat-hint">Dica: Digite <strong>/ia [pergunta]</strong> para interagir com o Gemini.</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL PLANO PRO (INFINITEPAY INTEGRATION) -->
+  <div id="proModal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <button id="btnCloseProModal" class="close-modal">&times;</button>
+      <h2>M.Y.MidiaStream <span style="color: var(--neon-pink);">PRO</span></h2>
+      <p style="color: var(--text-muted);">Eleve o nível das suas transmissões privadas para alta definição sem limites.</p>
+      
+      <ul>
+        <li>Salas ilimitadas e sem expiração</li>
+        <li>Mais ouvintes simultâneos na sala</li>
+        <li>Uso expandido da IA Gemini no chat (/ia)</li>
+        <li>Transmissão em qualidade máxima HD/60fps</li>
+      </ul>
+
+      <div style="margin-top: 2rem;">
+        <a id="btnSubscribePro" href="https://link.infinitepay.io/keygroup/VC1DLTEtSQ-58Jk5BA1jB-19,90" target="_blank" class="btn btn-pink" style="width: 100%; text-decoration: none; display: block; text-align: center; box-sizing: border-box;">
+          Assinar Plano Pro - R$ 19,90/mês
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPLICATION LOGIC -->
+  <script>
+    // GLOBAL STATE
+    const STATE = {
+      user: null,
+      isPro: false,
+      currentRoomId: null,
+      localStream: null,
+      history: []
+    };
+
+    // DOM ELEMENTS
+    const el = {
+      authSection: document.getElementById('authSection'),
+      dashboardSection: document.getElementById('dashboardSection'),
+      roomSection: document.getElementById('roomSection'),
+      authForm: document.getElementById('authForm'),
+      inputUsername: document.getElementById('inputUsername'),
+      btnLogout: document.getElementById('btnLogout'),
+      btnCreateRoom: document.getElementById('btnCreateRoom'),
+      roomHistoryList: document.getElementById('roomHistoryList'),
+      proBadge: document.getElementById('proBadge'),
+      btnOpenProModal: document.getElementById('btnOpenProModal'),
+      btnCloseProModal: document.getElementById('btnCloseProModal'),
+      proModal: document.getElementById('proModal'),
+      btnStartStream: document.getElementById('btnStartStream'),
+      streamPlaceholder: document.getElementById('streamPlaceholder'),
+      remoteVideo: document.getElementById('remoteVideo'),
+      streamViewport: document.getElementById('streamViewport'),
+      btnToggleFullscreen: document.getElementById('btnToggleFullscreen'),
+      chatMessages: document.getElementById('chatMessages'),
+      chatInput: document.getElementById('chatInput'),
+      btnSendMsg: document.getElementById('btnSendMsg')
+    };
+
+    // INITIALIZATION
+    window.addEventListener('DOMContentLoaded', () => {
+      checkProUrlStatus();
+      loadStoredSession();
+      setupEventListeners();
+    });
+
+    // CHECK IF RETURNED FROM PAYMENT WITH ?status=sucesso
+    function checkProUrlStatus() {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('status') === 'sucesso' || urlParams.get('assinatura') === 'sucesso') {
+        localStorage.setItem('my_midiastream_pro', 'true');
+        alert('🎉 Pagamento confirmado com sucesso! O seu Plano Pro está ativo.');
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+
+      if (localStorage.getItem('my_midiastream_pro') === 'true') {
+        STATE.isPro = true;
+        el.proBadge.classList.remove('hidden');
+        el.btnOpenProModal.classList.add('hidden');
+      }
+    }
+
+    function loadStoredSession() {
+      const savedUser = localStorage.getItem('my_midiastream_user');
+      if (savedUser) {
+        STATE.user = JSON.parse(savedUser);
+        showDashboard();
+      } else {
+        showAuth();
+      }
+    }
+
+    function setupEventListeners() {
+      // Auth
+      el.authForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const username = el.inputUsername.value.trim();
+        if (!username) return;
+        
+        STATE.user = { username };
+        localStorage.setItem('my_midiastream_user', JSON.stringify(STATE.user));
+        showDashboard();
+      });
+
+      el.btnLogout.addEventListener('click', () => {
+        localStorage.removeItem('my_midiastream_user');
+        STATE.user = null;
+        showAuth();
+      });
+
+      // Modals
+      el.btnOpenProModal.addEventListener('click', () => el.proModal.classList.remove('hidden'));
+      el.btnCloseProModal.addEventListener('click', () => el.proModal.classList.add('hidden'));
+
+      // Navigation & Rooms
+      el.btnCreateRoom.addEventListener('click', createNewRoom);
+
+      // Streaming
+      el.btnStartStream.addEventListener('click', startScreenCapture);
+      el.btnToggleFullscreen.addEventListener('click', toggleFullscreen);
+
+      // Chat
+      el.btnSendMsg.addEventListener('click', sendMessage);
+      el.chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+      });
+    }
+
+    // UI NAVIGATION
+    function showAuth() {
+      el.authSection.classList.remove('hidden');
+      el.dashboardSection.classList.add('hidden');
+      el.roomSection.classList.add('hidden');
+      el.btnLogout.classList.add('hidden');
+    }
+
+    function showDashboard() {
+      el.authSection.classList.add('hidden');
+      el.dashboardSection.classList.remove('hidden');
+      el.roomSection.classList.add('hidden');
+      el.btnLogout.classList.remove('hidden');
+      renderHistory();
+    }
+
+    function showRoom(roomId) {
+      STATE.currentRoomId = roomId;
+      el.authSection.classList.add('hidden');
+      el.dashboardSection.classList.add('hidden');
+      el.roomSection.classList.remove('hidden');
+    }
+
+    // ROOM MANAGEMENT
+    function createNewRoom() {
+      const roomId = 'room_' + Math.random().toString(36).substring(2, 9);
+      saveRoomToHistory(roomId);
+      showRoom(roomId);
+    }
+
+    function saveRoomToHistory(roomId) {
+      let history = JSON.parse(localStorage.getItem('my_midiastream_history') || '[]');
+      if (!history.includes(roomId)) {
+        history.push(roomId);
+        localStorage.setItem('my_midiastream_history', JSON.stringify(history));
+      }
+    }
+
+    function renderHistory() {
+      let history = JSON.parse(localStorage.getItem('my_midiastream_history') || '[]');
+      if (history.length === 0) {
+        el.roomHistoryList.innerHTML = '<p style="color: var(--text-muted);">Nenhuma sala criada até o momento.</p>';
+        return;
+      }
+
+      el.roomHistoryList.innerHTML = history.map(id => `
+        <div style="background: rgba(255,255,255,0.03); padding: 0.8rem 1rem; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+          <span>Sala Privada #${id}</span>
+          <button class="btn" onclick="showRoom('${id}')">Entrar</button>
+        </div>
+      `).join('');
+    }
+
+    // SCREEN STREAMING (WEBRTC MEDIA API)
+    async function startScreenCapture() {
+      try {
+        STATE.localStream = await navigator.mediaDevices.getDisplayMedia({
+          video: { cursor: "always" },
+          audio: true
+        });
+
+        el.remoteVideo.srcObject = STATE.localStream;
+        el.streamPlaceholder.classList.add('hidden');
+      } catch (err) {
+        console.error("Erro ao capturar tela:", err);
+        alert("Não foi possível iniciar o compartilhamento de tela.");
+      }
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        el.streamViewport.requestFullscreen().catch(err => {
+          alert(`Erro ao ativar tela cheia: ${err.message}`);
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    // CHAT & GEMINI AI SIMULATOR
+    function sendMessage() {
+      const text = el.chatInput.value.trim();
+      if (!text) return;
+
+      appendChatMessage(STATE.user ? STATE.user.username : 'Usuário', text, false);
+      el.chatInput.value = '';
+
+      // Check for /ia command
+      if (text.startsWith('/ia ')) {
+        const query = text.replace('/ia ', '');
+        triggerAiResponse(query);
+      }
+    }
+
+    function appendChatMessage(sender, text, isAi = false) {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `chat-msg ${isAi ? 'ai-msg' : ''}`;
+      msgDiv.innerHTML = `
+        <span class="sender">${sender}</span>
+        <div>${text}</div>
+      `;
+      el.chatMessages.appendChild(msgDiv);
+      el.chatMessages.scrollTop = el.chatMessages.scrollHeight;
+    }
+
+    function triggerAiResponse(query) {
+      appendChatMessage('M.Y. AI Bot', 'Pensando...', true);
+
+      setTimeout(() => {
+        // Remove the temporary "Pensando..." message
+        const lastMsg = el.chatMessages.lastElementChild;
+        if (lastMsg && lastMsg.innerText.includes('Pensando...')) {
+          lastMsg.remove();
+        }
+
+        const responses = [
+          `Analisando "${query}": Para otimizar a sua transmissão, verifique se o áudio do sistema está habilitado na janela do navegador.`,
+          `Em resposta a "${query}": A integração WebRTC está ativa e pronta para streaming de alta taxa de quadros.`,
+          `Com base em "${query}": Você pode expandir o vídeo para Tela Cheia no botão inferior para uma experiência de cinema!`
+        ];
+
+        const randomReply = responses[Math.floor(Math.random() * responses.length)];
+        appendChatMessage('M.Y. AI Bot', randomReply, true);
+      }, 1200);
+    }
+  </script>
+</body>
+</html>
