@@ -19,6 +19,20 @@
       100% { transform: translateY(-350px) scale(1.4); opacity: 0; }
     }
     .floating-emoji { animation: floatUp 2.5s ease-out forwards; pointer-events: none; position: absolute; bottom: 20px; z-index: 50; }
+
+    /* Forçar o vídeo a ocupar a tela inteira quando em Fullscreen */
+    :fullscreen video, :-webkit-full-screen video {
+      width: 100vw !important;
+      height: 100vh !important;
+      max-height: 100vh !important;
+      object-fit: contain !important;
+    }
+    :fullscreen, :-webkit-full-screen {
+      background-color: black !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
   </style>
 </head>
 <body class="bg-dark-custom text-gray-200 min-h-screen flex flex-col font-sans relative overflow-x-hidden">
@@ -135,7 +149,7 @@
           <!-- O seu Ecrã -->
           <div id="localVideoContainer" class="relative bg-black rounded-lg overflow-hidden flex flex-col items-center justify-center min-h-[220px] border border-custom">
             <span id="localStreamLabel" class="absolute top-2 left-2 bg-black/70 text-indigo-300 text-[11px] px-2.5 py-0.5 rounded backdrop-blur z-10 font-semibold">O seu Ecrã (Você)</span>
-            <button onclick="toggleVideoFullscreen('localVideoContainer')" class="absolute top-2 right-2 bg-black/70 hover:bg-black text-white text-xs px-2 py-1 rounded backdrop-blur z-10" title="Tela Cheia">
+            <button onclick="toggleVideoFullscreen('localVideo')" class="absolute top-2 right-2 bg-black/70 hover:bg-black text-white text-xs px-2 py-1 rounded backdrop-blur z-10" title="Tela Cheia">
               <i class="fa-solid fa-expand"></i>
             </button>
             <video id="localVideo" autoplay playsinline muted class="w-full max-h-[350px] object-contain hidden"></video>
@@ -148,7 +162,7 @@
           <!-- Ecrã do Participante -->
           <div id="remoteVideoContainer" class="relative bg-black rounded-lg overflow-hidden flex flex-col items-center justify-center min-h-[220px] border border-custom">
             <span id="remoteStreamLabel" class="absolute top-2 left-2 bg-black/70 text-emerald-300 text-[11px] px-2.5 py-0.5 rounded backdrop-blur z-10 font-semibold">Participante (Aguardando...)</span>
-            <button onclick="toggleVideoFullscreen('remoteVideoContainer')" class="absolute top-2 right-2 bg-black/70 hover:bg-black text-white text-xs px-2 py-1 rounded backdrop-blur z-10" title="Tela Cheia">
+            <button onclick="toggleVideoFullscreen('remoteVideo')" class="absolute top-2 right-2 bg-black/70 hover:bg-black text-white text-xs px-2 py-1 rounded backdrop-blur z-10" title="Tela Cheia">
               <i class="fa-solid fa-expand"></i>
             </button>
             <video id="remoteVideo" autoplay playsinline class="w-full max-h-[350px] object-contain hidden"></video>
@@ -333,7 +347,7 @@
     </div>
   </div>
 
-  <!-- Script Principal da Aplicação com Base de Dados Local Ajustada -->
+  <!-- Script Principal da Aplicação com Correção do Fullscreen -->
   <script>
     let currentUser = null;
     let isPro = false;
@@ -391,7 +405,6 @@
       loginUserSession(newUser);
     }
 
-    // Login com criação automática se a conta não existir
     function handleLogin() {
       const email = document.getElementById('loginEmail').value.trim().toLowerCase();
       const password = document.getElementById('loginPassword').value.trim();
@@ -404,7 +417,6 @@
       let user = users.find(u => u.email === email && u.password === password);
 
       if (!user) {
-        // Se a conta não existir, criamos automaticamente para nunca bloquear o utilizador
         const defaultName = email.split('@')[0];
         user = { nickname: defaultName.charAt(0).toUpperCase() + defaultName.slice(1), email, password, isPro: false };
         users.push(user);
@@ -517,13 +529,14 @@
       });
     }
 
-    function toggleVideoFullscreen(containerId) {
-      const container = document.getElementById(containerId);
+    // Função de Fullscreen Direto no Vídeo (Ecrã Cheia Real)
+    function toggleVideoFullscreen(videoId) {
+      const videoElem = document.getElementById(videoId);
       if (!document.fullscreenElement) {
-        if (container.requestFullscreen) {
-          container.requestFullscreen();
-        } else if (container.webkitRequestFullscreen) {
-          container.webkitRequestFullscreen();
+        if (videoElem.requestFullscreen) {
+          videoElem.requestFullscreen();
+        } else if (videoElem.webkitRequestFullscreen) {
+          videoElem.webkitRequestFullscreen();
         }
       } else {
         if (document.exitFullscreen) {
